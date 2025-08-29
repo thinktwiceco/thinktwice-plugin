@@ -1,0 +1,156 @@
+---
+description: Code generation scope rule for the Maurice3 project
+alwaysApply: true
+globs: *.py
+---
+
+# Python Code Generation Scope Rule
+
+You are working on the Maurice3 project. **STRICTLY ENFORCE** this code generation scope rule for all Python files:
+
+## CRITICAL CODE SCOPE RULES (NON-NEGOTIABLE)
+
+### 1. Minimal Implementation Only
+- **ONLY** implement exactly what is requested
+- **NEVER** add extra features, methods, or functionality without explicit request
+- **NEVER** add "helpful" additions that weren't asked for
+- **NEVER** implement complete solutions when partial implementation is requested
+
+### 2. Permission Required for Additions
+- **ALWAYS** ask permission before adding anything beyond the core request
+- **DISCUSS** whether additional code is appropriate before implementing
+- **NEVER** add code without user consent, even if it seems logical or helpful
+- **STOP** and ask if unsure about scope boundaries
+
+### 3. Scope Boundaries
+- **FOCUS** only on the specific function, method, or class mentioned
+- **DO NOT** implement related functionality unless specifically requested  
+- **DO NOT** add imports, dependencies, or utilities unless essential for the core request
+- **DO NOT** add error handling, logging, or validation unless asked
+
+### 4. Examples of What NOT to Add
+
+❌ **NEVER add without permission:**
+- Additional methods to a class when only one method was requested
+- Extra validation or error handling beyond the basic requirement
+- Logging, monitoring, or debugging code
+- Helper functions or utilities not directly needed
+- Documentation beyond basic docstrings for the requested code
+- Test files or test cases
+- Configuration or setup code
+- Import statements beyond what's strictly necessary
+
+✅ **ONLY implement:**
+- The exact function, method, or class requested
+- Basic docstring for the requested code
+- Essential imports required for the specific functionality
+- Minimal error handling if the code would break without it
+
+### 5. When in Doubt
+- **ASK**: "Should I also add [specific functionality]?"
+- **DISCUSS**: "Would it be appropriate to include [specific feature]?"
+- **CONFIRM**: "Do you want me to implement just [core request] or also [additional item]?"
+
+## EXAMPLES
+
+### ❌ BAD - Adding Too Much
+```
+User: "Add a create_user function"
+Assistant: Creates create_user + update_user + delete_user + user validation + error handling + logging
+```
+
+### ✅ GOOD - Exact Scope
+```
+User: "Add a create_user function"  
+Assistant: Creates only create_user function with basic implementation and docstring
+```
+
+### ✅ GOOD - Asking Permission
+```
+User: "Add a create_user function"
+Assistant: "I'll implement the create_user function. Should I also add basic input validation, or just the core creation logic?"
+```
+
+## ENFORCEMENT
+
+- **EVERY** code generation task must follow this rule
+- **QUESTION** the scope before implementing if unclear
+- **PREFER** under-implementation over over-implementation
+- **REMEMBER**: The user can always ask for more, but removing unwanted code is wasteful
+
+This rule applies to **ALL** Python files in the Maurice3 project without exception.
+# Python Code Generation Scope Rule
+
+You are working on the Maurice3 project. **STRICTLY ENFORCE** this code generation scope rule for all Python files:
+
+## CRITICAL CODE SCOPE RULES (NON-NEGOTIABLE)
+
+### 1. Minimal Implementation Only
+- **ONLY** implement exactly what is requested
+- **NEVER** add extra features, methods, or functionality without explicit request
+- **NEVER** add "helpful" additions that weren't asked for
+- **NEVER** implement complete solutions when partial implementation is requested
+
+### 2. Permission Required for Additions
+- **ALWAYS** ask permission before adding anything beyond the core request
+- **DISCUSS** whether additional code is appropriate before implementing
+- **NEVER** add code without user consent, even if it seems logical or helpful
+- **STOP** and ask if unsure about scope boundaries
+
+### 3. Scope Boundaries
+- **FOCUS** only on the specific function, method, or class mentioned
+- **DO NOT** implement related functionality unless specifically requested  
+- **DO NOT** add imports, dependencies, or utilities unless essential for the core request
+- **DO NOT** add error handling, logging, or validation unless asked
+
+### 4. Examples of What NOT to Add
+
+❌ **NEVER add without permission:**
+- Additional methods to a class when only one method was requested
+- Extra validation or error handling beyond the basic requirement
+- Logging, monitoring, or debugging code
+- Helper functions or utilities not directly needed
+- Documentation beyond basic docstrings for the requested code
+- Test files or test cases
+- Configuration or setup code
+- Import statements beyond what's strictly necessary
+
+✅ **ONLY implement:**
+- The exact function, method, or class requested
+- Basic docstring for the requested code
+- Essential imports required for the specific functionality
+- Minimal error handling if the code would break without it
+
+### 5. When in Doubt
+- **ASK**: "Should I also add [specific functionality]?"
+- **DISCUSS**: "Would it be appropriate to include [specific feature]?"
+- **CONFIRM**: "Do you want me to implement just [core request] or also [additional item]?"
+
+## EXAMPLES
+
+### ❌ BAD - Adding Too Much
+```
+User: "Add a create_user function"
+Assistant: Creates create_user + update_user + delete_user + user validation + error handling + logging
+```
+
+### ✅ GOOD - Exact Scope
+```
+User: "Add a create_user function"  
+Assistant: Creates only create_user function with basic implementation and docstring
+```
+
+### ✅ GOOD - Asking Permission
+```
+User: "Add a create_user function"
+Assistant: "I'll implement the create_user function. Should I also add basic input validation, or just the core creation logic?"
+```
+
+## ENFORCEMENT
+
+- **EVERY** code generation task must follow this rule
+- **QUESTION** the scope before implementing if unclear
+- **PREFER** under-implementation over over-implementation
+- **REMEMBER**: The user can always ask for more, but removing unwanted code is wasteful
+
+This rule applies to **ALL** Python files in the Maurice3 project without exception.

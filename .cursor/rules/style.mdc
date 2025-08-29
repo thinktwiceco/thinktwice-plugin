@@ -1,0 +1,75 @@
+---
+alwaysApply: false
+---
+
+# Style Guidelines
+
+## CRITICAL STYLE RULES (NON-NEGOTIABLE)
+
+### 1. Always Ask About Style
+- **EXPLICITLY ASK** when discussing or implementing styling
+- **DISCUSS** styling approach before making changes
+- **CONFIRM** style requirements with the user
+
+### 2. Check Global Configuration First
+- **ALWAYS** check `maurice-plugin/style.css` for existing global styles
+- **REUSE** existing CSS variables and configurations when possible
+- **AVOID** duplicating styles that already exist globally
+
+### 3. Component-Specific Styling
+- **CREATE** component-specific style inside the component file as code.
+
+### 4. Style Organization
+- **GLOBAL STYLES**: Use `maurice-plugin/style.css` for:
+  - CSS variables (custom properties)
+  - Base styles (body, root, etc.)
+  - Common utility classes
+  - Theme configurations
+
+- **COMPONENT STYLES**: Use `<ComponentName>.css` for:
+  - Component-specific styling
+  - Layout and positioning
+  - Component-specific animations
+  - Component state styles
+
+### 5. Examples
+
+#### ✅ GOOD - Using Global Variables
+```css
+/* In ComponentName.css */
+.my-button {
+  background-color: var(--primary-button-color);
+  color: var(--text-color-light);
+}
+```
+
+#### ❌ BAD - Duplicating Global Styles
+```css
+/* In ComponentName.css */
+.my-button {
+  background-color: #69C9D0; /* Should use var(--primary-button-color) */
+  color: #FFFFFF; /* Should use var(--text-color-light) */
+}
+```
+
+### 6. When in Doubt
+- **ASK**: "What styling approach should I use for this component?"
+- **CHECK**: "Let me check the global style.css first"
+- **DISCUSS**: "Should this be a global style or component-specific?"
+
+## ENFORCEMENT
+
+- **EVERY** styling task must follow these rules
+- **ALWAYS** check global styles before creating new ones
+- **NEVER** duplicate existing global configurations
+- **ALWAYS** ask about styling approach before implementing
+
+
+
+
+
+
+
+
+
+
