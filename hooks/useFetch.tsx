@@ -57,21 +57,18 @@ export function useFetch<T = any>() {
           throw new Error(`Unsupported HTTP method: ${method}`)
       }
 
+      const resultData = dataValidation ? dataValidation.parse(response.data) : response.data
+
       setState({
         loading: false,
         success: response.success,
-        data: response.data,
+        data: resultData,
         errorMessage: response.error_message || null
       })
 
       console.log("--- RESPONSE DATA --> ", response)
 
-      if (dataValidation) {
-        const parsedData = dataValidation.parse(response.data)
-        return parsedData as T
-      }
-
-      return response.data as T
+      return resultData as T
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred'
 

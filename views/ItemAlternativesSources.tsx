@@ -1,14 +1,13 @@
-import Card from "../components/ui/Card"
-import Button from "../components/ui/Button"
-import Header from "../components/ui/Header"
 import WithAPIResponse from "~components/ui/WithAPIResponse"
 import Skeleton from "../components/ui/Skeleton"
+import RefurbishedIcon from "../components/ui/RefurbishedIcon"
+import RentBorrowIcon from "../components/ui/RentBorrowIcon"
+import DIYIcon from "../components/ui/DIYIcon"
 import { type Item } from "./ProductView"
 import { type AlternativeType } from "./ProductAlternatives"
-import { spacing, commonSpacing, textSize } from "../design-system"
+import { spacing, textSize } from "../design-system"
 import { useFetch } from "~hooks/useFetch"
 import { useEffect } from "react"
-import thoughtfulIcon from "url:../assets/icons/Icons/Thoughtful.svg"
 
 import * as z from "zod"
 
@@ -17,7 +16,7 @@ const zAlternative = z.object({
   source_logo: z.string().nullable().optional(),
   source: z.string().nullable().optional().default("Unknown"),
   description: z.string(),
-  estimate_savings: z.string().optional(),
+  estimate_savings: z.coerce.string().optional().default("0"),
   url: z.string(),
 })
 
@@ -32,15 +31,35 @@ type AlternativeItemProps = {
   product: Alternative
   titleLength?: number
   descriptionLength?: number
+  alternativeTypeName?: string
 }
 
-const AlternativeItem = ({ product, titleLength = 10, descriptionLength = 10 }: AlternativeItemProps) => {
+const AlternativeItem = ({ product, titleLength = 10, descriptionLength = 10, alternativeTypeName }: AlternativeItemProps) => {
   const truncateText = (text: string, maxLength: number) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text
   }
 
   const getSourceInitial = (source: string) => {
-    return source.charAt(0).toUpperCase()
+    let _source = source || "Unknown"
+    return _source.charAt(0).toUpperCase()
+  }
+
+  const getAlternativeIcon = (typeName?: string) => {
+    if (!typeName) {
+      return <div style={fallbackImageStyle}>{getSourceInitial(product.source)}</div>
+    }
+
+    const lowerTypeName = typeName.toLowerCase()
+    
+    if (lowerTypeName.includes('refurbished') || lowerTypeName.includes('used') || lowerTypeName.includes('second-hand')) {
+      return <RefurbishedIcon size={60} />
+    } else if (lowerTypeName.includes('rent') || lowerTypeName.includes('borrow') || lowerTypeName.includes('lease')) {
+      return <RentBorrowIcon size={60} />
+    } else if (lowerTypeName.includes('diy') || lowerTypeName.includes('make') || lowerTypeName.includes('build')) {
+      return <DIYIcon size={60} />
+    } else {
+      return <div style={fallbackImageStyle}>{getSourceInitial(product.source)}</div>
+    }
   }
 
   const productItemStyle: React.CSSProperties = {
@@ -52,6 +71,7 @@ const AlternativeItem = ({ product, titleLength = 10, descriptionLength = 10 }: 
     gap: spacing.md,
     cursor: "pointer",
     transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    position: "relative",
   }
 
   const productImageStyle: React.CSSProperties = {
@@ -89,10 +109,22 @@ const AlternativeItem = ({ product, titleLength = 10, descriptionLength = 10 }: 
     margin: 0,
   }
 
-  const productPriceStyle: React.CSSProperties = {
+  const productDescriptionStyle: React.CSSProperties = {
     fontSize: textSize.xs,
     color: "var(--text-color-dark)",
     margin: 0,
+    opacity: 0,
+    transition: "opacity 0.2s ease",
+    position: "absolute",
+    top: "100%",
+    left: spacing.md,
+    right: spacing.md,
+    backgroundColor: "white",
+    padding: spacing.sm,
+    borderRadius: "4px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+    zIndex: 10,
+    pointerEvents: "none",
   }
 
   const discountBadgeStyle: React.CSSProperties = {
@@ -118,20 +150,29 @@ const AlternativeItem = ({ product, titleLength = 10, descriptionLength = 10 }: 
         console.log(`Selected: ${product.title}`)
         window.open(product.url, '_blank')
       }}
+      onMouseEnter={(e) => {
+        const descriptionElement = e.currentTarget.querySelector('[data-description]') as HTMLElement
+        if (descriptionElement) {
+          descriptionElement.style.opacity = "1"
+          descriptionElement.style.pointerEvents = "auto"
+        }
+      }}
+      onMouseLeave={(e) => {
+        const descriptionElement = e.currentTarget.querySelector('[data-description]') as HTMLElement
+        if (descriptionElement) {
+          descriptionElement.style.opacity = "0"
+          descriptionElement.style.pointerEvents = "none"
+        }
+      }}
     >
       {product.source_logo ? (
         <img 
           src={product.source_logo} 
           alt={product.title} 
           style={productImageStyle} 
-          // onError={(e) => {
-          //   e.currentTarget.src = thoughtfulIcon
-          // }}
         />
       ) : (
-        <div style={fallbackImageStyle}>
-          {getSourceInitial(product.source)}
-        </div>
+        getAlternativeIcon(alternativeTypeName)
       )}
       <div style={productInfoStyle}>
         <p 
@@ -141,8 +182,9 @@ const AlternativeItem = ({ product, titleLength = 10, descriptionLength = 10 }: 
           {truncatedTitle}
         </p>
         <p 
-          style={productPriceStyle}
+          style={productDescriptionStyle}
           title={showDescriptionTooltip ? product.description : undefined}
+          data-description
         >
           {truncatedDescription}
         </p>
@@ -157,26 +199,8 @@ const AlternativeItem = ({ product, titleLength = 10, descriptionLength = 10 }: 
 type ItemAlternativesSourcesProps = {
   item: Item
   selectedAlternative: AlternativeType
-  onBack: () => void
-  onClose?: () => void
   titleLength?: number
   descriptionLength?: number
-}
-
-const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
-  fontWeight: "bold",
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.sm} 0`,
-}
-
-const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.md,
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${commonSpacing.sectionMargin} 0`,
-  opacity: "0.9",
 }
 
 const containerStyle: React.CSSProperties = {
@@ -217,79 +241,47 @@ const productListStyle: React.CSSProperties = {
   gap: spacing.sm,
 }
 
-const alternativeButtonStyle: React.CSSProperties = {
-  backgroundColor: "#FFE8D1",
-  borderRadius: "12px",
-  padding: spacing.lg,
-  display: "flex",
-  flexDirection: "column",
-  gap: spacing.sm,
-  cursor: "pointer",
-  transition: "transform 0.2s ease, box-shadow 0.2s ease",
-}
-
-const scrollbarStyle: React.CSSProperties = {
-  scrollbarWidth: "thin",
-  scrollbarColor: "#68c3d4 transparent",
-}
-
-const ItemAlternativesSources = ({ item, selectedAlternative, onBack, onClose, titleLength, descriptionLength }: ItemAlternativesSourcesProps) => {
+const ItemAlternativesSources = ({ item, selectedAlternative, titleLength, descriptionLength }: ItemAlternativesSourcesProps) => {
   const { fetchData, loading, success, data, errorMessage } = useFetch<DataResponse>()
 
   useEffect(() => {
-    fetchData(`/items/${item.id}/alternatives/${selectedAlternative.id}`, {
-      method: "GET",
-      dataValidation: zDataResponse
-    }).catch((error) => {
-      console.error("--- ERROR --> ", error)
-    })
+          fetchData(`/items/${item.id}/alternatives/${selectedAlternative.id}`, {
+        method: "GET",
+        dataValidation: zDataResponse
+      }).catch((error) => {
+        console.error("--- ERROR --> ", error)
+      })
   }, [item.id, selectedAlternative.id])
 
   const alternatives = data?.alternatives || []
 
   return (
-    <Card>
-      <Header
-        onBack={onBack}
-        onClose={onClose}
-        centerIcon={<img src={thoughtfulIcon} alt="sustainability" style={{ width: "35px", height: "35px" }} />}
-      />
-      <br />
-      <h1 style={titleStyle}>Congrats on making a thoughtful choice!</h1>
-      <p style={subtitleStyle}>These options are better for the planet and your wallet.</p>
-      
-      <div style={{ ...containerStyle, ...scrollbarStyle }}>
-        <WithAPIResponse
-          loading={loading}
-          errorMessage={errorMessage}
-          success={success}
-          onLoadingComponent={<Skeleton count={3} />}
-        >
-          {alternatives.length > 0 && (
-            <div style={sectionStyle}>
-              <h3 style={sectionTitleStyle}>{selectedAlternative.name}</h3>
-              <p style={sectionSubtitleStyle}>{selectedAlternative.description}</p>
-              <div style={productListStyle}>
-                {alternatives.map((product) => (
-                  <AlternativeItem
-                    key={product.title}
-                    product={product}
-                    titleLength={titleLength}
-                    descriptionLength={descriptionLength}
-                  />
-                ))}
-              </div>
+    <div style={containerStyle}>
+      <WithAPIResponse
+        loading={loading}
+        errorMessage={errorMessage}
+        success={success}
+        onLoadingComponent={<Skeleton count={3} />}
+      >
+        {alternatives.length > 0 && (
+          <div style={sectionStyle}>
+            <h3 style={sectionTitleStyle}>{selectedAlternative.name}</h3>
+            <p style={sectionSubtitleStyle}>{selectedAlternative.description}</p>
+            <div style={productListStyle}>
+              {alternatives.map((product) => (
+                <AlternativeItem
+                  key={product.title}
+                  product={product}
+                  titleLength={titleLength}
+                  descriptionLength={descriptionLength}
+                  alternativeTypeName={selectedAlternative.name}
+                />
+              ))}
             </div>
-          )}
-        </WithAPIResponse>
-
-        {/* Rent or Borrow Section */}
-        <div style={alternativeButtonStyle} className="hover-highlight">
-          <h3 style={sectionTitleStyle}>Rent or Borrow</h3>
-          <p style={sectionSubtitleStyle}>Use it when you need it</p>
-        </div>
-      </div>
-    </Card>
+          </div>
+        )}
+      </WithAPIResponse>
+    </div>
   )
 }
 

@@ -31,9 +31,9 @@ export const getOverlayAnchor: PlasmoGetOverlayAnchor = () => {
 }
 
 const App = () => {
-  const [currentView, setCurrentView] = useState<'product' | 'alternatives' | 'itemAlternativesSources' | 'idontneedit' | 'sleeponit' | 'ineedit'>('product')
+  const [currentView, setCurrentView] = useState<'product' | 'alternatives' | 'idontneedit' | 'sleeponit' | 'ineedit'>('product')
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
-  const [selectedAlternative, setSelectedAlternative] = useState<AlternativeType | null>(null)
+  const [expandedAlternativeId, setExpandedAlternativeId] = useState<number | null>(null)
 
   useEffect(() => {
     const tracker = new Fingerprints()
@@ -49,22 +49,17 @@ const App = () => {
   const handleShowAlternatives = (item: Item) => {
     setSelectedItem(item)
     setCurrentView('alternatives')
+    setExpandedAlternativeId(null)
   }
 
-  const handleSelectAlternativeSource = (alternative: AlternativeType) => {
-    setSelectedAlternative(alternative)
-    setCurrentView('itemAlternativesSources')
+  const handleSelectAlternativeSource = (alternativeId: number) => {
+    setExpandedAlternativeId(expandedAlternativeId === alternativeId ? null : alternativeId)
   }
 
   const handleBackToProduct = () => {
     setCurrentView('product')
     setSelectedItem(null)
-    setSelectedAlternative(null)
-  }
-
-  const handleBackToAlternatives = () => {
-    setCurrentView('alternatives')
-    setSelectedAlternative(null)
+    setExpandedAlternativeId(null)
   }
 
   const handleShowIDontNeedIt = () => {
@@ -104,17 +99,7 @@ const App = () => {
             onBack={handleBackToProduct}
             onClose={handleBackToProduct}
             onSelectAlternative={handleSelectAlternativeSource}
-          />
-        )
-      }
-
-      if (currentView === 'itemAlternativesSources' && selectedItem && selectedAlternative) {
-        return (
-          <ItemAlternativesSources 
-            item={selectedItem}
-            selectedAlternative={selectedAlternative}
-            onBack={handleBackToAlternatives}
-            onClose={handleBackToProduct}
+            expandedAlternativeId={expandedAlternativeId}
           />
         )
       }

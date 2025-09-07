@@ -3,6 +3,7 @@ import Button from "../components/ui/Button"
 import Header from "../components/ui/Header"
 import WithAPIResponse from "~components/ui/WithAPIResponse"
 import Skeleton from "../components/ui/Skeleton"
+import ItemAlternativesSources from "./ItemAlternativesSources"
 
 import thoughtfulIcon from "url:../assets/icons/Icons/Thoughtful.svg"
 import { type Item } from "./ProductView"
@@ -15,6 +16,8 @@ const zAlternativeType = z.object({
   id: z.number(),
   name: z.string(),
   description: z.string(),
+  search: z.string(),
+  do_not_search: z.string(),
 })
 
 const zDataResponse = z.object({
@@ -28,7 +31,8 @@ type ProductAlternativesProps = {
   item: Item
   onBack: () => void
   onClose?: () => void
-  onSelectAlternative: (alternative: AlternativeType) => void
+  onSelectAlternative: (alternativeId: number) => void
+  expandedAlternativeId: number | null
 }
 
 
@@ -60,7 +64,7 @@ const investButtonStyle: React.CSSProperties = {
   marginTop: spacing.lg,
 }
 
-const ProductAlternatives = ({ item, onBack, onClose, onSelectAlternative }: ProductAlternativesProps) => {
+const ProductAlternatives = ({ item, onBack, onClose, onSelectAlternative, expandedAlternativeId }: ProductAlternativesProps) => {
   const { fetchData, loading, success, data, errorMessage } = useFetch<DataResponse>()
 
   useEffect(() => {
@@ -76,7 +80,6 @@ const ProductAlternatives = ({ item, onBack, onClose, onSelectAlternative }: Pro
   
   // Define variants for alternative buttons
   const buttonVariants = ["primary", "secondary", "tertiary"]
-
 
   const getButtonContent = (name: string, description: string) => {
     return (
@@ -103,6 +106,8 @@ const ProductAlternatives = ({ item, onBack, onClose, onSelectAlternative }: Pro
     }
   }
 
+  const expandedAlternative = alternatives.find(alt => alt.id === expandedAlternativeId)
+
   return (
     <Card>
       <Header
@@ -123,16 +128,27 @@ const ProductAlternatives = ({ item, onBack, onClose, onSelectAlternative }: Pro
           onLoadingComponent={<Skeleton count={2} />}
         >
           {alternatives.map((alternative, index) => (
-            <div key={alternative.id} style={{ marginBottom: spacing.sm }}>
-              <Button
-                variant={buttonVariants[index % buttonVariants.length]}
-                icon={null}
-                onClick={() => {
-                  onSelectAlternative(alternative)
-                }}
-              >
-                {getButtonContent(alternative.name, alternative.description)}
-              </Button>
+            <div key={alternative.id}>
+              <div style={{ marginBottom: spacing.sm }}>
+                <Button
+                  variant={buttonVariants[index % buttonVariants.length]}
+                  icon={null}
+                  onClick={() => {
+                    onSelectAlternative(alternative.id)
+                  }}
+                >
+                  {getButtonContent(alternative.name, alternative.description)}
+                </Button>
+              </div>
+              
+              {expandedAlternativeId === alternative.id && expandedAlternative && (
+                <div style={{ marginBottom: spacing.lg }}>
+                  <ItemAlternativesSources 
+                    item={item}
+                    selectedAlternative={expandedAlternative}
+                  />
+                </div>
+              )}
             </div>
           ))}
         </WithAPIResponse>
