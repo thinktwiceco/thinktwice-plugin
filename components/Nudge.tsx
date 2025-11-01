@@ -1,36 +1,36 @@
-import WithAPIResponse from "~components/ui/WithAPIResponse"
-import { useFetch } from "~hooks/useFetch"
-import { useEffect } from "react"
-import * as z from "zod"
-import { spacing, commonSpacing, textSize } from "../design-system"
+import { useState, useEffect } from "react"
+import { spacing } from "../design-system"
 
-const zNudge = z.object({
-    nudge: z.object({
-        nudge: z.string(),
-        theme: z.string(),
-        type: z.string()
-    })
-})
-
-type Nudge = z.infer<typeof zNudge>
-
-
+const MOCK_NUDGES = [
+  {
+    nudge: "Every purchase is a vote for the kind of world you want to live in.",
+    theme: "environmental",
+    type: "reflection"
+  },
+  {
+    nudge: "Waiting 24 hours before buying can save you from impulse purchases you'll regret.",
+    theme: "financial",
+    type: "advice"
+  },
+  {
+    nudge: "The best purchase is often the one you don't make.",
+    theme: "mindfulness",
+    type: "wisdom"
+  }
+]
 
 const Nudge = () => {
+  const [selectedNudge, setSelectedNudge] = useState("")
 
-
-  const { fetchData, loading, success, data, errorMessage } = useFetch<Nudge>()
-
-    useEffect(() => {
-        fetchData("/nudges/random", { dataValidation: zNudge })
-    }, [])
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * MOCK_NUDGES.length)
+    setSelectedNudge(MOCK_NUDGES[randomIndex].nudge)
+  }, [])
 
   return (
-    <WithAPIResponse loading={loading} errorMessage={errorMessage} success={success}>
-        <div className="info-container" style={{ textAlign: "center", marginBottom: spacing.sm }}>
-        <p className="info-container-text" style={{ fontWeight: "500" }}>{data?.nudge.nudge}</p>
-        </div>
-    </WithAPIResponse>
+    <div className="info-container" style={{ textAlign: "center", marginBottom: spacing.sm }}>
+      <p className="info-container-text" style={{ fontWeight: "500" }}>{selectedNudge}</p>
+    </div>
   )
 }
 

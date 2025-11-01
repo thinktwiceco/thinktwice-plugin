@@ -1,16 +1,10 @@
-import type { PlasmoCSConfig, PlasmoGetOverlayAnchor, PlasmoGetRootContainer, PlasmoGetStyle } from "plasmo"
+import type { PlasmoCSConfig, PlasmoGetOverlayAnchor, PlasmoGetStyle } from "plasmo"
 import ProductView from "~/views/ProductView"
-import ProductAlternatives from "~/views/ProductAlternatives"
-import ItemAlternativesSources from "~/views/ItemAlternativesSources"
 import IDontNeedIt from "~/views/IDontNeedIt"
 import SleepOnIt from "~/views/SleepOnIt"
 import INeedIt from "~/views/INeedIt"
 import styleText from "data-text:~style.css"
-import { Fingerprints } from "~scripts/fingerprints"
-import { useEffect, useState } from "react"
-import { v4 as uuidv4 } from 'uuid';
-import type { Item } from "~/views/ProductView"
-import type { AlternativeType } from "~/views/ProductAlternatives"
+import { useState } from "react"
 
 export const config: PlasmoCSConfig = {
   matches: ["*://*.amazon.com/*"],
@@ -31,48 +25,21 @@ export const getOverlayAnchor: PlasmoGetOverlayAnchor = () => {
 }
 
 const App = () => {
-  const [currentView, setCurrentView] = useState<'product' | 'alternatives' | 'idontneedit' | 'sleeponit' | 'ineedit'>('product')
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
-  const [expandedAlternativeId, setExpandedAlternativeId] = useState<number | null>(null)
-
-  useEffect(() => {
-    const tracker = new Fingerprints()
-    tracker.saveSessionId(String(uuidv4()))
-    const fingerprintsString = tracker.getFingerprints()
-    tracker.saveFingerprints(fingerprintsString)
-
-    return () => {
-      tracker.clearSessionId()
-    }
-  }, [])
-
-  const handleShowAlternatives = (item: Item) => {
-    setSelectedItem(item)
-    setCurrentView('alternatives')
-    setExpandedAlternativeId(null)
-  }
-
-  const handleSelectAlternativeSource = (alternativeId: number) => {
-    setExpandedAlternativeId(expandedAlternativeId === alternativeId ? null : alternativeId)
-  }
+  const [currentView, setCurrentView] = useState<'product' | 'idontneedit' | 'sleeponit' | 'ineedit'>('product')
 
   const handleBackToProduct = () => {
     setCurrentView('product')
-    setSelectedItem(null)
-    setExpandedAlternativeId(null)
   }
 
   const handleShowIDontNeedIt = () => {
     setCurrentView('idontneedit')
   }
 
-  const handleShowSleepOnIt = (item: Item) => {
-    setSelectedItem(item)
+  const handleShowSleepOnIt = () => {
     setCurrentView('sleeponit')
   }
 
-  const handleShowINeedIt = (item: Item) => {
-    setSelectedItem(item)
+  const handleShowINeedIt = () => {
     setCurrentView('ineedit')
   }
 
@@ -92,18 +59,6 @@ const App = () => {
         productId = gpMatch[1]
       }
 
-      if (currentView === 'alternatives' && selectedItem) {
-        return (
-          <ProductAlternatives 
-            item={selectedItem} 
-            onBack={handleBackToProduct}
-            onClose={handleBackToProduct}
-            onSelectAlternative={handleSelectAlternativeSource}
-            expandedAlternativeId={expandedAlternativeId}
-          />
-        )
-      }
-
       if (currentView === 'idontneedit') {
         return (
           <IDontNeedIt
@@ -113,21 +68,18 @@ const App = () => {
         )
       }
 
-      if (currentView === 'sleeponit' && selectedItem) {
+      if (currentView === 'sleeponit') {
         return (
           <SleepOnIt
-            item={selectedItem}
             onBack={handleBackToProduct}
             onClose={handleBackToProduct}
-            onShowAlternatives={handleShowAlternatives}
           />
         )
       }
 
-      if (currentView === 'ineedit' && selectedItem) {
+      if (currentView === 'ineedit') {
         return (
           <INeedIt 
-            item={selectedItem}
             onBack={handleBackToProduct}
             onClose={handleBackToProduct}
           />
@@ -139,7 +91,6 @@ const App = () => {
           url={window.location.href} 
           productId={productId} 
           marketplace="amazon" 
-          onShowAlternatives={handleShowAlternatives}
           onShowIDontNeedIt={handleShowIDontNeedIt}
           onShowSleepOnIt={handleShowSleepOnIt}
           onShowINeedIt={handleShowINeedIt}

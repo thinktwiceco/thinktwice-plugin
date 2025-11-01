@@ -1,18 +1,12 @@
 import Card from "../components/ui/Card"
-import Button from "../components/ui/Button"
 import Header from "../components/ui/Header"
 
-import starIcon from "url:../assets/icons/Icons/Star.svg"
-import lightbulbIcon from "url:../assets/icons/Icons/Lightbulb.svg"
 import moonIcon from "url:../assets/icons/Icons/Moon.svg"
-import { spacing, commonSpacing, textSize } from "../design-system"
-import { type Item } from "./ProductView"
+import { spacing, textSize } from "../design-system"
 
 type SleepOnItProps = {
-  item: Item
   onBack: () => void
   onClose?: () => void
-  onShowAlternatives: (item: Item) => void
 }
 
 const titleStyle: React.CSSProperties = {
@@ -28,7 +22,7 @@ const subtitleStyle: React.CSSProperties = {
   fontSize: textSize.md,
   color: "var(--text-color-light)",
   textAlign: "center",
-  margin: `0 0 ${commonSpacing.sectionMargin} 0`,
+  margin: `0 0 ${spacing.xxl} 0`,
   opacity: "0.9",
   lineHeight: "1.4",
 }
@@ -63,7 +57,7 @@ const starDecorationStyle: React.CSSProperties = {
   zIndex: 1,
 }
 
-const SleepOnIt = ({ item, onBack, onClose, onShowAlternatives }: SleepOnItProps) => {
+const SleepOnIt = ({ onBack, onClose }: SleepOnItProps) => {
   return (
     <Card>
       <Header
@@ -73,16 +67,6 @@ const SleepOnIt = ({ item, onBack, onClose, onShowAlternatives }: SleepOnItProps
       />
       <h1 style={titleStyle}>Brilliant choice!</h1>
       <p style={subtitleStyle}>3 out of 4 people change their mind within 24 hours.</p>
-
-      <Button
-        variant="primary"
-        icon={lightbulbIcon}
-        onClick={() => {
-          onShowAlternatives(item)
-        }}
-      >
-        Explore sustainable alternatives now
-      </Button>
     </Card>
   )
 }

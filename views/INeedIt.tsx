@@ -2,11 +2,9 @@ import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 
 import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"
-import { spacing, commonSpacing, textSize } from "../design-system"
-import { type Item } from "./ProductView"
+import { spacing, textSize } from "../design-system"
 
 type INeedItProps = {
-  item: Item
   onBack: () => void
   onClose?: () => void
 }
@@ -29,7 +27,7 @@ const subtitleStyle: React.CSSProperties = {
   lineHeight: "1.4",
 }
 
-const INeedIt = ({ item, onBack, onClose }: INeedItProps) => {
+const INeedIt = ({ onBack, onClose }: INeedItProps) => {
   return (
     <Card>
       <Header
