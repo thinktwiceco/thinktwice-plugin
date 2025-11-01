@@ -1,11 +1,12 @@
+import React from "react"
+import { spacing, commonSpacing } from "../../design-system"
+
 type HeaderProps = {
   onBack?: () => void
   onClose?: () => void
   centerIcon?: string | React.ReactNode
   centerIconAlt?: string
 }
-
-import { spacing, commonSpacing } from "../../design-system"
 
 const headerStyle: React.CSSProperties = {
   display: "grid",
