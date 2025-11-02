@@ -27,7 +27,8 @@ const Button = ({
       gap: spacing.sm,
       width: "100%",
       justifyContent: "center",
-      fontWeight: "550"
+      fontWeight: "550",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"
     }
 
     switch (variant) {
@@ -35,19 +36,19 @@ const Button = ({
         return {
           ...baseStyle,
           backgroundColor: "var(--primary-button-color)",
-          color: "var(--text-color-dark)"
+          color: "#065F46"
         }
       case "secondary":
         return {
           ...baseStyle,
           backgroundColor: "var(--secondary-button-color)",
-          color: "var(--text-color-dark)"
+          color: "#223573"
         }
       case "tertiary":
         return {
           ...baseStyle,
           backgroundColor: "var(--tertiary-button-color)",
-          color: "var(--text-color-dark)"
+          color: "#7F1D1D"
         }
       case "disabled":
         return {

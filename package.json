@@ -51,7 +51,9 @@
           "assets/icons/Icons/Thoughtful.svg",
           "assets/icons/Icons/Lightbulb.svg",
           "assets/icons/Icons/Clock.svg",
-          "assets/icons/Icons/Trophy.svg"
+          "assets/icons/Icons/Trophy.svg",
+          "assets/icons/Icons/Trophy.png",
+          "assets/icons/Icons/TrophyOutline.png"
         ],
         "matches": [
           "<all_urls>"

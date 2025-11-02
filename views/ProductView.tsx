@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import clockIcon from "url:../assets/icons/Icons/Clock.svg"
 import lightbulbIcon from "url:../assets/icons/Icons/Lightbulb.svg"
 import thoughtfulIcon from "url:../assets/icons/Icons/Thoughtful.svg"
-import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"
+import trophyIcon from "url:../assets/icons/Icons/Trophy.png"
 
 import Nudge from "../components/Nudge"
 import Button from "../components/ui/Button"

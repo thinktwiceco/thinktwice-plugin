@@ -12,19 +12,19 @@ const containerStyle: React.CSSProperties = {
 const headerStyle: React.CSSProperties = {
   marginBottom: "16px",
   paddingBottom: "12px",
-  borderBottom: "2px solid #E5E7EB"
+  borderBottom: "2px solid var(--popup-border)"
 }
 
 const titleStyle: React.CSSProperties = {
   fontSize: "20px",
   fontWeight: "bold",
   margin: "0 0 4px 0",
-  color: "#1F2937"
+  color: "var(--popup-text-primary)"
 }
 
 const subtitleStyle: React.CSSProperties = {
   fontSize: "14px",
-  color: "#6B7280",
+  color: "var(--popup-text-secondary)",
   margin: 0
 }
 
@@ -38,26 +38,26 @@ const sectionHeaderStyle: React.CSSProperties = {
   alignItems: "center",
   marginBottom: "12px",
   paddingBottom: "8px",
-  borderBottom: "1px solid #E5E7EB"
+  borderBottom: "1px solid var(--popup-border)"
 }
 
 const sectionTitleStyle: React.CSSProperties = {
   fontSize: "16px",
   fontWeight: "600",
-  color: "#1F2937",
+  color: "var(--popup-text-primary)",
   margin: 0
 }
 
 const totalSavingsStyle: React.CSSProperties = {
   fontSize: "14px",
   fontWeight: "600",
-  color: "#10B981",
+  color: "var(--popup-success-color)",
   margin: 0
 }
 
 const encouragingMessageStyle: React.CSSProperties = {
   fontSize: "13px",
-  color: "#6B7280",
+  color: "var(--popup-text-secondary)",
   fontStyle: "italic",
   marginTop: "4px",
   marginBottom: "12px"
@@ -68,9 +68,9 @@ const reminderCardStyle: React.CSSProperties = {
   gap: "12px",
   padding: "12px",
   marginBottom: "12px",
-  backgroundColor: "#F9FAFB",
+  backgroundColor: "var(--popup-card-background)",
   borderRadius: "8px",
-  border: "1px solid #E5E7EB"
+  border: "1px solid var(--popup-border)"
 }
 
 const reminderImageStyle: React.CSSProperties = {
@@ -91,7 +91,7 @@ const reminderContentStyle: React.CSSProperties = {
 const reminderTitleStyle: React.CSSProperties = {
   fontSize: "14px",
   fontWeight: "600",
-  color: "#1F2937",
+  color: "var(--popup-text-primary)",
   margin: 0,
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -102,7 +102,7 @@ const reminderTitleStyle: React.CSSProperties = {
 
 const reminderTimeStyle: React.CSSProperties = {
   fontSize: "12px",
-  color: "#6B7280",
+  color: "var(--popup-text-secondary)",
   margin: 0
 }
 
@@ -124,20 +124,20 @@ const buttonStyle: React.CSSProperties = {
 
 const changedMindButtonStyle: React.CSSProperties = {
   ...buttonStyle,
-  backgroundColor: "#E5E7EB",
-  color: "#374151"
+  backgroundColor: "var(--popup-button-background)",
+  color: "var(--popup-button-text)"
 }
 
 const emptyStateStyle: React.CSSProperties = {
   textAlign: "center",
   padding: "40px 20px",
-  color: "#6B7280"
+  color: "var(--popup-text-secondary)"
 }
 
 const loadingStyle: React.CSSProperties = {
   textAlign: "center",
   padding: "40px 20px",
-  color: "#6B7280"
+  color: "var(--popup-text-secondary)"
 }
 
 function IndexPopup() {

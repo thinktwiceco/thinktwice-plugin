@@ -22,13 +22,37 @@ const MOCK_NUDGES = [
   }
 ]
 
+const CHARS_PER_SECOND = 17
+
 const Nudge = () => {
   const [selectedNudge, setSelectedNudge] = useState("")
+  const [visibleCharCount, setVisibleCharCount] = useState(0)
 
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * MOCK_NUDGES.length)
     setSelectedNudge(MOCK_NUDGES[randomIndex].nudge)
   }, [])
+
+  useEffect(() => {
+    if (!selectedNudge) return
+
+    setVisibleCharCount(0)
+
+    const intervalMs = 1000 / CHARS_PER_SECOND
+
+    const intervalId = setInterval(() => {
+      setVisibleCharCount((prev) => {
+        if (prev < selectedNudge.length) {
+          return prev + 1
+        } else {
+          clearInterval(intervalId)
+          return prev
+        }
+      })
+    }, intervalMs)
+
+    return () => clearInterval(intervalId)
+  }, [selectedNudge])
 
   return (
     <div
@@ -36,19 +60,22 @@ const Nudge = () => {
       style={{
         textAlign: "center",
         marginBottom: spacing.sm,
-        background:
-          "linear-gradient(135deg, rgba(104, 195, 212, 0.3), rgba(255, 232, 209, 0.4))",
-        border: "none"
+        border: "none",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"
       }}>
       <p
         className="info-container-text"
         style={{
           fontWeight: "600",
           fontSize: textSize.lg,
-          color: "var(--text-color-dark)",
-          fontStyle: "italic"
+          color: "var(--text-color-light)"
         }}>
-        {selectedNudge}
+        <span style={{ color: "var(--text-color-light)" }}>
+          {selectedNudge.slice(0, visibleCharCount)}
+        </span>
+        <span style={{ color: "var(--background-color)" }}>
+          {selectedNudge.slice(visibleCharCount)}
+        </span>
       </p>
     </div>
   )
