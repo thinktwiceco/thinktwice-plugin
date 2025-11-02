@@ -5,6 +5,7 @@ import SleepOnIt from "~/views/SleepOnIt"
 import INeedIt from "~/views/INeedIt"
 import styleText from "data-text:~style.css"
 import { useState } from "react"
+import type { Product } from "~/storage"
 
 export const config: PlasmoCSConfig = {
   matches: ["*://*.amazon.com/*"],
@@ -26,6 +27,7 @@ export const getOverlayAnchor: PlasmoGetOverlayAnchor = () => {
 
 const App = () => {
   const [currentView, setCurrentView] = useState<'product' | 'idontneedit' | 'sleeponit' | 'ineedit'>('product')
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
 
   const handleBackToProduct = () => {
     setCurrentView('product')
@@ -35,7 +37,8 @@ const App = () => {
     setCurrentView('idontneedit')
   }
 
-  const handleShowSleepOnIt = () => {
+  const handleShowSleepOnIt = (product: Product | null) => {
+    setCurrentProduct(product)
     setCurrentView('sleeponit')
   }
 
@@ -73,6 +76,7 @@ const App = () => {
           <SleepOnIt
             onBack={handleBackToProduct}
             onClose={handleBackToProduct}
+            product={currentProduct}
           />
         )
       }

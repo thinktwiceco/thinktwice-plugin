@@ -1,12 +1,17 @@
+import { useState } from "react"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
+import Button from "../components/ui/Button"
 
 import moonIcon from "url:../assets/icons/Icons/Moon.svg"
 import { spacing, textSize } from "../design-system"
+import { storage } from "../storage"
+import type { Product } from "../storage"
 
 type SleepOnItProps = {
   onBack: () => void
   onClose?: () => void
+  product: Product | null
 }
 
 const titleStyle: React.CSSProperties = {
@@ -27,37 +32,101 @@ const subtitleStyle: React.CSSProperties = {
   lineHeight: "1.4",
 }
 
-const iconContainerStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+const durationOptionsStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: spacing.sm,
   marginBottom: spacing.lg,
-  position: "relative",
 }
 
-const mainIconStyle: React.CSSProperties = {
-  width: "60px",
-  height: "60px",
-  backgroundColor: "#FFD700",
-  borderRadius: "50%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "24px",
-  fontWeight: "bold",
-  color: "#8B5CF6",
-  position: "relative",
-  zIndex: 2,
+const durationButtonStyle: React.CSSProperties = {
+  padding: spacing.md,
+  borderRadius: "8px",
+  border: "2px solid rgba(255, 255, 255, 0.2)",
+  backgroundColor: "transparent",
+  color: "var(--text-color-light)",
+  fontSize: textSize.sm,
+  fontWeight: "500",
+  cursor: "pointer",
+  transition: "all 0.2s ease",
 }
 
-const starDecorationStyle: React.CSSProperties = {
-  position: "absolute",
-  width: "12px",
-  height: "12px",
-  zIndex: 1,
+const durationButtonSelectedStyle: React.CSSProperties = {
+  ...durationButtonStyle,
+  border: "2px solid var(--primary-button-color)",
+  backgroundColor: "rgba(104, 195, 212, 0.2)",
 }
 
-const SleepOnIt = ({ onBack, onClose }: SleepOnItProps) => {
+const successStyle: React.CSSProperties = {
+  ...subtitleStyle,
+  color: "var(--primary-button-color)",
+  fontWeight: "600",
+}
+
+const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
+  const [selectedDuration, setSelectedDuration] = useState<number>(24 * 60 * 60 * 1000) // Default: 24 hours
+  const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  const durationOptions = [
+    { label: "1 minute", value: 1 * 60 * 1000 },
+    { label: "1 hour", value: 1 * 60 * 60 * 1000 },
+    { label: "6 hours", value: 6 * 60 * 60 * 1000 },
+    { label: "24 hours", value: 24 * 60 * 60 * 1000 },
+    { label: "3 days", value: 3 * 24 * 60 * 60 * 1000 },
+    { label: "1 week", value: 7 * 24 * 60 * 60 * 1000 },
+  ]
+
+  const handleSaveReminder = async () => {
+    if (!product) {
+      console.error('No product available')
+      return
+    }
+
+    setSaving(true)
+    try {
+      console.log('[SleepOnIt] Starting to save reminder for product:', product.id)
+      console.log('[SleepOnIt] Product:', product)
+      
+      console.log('[SleepOnIt] Saving product...')
+      await storage.saveProduct(product)
+      console.log('[SleepOnIt] Product saved successfully')
+
+      const reminder = {
+        id: crypto.randomUUID(),
+        productId: product.id,
+        reminderTime: Date.now() + selectedDuration,
+        duration: selectedDuration,
+        status: 'pending' as const
+      }
+      
+      console.log('[SleepOnIt] Saving reminder...')
+      await storage.saveReminder(reminder)
+      console.log('[SleepOnIt] Reminder saved successfully')
+
+      // Create alarm for reminder
+      console.log('[SleepOnIt] Creating alarm for reminder...')
+      chrome.runtime.sendMessage({
+        type: 'CREATE_ALARM',
+        reminderId: reminder.id,
+        when: reminder.reminderTime
+      }, (response) => {
+        if (response?.success) {
+          console.log('[SleepOnIt] Alarm created successfully')
+        } else {
+          console.error('[SleepOnIt] Failed to create alarm:', response)
+        }
+      })
+
+      setSaved(true)
+    } catch (error) {
+      console.error('[SleepOnIt] Failed to save reminder:', error)
+      alert('Failed to save reminder. Please check the console for details.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <Card>
       <Header
@@ -67,6 +136,40 @@ const SleepOnIt = ({ onBack, onClose }: SleepOnItProps) => {
       />
       <h1 style={titleStyle}>Brilliant choice!</h1>
       <p style={subtitleStyle}>3 out of 4 people change their mind within 24 hours.</p>
+
+      {!saved ? (
+        <>
+          <p style={{ ...subtitleStyle, marginBottom: spacing.md }}>
+            When should we remind you?
+          </p>
+          <div style={durationOptionsStyle}>
+            {durationOptions.map((option) => (
+              <button
+                key={option.value}
+                style={
+                  selectedDuration === option.value
+                    ? durationButtonSelectedStyle
+                    : durationButtonStyle
+                }
+                onClick={() => setSelectedDuration(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <Button
+            variant="primary"
+            onClick={handleSaveReminder}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Set Reminder"}
+          </Button>
+        </>
+      ) : (
+        <p style={successStyle}>
+          ✓ Reminder saved! We'll notify you in the extension popup.
+        </p>
+      )}
     </Card>
   )
 }

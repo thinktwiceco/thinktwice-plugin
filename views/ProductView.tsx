@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import Card from "../components/ui/Card"
 import Button from "../components/ui/Button"
 import Header from "../components/ui/Header"
@@ -8,13 +9,15 @@ import lightbulbIcon from "url:../assets/icons/Icons/Lightbulb.svg"
 import clockIcon from "url:../assets/icons/Icons/Clock.svg"
 import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"
 import { spacing, commonSpacing, textSize } from "../design-system"
+import { extractProduct } from "../utils/productExtractor"
+import type { Product } from "../storage"
 
 type ProductViewProps = {
   url: string
   productId?: string | null
   marketplace: "amazon"
   onShowIDontNeedIt: () => void
-  onShowSleepOnIt: () => void
+  onShowSleepOnIt: (product: Product | null) => void
   onShowINeedIt: () => void
 }
 
@@ -66,6 +69,24 @@ const actionsGroupStyle: React.CSSProperties = {
 }
 
 const ProductView = ({ url, productId, marketplace, onShowIDontNeedIt, onShowSleepOnIt, onShowINeedIt }: ProductViewProps) => {
+  const [extractedProduct, setExtractedProduct] = useState<Product | null>(null)
+
+  useEffect(() => {
+    if (productId) {
+      try {
+        const product = extractProduct(marketplace, productId)
+        setExtractedProduct(product)
+      } catch (error) {
+        console.error('[ProductView] Failed to extract product:', error)
+        setExtractedProduct(null)
+      }
+    }
+  }, [productId, marketplace])
+
+  const handleSleepOnIt = () => {
+    onShowSleepOnIt(extractedProduct)
+  }
+
   return (
     <Card>
       <Header onClose={() => {}} centerIcon={<h2 style={titleStyle}>ThinkTwice</h2>} />
@@ -80,7 +101,7 @@ const ProductView = ({ url, productId, marketplace, onShowIDontNeedIt, onShowSle
         <div style={actionsStyle}>
           <Button variant="primary" icon={thoughtfulIcon} onClick={onShowIDontNeedIt}>I don't really need it</Button>
           <div style={actionsGroupStyle}>
-            <Button variant="tertiary" icon={clockIcon} onClick={onShowSleepOnIt}>Sleep on it</Button>
+            <Button variant="tertiary" icon={clockIcon} onClick={handleSleepOnIt}>Sleep on it</Button>
             <Button variant="tertiary" icon={trophyIcon} onClick={onShowINeedIt}>I need it</Button>
           </div>
         </div>
