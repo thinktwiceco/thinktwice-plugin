@@ -287,7 +287,6 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
 - **No tracking** - No analytics or telemetry
 - **User control** - Users can dismiss reminders and clear data
 - **Minimal data collection** - Only stores what's necessary for functionality
-- **No affiliate links** - No commercial relationships with retailers
 
 ---
 
@@ -320,47 +319,6 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
 - **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture and data flow
 - **[sleep-on-it-implementation.md](./docs/sleep-on-it-implementation.md)** - Implementation details
 - **[user-flows.md](./docs/user-flows.md)** - User flows and feature roadmap
-
----
-
-## 🐛 Known Issues
-
-- Investment option handlers are not yet fully implemented (basic console logging only)
-- Alternative purchase options (DIY, Refurbished, Rent/Borrow) UI components exist but are not integrated
-- Close button behavior could be more sophisticated
-
----
-
-## 🚦 Roadmap
-
-### Phase 1: Core Functionality Enhancement
-- [ ] Implement investment options integration
-- [ ] Add alternative purchase options flow (DIY, Refurbished, Rent/Borrow)
-- [ ] Enhance close/dismiss behavior
-
-### Phase 2: User Retention
-- [ ] Settings page for customization
-- [ ] Statistics dashboard (money saved, purchases avoided)
-- [ ] Enhanced context-aware nudges
-
-### Phase 3: Expansion
-- [ ] Multi-marketplace support (eBay, Walmart, Target)
-- [ ] Product price history integration
-- [ ] Social features and savings challenges
-
-See [docs/user-flows.md](./docs/user-flows.md) for complete feature roadmap.
-
----
-
-## 📝 License
-
-[Add license information]
-
----
-
-## 👥 Authors
-
-[Add author information]
 
 ---
 
