@@ -8,20 +8,20 @@ body {
   --background-color: #3d4f5e;
   --secondary-background-color: #4a5d6e;
   --primary-button-color: #b8d8d4;
-  --secondary-button-color: #BFDBFE;
-  --tertiary-button-color: #FCA5A5;
+  --secondary-button-color: #bfdbfe;
+  --tertiary-button-color: #fca5a5;
   --light-button-color: #e7e7e7;
   --text-color-light: #d1dce5;
   --text-color-dark: #2d3e4e;
   --error-color: #ffffff;
   --error-background-color: #e74c3c;
   --popup-background: #ffffff;
-  --popup-text-primary: #1F2937;
-  --popup-text-secondary: #6B7280;
-  --popup-card-background: #F9FAFB;
-  --popup-border: #E5E7EB;
-  --popup-success-color: #10B981;
-  --popup-button-background: #E5E7EB;
+  --popup-text-primary: #1f2937;
+  --popup-text-secondary: #6b7280;
+  --popup-card-background: #f9fafb;
+  --popup-border: #e5e7eb;
+  --popup-success-color: #10b981;
+  --popup-button-background: #e5e7eb;
   --popup-button-text: #374151;
   font-family: "Inter", sans-serif;
 }
