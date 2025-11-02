@@ -7,7 +7,7 @@ import type {
 import { useState } from "react"
 
 import { useGoogleFonts } from "~/hooks/useGoogleFonts"
-import { usePendingReminder } from "~/hooks/usePendingReminder"
+import { useProductPageState } from "~/hooks/useProductPageState"
 import type { Product } from "~/storage"
 import { storage } from "~/storage"
 import BackToAnOldFlame from "~/views/BackToAnOldFlame"
@@ -66,7 +66,7 @@ const App = () => {
     currentProduct,
     reminderId,
     hideOverlay
-  } = usePendingReminder({
+  } = useProductPageState({
     getProductId: getAmazonProductId,
     marketplace: MARKETPLACE
   })
@@ -104,8 +104,12 @@ const App = () => {
     setLocalView("thoughtfulpurchase")
   }
 
-  // If hideOverlay is true, don't render anything
-  if (hideOverlay) {
+  // Allow "ineedit" view to show even if hideOverlay is true
+  // (this allows the celebration to display before auto-closing)
+  const shouldShowOverlay = !hideOverlay || currentView === "ineedit"
+
+  // If hideOverlay is true and we're not showing the ineedit view, don't render anything
+  if (!shouldShowOverlay) {
     return null
   }
 

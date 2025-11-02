@@ -135,6 +135,3 @@ export function useProductPageState({
     hideOverlay
   }
 }
-
-// Export the old name for backwards compatibility (deprecated)
-export const usePendingReminder = useProductPageState

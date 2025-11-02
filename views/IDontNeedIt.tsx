@@ -76,7 +76,13 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
         {options.map((option, index) => (
           <div key={index}>
             <Button
-              variant={option.variant}
+              variant={
+                option.variant as
+                  | "primary"
+                  | "secondary"
+                  | "tertiary"
+                  | "disabled"
+              }
               icon={null}
               onClick={() => {
                 console.log(`Selected: ${option.title}`)

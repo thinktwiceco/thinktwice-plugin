@@ -68,4 +68,26 @@ export class StorageProxyService {
       })
     })
   }
+
+  /**
+   * Add a listener for chrome.storage.onChanged events
+   * @param callback - Function to call when storage changes
+   * @returns Cleanup function to remove the listener
+   */
+  static addChangeListener(
+    callback: (changes: chrome.storage.StorageChange, areaName: string) => void
+  ): () => void {
+    if (
+      typeof chromeAPI !== "undefined" &&
+      typeof chromeAPI.storage !== "undefined" &&
+      typeof chromeAPI.storage.onChanged !== "undefined"
+    ) {
+      chromeAPI.storage.onChanged.addListener(callback)
+      return () => {
+        chromeAPI.storage.onChanged.removeListener(callback)
+      }
+    }
+    // Return no-op cleanup function if storage API is not available
+    return () => {}
+  }
 }

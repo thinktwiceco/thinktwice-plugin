@@ -191,6 +191,38 @@ AlarmService.registerListener(async (alarm) => {
 // ===== Notification Click Handlers =====
 NotificationService.registerClickListener()
 
+// ===== Storage Change Listener =====
+// Watch for changes to reminders storage and update badge count immediately
+if (
+  typeof chromeAPI !== "undefined" &&
+  typeof chromeAPI.storage !== "undefined" &&
+  typeof chromeAPI.storage.onChanged !== "undefined"
+) {
+  chromeAPI.storage.onChanged.addListener((changes, areaName) => {
+    // Only watch local storage changes
+    if (areaName !== "local") return
+
+    // Check if reminders storage changed
+    if (changes.thinktwice_reminders) {
+      console.log(
+        "[Background] Reminders storage changed, updating badge count"
+      )
+      // Update badge count when reminders are added, updated, or deleted
+      BadgeService.updateBadgeCount(storage).catch((error) => {
+        console.error(
+          "[Background] Error updating badge after storage change:",
+          error
+        )
+      })
+    }
+  })
+  console.log("[Background] Storage change listener registered")
+} else {
+  console.error(
+    "[Background] ❌ chrome.storage.onChanged NOT AVAILABLE - Badge won't update on storage changes!"
+  )
+}
+
 // ===== Service Worker Initialization =====
 async function initializeServiceWorker() {
   console.log("[Background] Initializing service worker...")
