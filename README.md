@@ -16,6 +16,7 @@ A Chrome browser extension that helps users make more thoughtful purchasing deci
 ### Core Philosophy
 
 The extension is designed around behavioral economics principles:
+
 - **Delayed gratification**: Research shows 3 out of 4 people change their mind within 24 hours
 - **Conscious consumption**: Make intentional decisions rather than impulse purchases
 - **Financial wellness**: Redirect saved money toward long-term goals
@@ -27,6 +28,7 @@ The extension is designed around behavioral economics principles:
 ### ✅ Implemented Features
 
 #### Core Functionality
+
 - **Product page intervention** - Overlay appears on Amazon product pages with decision options
 - **Behavioral nudges** - Random nudges displayed to encourage thoughtful consideration
 - **Three decision paths**:
@@ -35,6 +37,7 @@ The extension is designed around behavioral economics principles:
   - "I need it" → Confirmation and proceed to purchase
 
 #### Sleep On It System (Fully Implemented)
+
 - **Reminder scheduling** with customizable durations:
   - 1 minute (debug/testing)
   - 1 hour, 6 hours, 24 hours
@@ -48,6 +51,7 @@ The extension is designed around behavioral economics principles:
   - "Not interested" → Dismisses reminder
 
 #### Data Persistence
+
 - **Chrome Storage API integration** - All data stored locally
 - **Storage abstraction layer** with TypeScript interfaces
 - **Message passing architecture** for content scripts
@@ -97,16 +101,19 @@ See [docs/user-flows.md](./docs/user-flows.md) for detailed feature roadmap.
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    cd /home/verte/Desktop/Thinktwice/plugin-3
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Start development server**
+
    ```bash
    npm run dev
    ```
@@ -136,6 +143,7 @@ See [docs/user-flows.md](./docs/user-flows.md) for detailed feature roadmap.
 ### Testing the Extension
 
 1. **Visit an Amazon product page**
+
    ```
    https://www.amazon.com/dp/B0XXXXXXX
    ```
@@ -259,24 +267,26 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
 ## 🗄️ Data Models
 
 ### Product
+
 ```typescript
 {
-  id: string           // Amazon product ID (e.g., "B0XXXXXXX")
-  name: string         // Product title
+  id: string // Amazon product ID (e.g., "B0XXXXXXX")
+  name: string // Product title
   price: string | null // Price string (e.g., "$99.99")
   image: string | null // Product image URL
-  url: string          // Full Amazon product URL
-  timestamp: number    // When saved (Date.now())
+  url: string // Full Amazon product URL
+  timestamp: number // When saved (Date.now())
 }
 ```
 
 ### Reminder
+
 ```typescript
 {
-  id: string           // UUID for reminder
-  productId: string    // References Product.id
+  id: string // UUID for reminder
+  productId: string // References Product.id
   reminderTime: number // When to remind (Date.now() + duration)
-  duration: number     // Duration in milliseconds
+  duration: number // Duration in milliseconds
   status: "pending" | "completed" | "dismissed"
 }
 ```

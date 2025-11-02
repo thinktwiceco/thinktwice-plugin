@@ -1,5 +1,7 @@
+import { MessageType } from "../types/messages"
+import type { MessageResponse } from "../types/messages"
 import type { IStorage } from "./IStorage"
-import type { Product, Reminder, Settings, StorageData } from "./types"
+import type { Product, Reminder, Settings } from "./types"
 import { DEFAULT_SETTINGS } from "./types"
 
 const STORAGE_KEYS = {
@@ -22,25 +24,31 @@ const hasDirectStorageAccess = (): boolean => {
 }
 
 // Helper to use message passing when direct access is not available
-const sendStorageMessage = <T>(type: string, payload: any): Promise<T> => {
+const sendStorageMessage = <T>(
+  type: MessageType,
+  payload: Record<string, unknown>
+): Promise<T> => {
   return new Promise((resolve, reject) => {
     try {
       console.log("[BrowserStorage] Sending message:", type, payload)
-      chrome.runtime.sendMessage({ type, ...payload }, (response) => {
-        console.log(
-          "[BrowserStorage] Received response:",
-          response,
-          "lastError:",
-          chrome.runtime.lastError
-        )
-        if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError.message))
-        } else if (response?.success) {
-          resolve(response.data)
-        } else {
-          reject(new Error("Storage operation failed - no success response"))
+      chrome.runtime.sendMessage(
+        { type, ...payload },
+        (response: MessageResponse<T>) => {
+          console.log(
+            "[BrowserStorage] Received response:",
+            response,
+            "lastError:",
+            chrome.runtime.lastError
+          )
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message))
+          } else if (response?.success) {
+            resolve(response.data)
+          } else {
+            reject(new Error("Storage operation failed - no success response"))
+          }
         }
-      })
+      )
     } catch (error) {
       console.error("[BrowserStorage] Exception in sendStorageMessage:", error)
       reject(error)
@@ -49,7 +57,9 @@ const sendStorageMessage = <T>(type: string, payload: any): Promise<T> => {
 }
 
 // Wrapper for chrome.storage operations that works in all contexts
-const storageGet = async (keys: string | string[]): Promise<any> => {
+const storageGet = async (
+  keys: string | string[]
+): Promise<Record<string, unknown>> => {
   const hasDirect = hasDirectStorageAccess()
   console.log(
     "[BrowserStorage] storageGet - hasDirectStorageAccess:",
@@ -61,11 +71,11 @@ const storageGet = async (keys: string | string[]): Promise<any> => {
       chrome.storage.local.get(keys, resolve)
     })
   } else {
-    return sendStorageMessage("STORAGE_GET", { keys })
+    return sendStorageMessage(MessageType.STORAGE_GET, { keys })
   }
 }
 
-const storageSet = async (data: any): Promise<void> => {
+const storageSet = async (data: Record<string, unknown>): Promise<void> => {
   const hasDirect = hasDirectStorageAccess()
   console.log(
     "[BrowserStorage] storageSet - hasDirectStorageAccess:",
@@ -77,7 +87,7 @@ const storageSet = async (data: any): Promise<void> => {
       chrome.storage.local.set(data, resolve)
     })
   } else {
-    await sendStorageMessage("STORAGE_SET", { data })
+    await sendStorageMessage(MessageType.STORAGE_SET, { data })
   }
 }
 
@@ -85,7 +95,7 @@ export class BrowserStorage implements IStorage {
   async getReminders(): Promise<Reminder[]> {
     try {
       const result = await storageGet(STORAGE_KEYS.REMINDERS)
-      return result[STORAGE_KEYS.REMINDERS] || []
+      return (result[STORAGE_KEYS.REMINDERS] as Reminder[]) || []
     } catch (error) {
       console.error("Failed to get reminders:", error)
       return []
@@ -141,7 +151,8 @@ export class BrowserStorage implements IStorage {
   async getProduct(id: string): Promise<Product | null> {
     try {
       const result = await storageGet(STORAGE_KEYS.PRODUCTS)
-      const products = result[STORAGE_KEYS.PRODUCTS] || {}
+      const products =
+        (result[STORAGE_KEYS.PRODUCTS] as Record<string, Product>) || {}
       return products[id] || null
     } catch (error) {
       console.error("Failed to get product:", error)
@@ -152,7 +163,8 @@ export class BrowserStorage implements IStorage {
   async saveProduct(product: Product): Promise<void> {
     try {
       const result = await storageGet(STORAGE_KEYS.PRODUCTS)
-      const products = result[STORAGE_KEYS.PRODUCTS] || {}
+      const products =
+        (result[STORAGE_KEYS.PRODUCTS] as Record<string, Product>) || {}
       products[product.id] = product
       await storageSet({ [STORAGE_KEYS.PRODUCTS]: products })
     } catch (error) {
@@ -164,7 +176,8 @@ export class BrowserStorage implements IStorage {
   async updateProductState(id: string, state: Product["state"]): Promise<void> {
     try {
       const result = await storageGet(STORAGE_KEYS.PRODUCTS)
-      const products = result[STORAGE_KEYS.PRODUCTS] || {}
+      const products =
+        (result[STORAGE_KEYS.PRODUCTS] as Record<string, Product>) || {}
       if (products[id]) {
         products[id].state = state
         await storageSet({ [STORAGE_KEYS.PRODUCTS]: products })
@@ -180,7 +193,7 @@ export class BrowserStorage implements IStorage {
   async getSettings(): Promise<Settings> {
     try {
       const result = await storageGet(STORAGE_KEYS.SETTINGS)
-      return result[STORAGE_KEYS.SETTINGS] || DEFAULT_SETTINGS
+      return (result[STORAGE_KEYS.SETTINGS] as Settings) || DEFAULT_SETTINGS
     } catch (error) {
       console.error("Failed to get settings:", error)
       return DEFAULT_SETTINGS

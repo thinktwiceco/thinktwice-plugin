@@ -1,4 +1,4 @@
-import { spacing, textSize } from "../../design-system"
+import { textSize } from "../../design-system"
 
 interface RentBorrowIconProps {
   size?: number

@@ -5,6 +5,7 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import { spacing, textSize } from "../design-system"
+import { ChromeMessaging } from "../services/ChromeMessaging"
 import { storage } from "../storage"
 import type { Product } from "../storage"
 import Celebration from "./Celebration"
@@ -23,15 +24,6 @@ const titleStyle: React.CSSProperties = {
   textAlign: "center",
   margin: `0 0 ${spacing.md} 0`,
   lineHeight: "1.3"
-}
-
-const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.md,
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.xxl} 0`,
-  opacity: "0.9",
-  lineHeight: "1.4"
 }
 
 const actionsStyle: React.CSSProperties = {
@@ -54,21 +46,19 @@ const BackToAnOldFlame = ({
     setShowCelebration(true)
 
     // Wait 2 seconds to show celebration message, then close tab
-    setTimeout(() => {
+    setTimeout(async () => {
       console.log("[BackToAnOldFlame] Requesting tab close...")
 
-      // Use Chrome Extension API to close the current tab
-      chrome.runtime.sendMessage({ type: "CLOSE_CURRENT_TAB" }, (response) => {
-        if (response?.success) {
-          console.log("[BackToAnOldFlame] Tab close request successful")
-        } else {
-          console.error("[BackToAnOldFlame] Tab close failed:", response)
-          // Fallback: hide the overlay
-          if (onClose) {
-            onClose()
-          }
+      try {
+        await ChromeMessaging.closeCurrentTab()
+        console.log("[BackToAnOldFlame] Tab close request successful")
+      } catch (error) {
+        console.error("[BackToAnOldFlame] Tab close failed:", error)
+        // Fallback: hide the overlay
+        if (onClose) {
+          onClose()
         }
-      })
+      }
     }, 2000)
   }
 
@@ -120,7 +110,7 @@ const BackToAnOldFlame = ({
       />
 
       <h1 style={titleStyle}>
-        You said you didn't need this, did you change your mind?
+        You said you didn&apos;t need this, did you change your mind?
       </h1>
 
       <div style={actionsStyle}>
@@ -128,7 +118,7 @@ const BackToAnOldFlame = ({
           variant="primary"
           onClick={handleDontNeedIt}
           disabled={processing}>
-          You are right I don't need this
+          You are right I don&apos;t need this
         </Button>
         <Button
           variant="tertiary"

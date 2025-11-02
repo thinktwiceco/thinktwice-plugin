@@ -1,4 +1,6 @@
 import { useStorage } from "./hooks/useStorage"
+import { ChromeMessaging } from "./services/ChromeMessaging"
+import type { Reminder } from "./storage"
 
 const containerStyle: React.CSSProperties = {
   width: "400px",
@@ -175,7 +177,7 @@ function IndexPopup() {
 
   const handleChangedMind = async (reminderId: string, productUrl: string) => {
     await updateReminder(reminderId, { status: "dismissed" })
-    chrome.tabs.create({ url: productUrl })
+    await ChromeMessaging.createTab(productUrl)
   }
 
   const pendingReminders = reminders.filter((r) => r.status === "pending")
@@ -194,7 +196,7 @@ function IndexPopup() {
     return sum + parsePrice(product?.price || null)
   }, 0)
 
-  const renderReminderCard = (reminder: any, isAchievement: boolean) => {
+  const renderReminderCard = (reminder: Reminder, isAchievement: boolean) => {
     const product = products[reminder.productId]
     if (!product) return null
 
@@ -250,7 +252,7 @@ function IndexPopup() {
             No items yet
           </div>
           <div style={{ fontSize: "14px" }}>
-            Click "Sleep on it" on any Amazon product to start saving
+            Click &quot;Sleep on it&quot; on any Amazon product to start saving
           </div>
         </div>
       ) : (
