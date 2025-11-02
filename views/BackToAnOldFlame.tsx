@@ -35,10 +35,11 @@ const actionsStyle: React.CSSProperties = {
 const BackToAnOldFlame = ({
   product,
   reminderId,
-  onShowThoughtfulPurchase,
   onClose
 }: BackToAnOldFlameProps) => {
-  const [celebrationType, setCelebrationType] = useState<"dontNeed" | "needIt" | null>(null)
+  const [celebrationType, setCelebrationType] = useState<
+    "dontNeed" | "needIt" | null
+  >(null)
   const [processing, setProcessing] = useState(false)
 
   const handleDontNeedIt = () => {
@@ -48,7 +49,7 @@ const BackToAnOldFlame = ({
 
   const handleINeedIt = async () => {
     setProcessing(true)
-    
+
     // Delete reminder and update product state
     try {
       await storage.deleteReminder(reminderId)
