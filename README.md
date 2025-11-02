@@ -1,3 +1,5 @@
+[![Lint and Format](https://github.com/thinktwiceco/thinktwice-plugin/actions/workflows/lint-and-format.yml/badge.svg)](https://github.com/thinktwiceco/thinktwice-plugin/actions/workflows/lint-and-format.yml)
+
 # ThinkTwice 🤔
 
 A Chrome browser extension that helps users make more thoughtful purchasing decisions on Amazon by providing behavioral nudges, delayed gratification tools, and purchase alternatives.
