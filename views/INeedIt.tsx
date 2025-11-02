@@ -14,6 +14,7 @@ const INeedIt = ({ onBack, onClose }: INeedItProps) => {
       iconAlt="trophy"
       title="Trusting yourself is powerful."
       subtitle="Enjoy your new purchase."
+      autoCloseDelay={4000}
       onBack={onBack}
       onClose={onClose}
     />
