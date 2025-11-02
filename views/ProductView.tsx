@@ -8,13 +8,12 @@ import Nudge from "../components/Nudge"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
-import { commonSpacing, spacing, textSize } from "../design-system"
+import { spacing, textSize } from "../design-system"
 import type { Product } from "../storage"
 import { storage } from "../storage"
 import { extractProduct } from "../utils/productExtractor"
 
 type ProductViewProps = {
-  url: string
   productId?: string | null
   marketplace: "amazon"
   onShowIDontNeedIt: (product: Product | null) => void
@@ -70,7 +69,6 @@ const actionsGroupStyle: React.CSSProperties = {
 }
 
 const ProductView = ({
-  url,
   productId,
   marketplace,
   onShowIDontNeedIt,
@@ -135,7 +133,7 @@ const ProductView = ({
             variant="primary"
             icon={thoughtfulIcon}
             onClick={handleIDontNeedIt}>
-            I don't really need it
+            I don&apos;t really need it
           </Button>
           <div style={actionsGroupStyle}>
             <Button

@@ -5,6 +5,7 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import { spacing, textSize } from "../design-system"
+import { ChromeMessaging } from "../services/ChromeMessaging"
 import { storage } from "../storage"
 import type { Product } from "../storage"
 import Celebration from "./Celebration"
@@ -54,21 +55,19 @@ const EarlyReturnFromSleep = ({
     setShowCelebration(true)
 
     // Wait 2 seconds to show celebration message, then close tab
-    setTimeout(() => {
+    setTimeout(async () => {
       console.log("[EarlyReturnFromSleep] Requesting tab close...")
 
-      // Use Chrome Extension API to close the current tab
-      chrome.runtime.sendMessage({ type: "CLOSE_CURRENT_TAB" }, (response) => {
-        if (response?.success) {
-          console.log("[EarlyReturnFromSleep] Tab close request successful")
-        } else {
-          console.error("[EarlyReturnFromSleep] Tab close failed:", response)
-          // Fallback: hide the overlay
-          if (onClose) {
-            onClose()
-          }
+      try {
+        await ChromeMessaging.closeCurrentTab()
+        console.log("[EarlyReturnFromSleep] Tab close request successful")
+      } catch (error) {
+        console.error("[EarlyReturnFromSleep] Tab close failed:", error)
+        // Fallback: hide the overlay
+        if (onClose) {
+          onClose()
         }
-      })
+      }
     }, 2000)
   }
 
@@ -119,7 +118,7 @@ const EarlyReturnFromSleep = ({
         }
       />
 
-      <h1 style={titleStyle}>Hey there! You're back early.</h1>
+      <h1 style={titleStyle}>Hey there! You&apos;re back early.</h1>
       <p style={subtitleStyle}>Did you change your mind about waiting?</p>
 
       <div style={actionsStyle}>
@@ -127,7 +126,7 @@ const EarlyReturnFromSleep = ({
           variant="primary"
           onClick={handleKeepWaiting}
           disabled={processing}>
-          You're right, I'll wait
+          You&apos;re right, I&apos;ll wait
         </Button>
         <Button
           variant="tertiary"

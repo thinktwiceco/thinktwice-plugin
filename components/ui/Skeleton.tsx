@@ -1,4 +1,4 @@
-import { commonSpacing, spacing, textSize } from "../../design-system"
+import { spacing, textSize } from "../../design-system"
 
 const skeletonButtonStyle: React.CSSProperties = {
   width: "100%",

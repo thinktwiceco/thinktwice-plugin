@@ -5,6 +5,7 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import { spacing, textSize } from "../design-system"
+import { ChromeMessaging } from "../services/ChromeMessaging"
 import { storage } from "../storage"
 import type { Product } from "../storage"
 
@@ -111,20 +112,12 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
 
       // Create alarm for reminder
       console.log("[SleepOnIt] Creating alarm for reminder...")
-      chrome.runtime.sendMessage(
-        {
-          type: "CREATE_ALARM",
-          reminderId: reminder.id,
-          when: reminder.reminderTime
-        },
-        (response) => {
-          if (response?.success) {
-            console.log("[SleepOnIt] Alarm created successfully")
-          } else {
-            console.error("[SleepOnIt] Failed to create alarm:", response)
-          }
-        }
-      )
+      try {
+        await ChromeMessaging.createAlarm(reminder.id, reminder.reminderTime)
+        console.log("[SleepOnIt] Alarm created successfully")
+      } catch (error) {
+        console.error("[SleepOnIt] Failed to create alarm:", error)
+      }
 
       setSaved(true)
     } catch (error) {
@@ -156,7 +149,7 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
       {!saved ? (
         <>
           <p style={{ ...subtitleStyle, marginBottom: spacing.md }}>
-            When should we remind you?
+            For how long you would like to think about this purchase?
           </p>
           <div style={durationOptionsStyle}>
             {durationOptions.map((option) => (
@@ -181,7 +174,7 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
         </>
       ) : (
         <p style={successStyle}>
-          ✓ Reminder saved! We'll notify you in the extension popup.
+          ✓ Reminder saved! Hold tight and remember about the goal!
         </p>
       )}
     </Card>
