@@ -6,10 +6,10 @@ interface DIYIconProps {
   backgroundColor?: string
 }
 
-const DIYIcon = ({ 
-  size = 60, 
-  color = "white", 
-  backgroundColor = "var(--tertiary-button-color)" 
+const DIYIcon = ({
+  size = 60,
+  color = "white",
+  backgroundColor = "var(--tertiary-button-color)"
 }: DIYIconProps) => {
   const iconStyle: React.CSSProperties = {
     width: `${size}px`,
@@ -22,7 +22,7 @@ const DIYIcon = ({
     color,
     fontSize: textSize.lg,
     fontWeight: "bold",
-    position: "relative",
+    position: "relative"
   }
 
   const toolStyle: React.CSSProperties = {
@@ -30,7 +30,7 @@ const DIYIcon = ({
     fontSize: `${size * 0.3}px`,
     top: "50%",
     left: "50%",
-    transform: "translate(-50%, -50%)",
+    transform: "translate(-50%, -50%)"
   }
 
   return (

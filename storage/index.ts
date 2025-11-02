@@ -1,7 +1,6 @@
-import { BrowserStorage } from './BrowserStorage'
+import { BrowserStorage } from "./BrowserStorage"
 
 export const storage = new BrowserStorage()
 
-export * from './types'
-export * from './IStorage'
-
+export * from "./types"
+export * from "./IStorage"

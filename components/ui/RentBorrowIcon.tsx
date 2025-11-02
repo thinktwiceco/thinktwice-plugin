@@ -6,10 +6,10 @@ interface RentBorrowIconProps {
   backgroundColor?: string
 }
 
-const RentBorrowIcon = ({ 
-  size = 60, 
-  color = "white", 
-  backgroundColor = "var(--secondary-button-color)" 
+const RentBorrowIcon = ({
+  size = 60,
+  color = "white",
+  backgroundColor = "var(--secondary-button-color)"
 }: RentBorrowIconProps) => {
   const iconStyle: React.CSSProperties = {
     width: `${size}px`,
@@ -22,7 +22,7 @@ const RentBorrowIcon = ({
     color,
     fontSize: textSize.lg,
     fontWeight: "bold",
-    position: "relative",
+    position: "relative"
   }
 
   const handshakeStyle: React.CSSProperties = {
@@ -30,7 +30,7 @@ const RentBorrowIcon = ({
     fontSize: `${size * 0.3}px`,
     top: "50%",
     left: "50%",
-    transform: "translate(-50%, -50%)",
+    transform: "translate(-50%, -50%)"
   }
 
   return (

@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
-import { storage, type Reminder, type Product, type Settings } from '../storage'
+import { useCallback, useEffect, useState } from "react"
+
+import { storage, type Product, type Reminder, type Settings } from "../storage"
 
 interface UseStorageReturn {
   reminders: Reminder[]
@@ -32,10 +33,10 @@ export function useStorage(): UseStorageReturn {
         storage.getReminders(),
         storage.getSettings()
       ])
-      
+
       setReminders(remindersData)
       setSettings(settingsData)
-      
+
       const productsMap: { [productId: string]: Product } = {}
       for (const reminder of remindersData) {
         const product = await storage.getProduct(reminder.productId)
@@ -44,10 +45,10 @@ export function useStorage(): UseStorageReturn {
         }
       }
       setProducts(productsMap)
-      
+
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to load data'))
+      setError(err instanceof Error ? err : new Error("Failed to load data"))
     } finally {
       setLoading(false)
     }
@@ -57,29 +58,41 @@ export function useStorage(): UseStorageReturn {
     loadData()
   }, [loadData])
 
-  const saveReminder = useCallback(async (reminder: Reminder) => {
-    await storage.saveReminder(reminder)
-    await loadData()
-  }, [loadData])
+  const saveReminder = useCallback(
+    async (reminder: Reminder) => {
+      await storage.saveReminder(reminder)
+      await loadData()
+    },
+    [loadData]
+  )
 
-  const updateReminder = useCallback(async (id: string, updates: Partial<Reminder>) => {
-    await storage.updateReminder(id, updates)
-    await loadData()
-  }, [loadData])
+  const updateReminder = useCallback(
+    async (id: string, updates: Partial<Reminder>) => {
+      await storage.updateReminder(id, updates)
+      await loadData()
+    },
+    [loadData]
+  )
 
-  const deleteReminder = useCallback(async (id: string) => {
-    await storage.deleteReminder(id)
-    await loadData()
-  }, [loadData])
+  const deleteReminder = useCallback(
+    async (id: string) => {
+      await storage.deleteReminder(id)
+      await loadData()
+    },
+    [loadData]
+  )
 
   const getProduct = useCallback(async (id: string) => {
     return await storage.getProduct(id)
   }, [])
 
-  const saveProduct = useCallback(async (product: Product) => {
-    await storage.saveProduct(product)
-    await loadData()
-  }, [loadData])
+  const saveProduct = useCallback(
+    async (product: Product) => {
+      await storage.saveProduct(product)
+      await loadData()
+    },
+    [loadData]
+  )
 
   const refreshReminders = useCallback(async () => {
     await loadData()
@@ -99,4 +112,3 @@ export function useStorage(): UseStorageReturn {
     refreshReminders
   }
 }
-

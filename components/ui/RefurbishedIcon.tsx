@@ -6,10 +6,10 @@ interface RefurbishedIconProps {
   backgroundColor?: string
 }
 
-const RefurbishedIcon = ({ 
-  size = 60, 
-  color = "white", 
-  backgroundColor = "var(--primary-button-color)" 
+const RefurbishedIcon = ({
+  size = 60,
+  color = "white",
+  backgroundColor = "var(--primary-button-color)"
 }: RefurbishedIconProps) => {
   const iconStyle: React.CSSProperties = {
     width: `${size}px`,
@@ -22,7 +22,7 @@ const RefurbishedIcon = ({
     color,
     fontSize: textSize.lg,
     fontWeight: "bold",
-    position: "relative",
+    position: "relative"
   }
 
   const arrowStyle: React.CSSProperties = {
@@ -30,7 +30,7 @@ const RefurbishedIcon = ({
     fontSize: `${size * 0.3}px`,
     top: "50%",
     left: "50%",
-    transform: "translate(-50%, -50%)",
+    transform: "translate(-50%, -50%)"
   }
 
   return (

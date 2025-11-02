@@ -1,4 +1,4 @@
-import type { Reminder, Product, Settings } from './types'
+import type { Product, Reminder, Settings } from "./types"
 
 export interface IStorage {
   getReminders(): Promise<Reminder[]>
@@ -6,11 +6,11 @@ export interface IStorage {
   saveReminder(reminder: Reminder): Promise<void>
   updateReminder(id: string, updates: Partial<Reminder>): Promise<void>
   deleteReminder(id: string): Promise<void>
-  
+
   getProduct(id: string): Promise<Product | null>
   saveProduct(product: Product): Promise<void>
-  
+  updateProductState(id: string, state: Product["state"]): Promise<void>
+
   getSettings(): Promise<Settings>
   updateSettings(settings: Partial<Settings>): Promise<void>
 }
-

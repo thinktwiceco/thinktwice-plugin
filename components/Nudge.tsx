@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react"
-import { spacing } from "../design-system"
+import { useEffect, useState } from "react"
+
+import { spacing, textSize } from "../design-system"
 
 const MOCK_NUDGES = [
   {
-    nudge: "Every purchase is a vote for the kind of world you want to live in.",
+    nudge:
+      "Every purchase is a vote for the kind of world you want to live in.",
     theme: "environmental",
     type: "reflection"
   },
   {
-    nudge: "Waiting 24 hours before buying can save you from impulse purchases you'll regret.",
+    nudge:
+      "Waiting 24 hours before buying can save you from impulse purchases you'll regret.",
     theme: "financial",
     type: "advice"
   },
@@ -28,8 +31,25 @@ const Nudge = () => {
   }, [])
 
   return (
-    <div className="info-container" style={{ textAlign: "center", marginBottom: spacing.sm }}>
-      <p className="info-container-text" style={{ fontWeight: "500" }}>{selectedNudge}</p>
+    <div
+      className="info-container"
+      style={{
+        textAlign: "center",
+        marginBottom: spacing.sm,
+        background:
+          "linear-gradient(135deg, rgba(104, 195, 212, 0.3), rgba(255, 232, 209, 0.4))",
+        border: "none"
+      }}>
+      <p
+        className="info-container-text"
+        style={{
+          fontWeight: "600",
+          fontSize: textSize.lg,
+          color: "var(--text-color-dark)",
+          fontStyle: "italic"
+        }}>
+        {selectedNudge}
+      </p>
     </div>
   )
 }

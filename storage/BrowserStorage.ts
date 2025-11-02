@@ -1,19 +1,21 @@
-import type { IStorage } from './IStorage'
-import type { Reminder, Product, Settings, StorageData } from './types'
-import { DEFAULT_SETTINGS } from './types'
+import type { IStorage } from "./IStorage"
+import type { Product, Reminder, Settings, StorageData } from "./types"
+import { DEFAULT_SETTINGS } from "./types"
 
 const STORAGE_KEYS = {
-  REMINDERS: 'thinktwice_reminders',
-  PRODUCTS: 'thinktwice_products',
-  SETTINGS: 'thinktwice_settings'
+  REMINDERS: "thinktwice_reminders",
+  PRODUCTS: "thinktwice_products",
+  SETTINGS: "thinktwice_settings"
 }
 
 // Helper to determine if we're in a context with direct chrome.storage access
 const hasDirectStorageAccess = (): boolean => {
   try {
-    return typeof chrome !== 'undefined' && 
-           typeof chrome.storage !== 'undefined' && 
-           typeof chrome.storage.local !== 'undefined'
+    return (
+      typeof chrome !== "undefined" &&
+      typeof chrome.storage !== "undefined" &&
+      typeof chrome.storage.local !== "undefined"
+    )
   } catch {
     return false
   }
@@ -23,19 +25,24 @@ const hasDirectStorageAccess = (): boolean => {
 const sendStorageMessage = <T>(type: string, payload: any): Promise<T> => {
   return new Promise((resolve, reject) => {
     try {
-      console.log('[BrowserStorage] Sending message:', type, payload)
+      console.log("[BrowserStorage] Sending message:", type, payload)
       chrome.runtime.sendMessage({ type, ...payload }, (response) => {
-        console.log('[BrowserStorage] Received response:', response, 'lastError:', chrome.runtime.lastError)
+        console.log(
+          "[BrowserStorage] Received response:",
+          response,
+          "lastError:",
+          chrome.runtime.lastError
+        )
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message))
         } else if (response?.success) {
           resolve(response.data)
         } else {
-          reject(new Error('Storage operation failed - no success response'))
+          reject(new Error("Storage operation failed - no success response"))
         }
       })
     } catch (error) {
-      console.error('[BrowserStorage] Exception in sendStorageMessage:', error)
+      console.error("[BrowserStorage] Exception in sendStorageMessage:", error)
       reject(error)
     }
   })
@@ -44,27 +51,33 @@ const sendStorageMessage = <T>(type: string, payload: any): Promise<T> => {
 // Wrapper for chrome.storage operations that works in all contexts
 const storageGet = async (keys: string | string[]): Promise<any> => {
   const hasDirect = hasDirectStorageAccess()
-  console.log('[BrowserStorage] storageGet - hasDirectStorageAccess:', hasDirect)
-  
+  console.log(
+    "[BrowserStorage] storageGet - hasDirectStorageAccess:",
+    hasDirect
+  )
+
   if (hasDirect) {
     return new Promise((resolve) => {
       chrome.storage.local.get(keys, resolve)
     })
   } else {
-    return sendStorageMessage('STORAGE_GET', { keys })
+    return sendStorageMessage("STORAGE_GET", { keys })
   }
 }
 
 const storageSet = async (data: any): Promise<void> => {
   const hasDirect = hasDirectStorageAccess()
-  console.log('[BrowserStorage] storageSet - hasDirectStorageAccess:', hasDirect)
-  
+  console.log(
+    "[BrowserStorage] storageSet - hasDirectStorageAccess:",
+    hasDirect
+  )
+
   if (hasDirect) {
     return new Promise((resolve) => {
       chrome.storage.local.set(data, resolve)
     })
   } else {
-    await sendStorageMessage('STORAGE_SET', { data })
+    await sendStorageMessage("STORAGE_SET", { data })
   }
 }
 
@@ -74,7 +87,7 @@ export class BrowserStorage implements IStorage {
       const result = await storageGet(STORAGE_KEYS.REMINDERS)
       return result[STORAGE_KEYS.REMINDERS] || []
     } catch (error) {
-      console.error('Failed to get reminders:', error)
+      console.error("Failed to get reminders:", error)
       return []
     }
   }
@@ -82,9 +95,9 @@ export class BrowserStorage implements IStorage {
   async getReminderById(id: string): Promise<Reminder | null> {
     try {
       const reminders = await this.getReminders()
-      return reminders.find(r => r.id === id) || null
+      return reminders.find((r) => r.id === id) || null
     } catch (error) {
-      console.error('Failed to get reminder by id:', error)
+      console.error("Failed to get reminder by id:", error)
       return null
     }
   }
@@ -95,7 +108,7 @@ export class BrowserStorage implements IStorage {
       reminders.push(reminder)
       await storageSet({ [STORAGE_KEYS.REMINDERS]: reminders })
     } catch (error) {
-      console.error('Failed to save reminder:', error)
+      console.error("Failed to save reminder:", error)
       throw error
     }
   }
@@ -103,13 +116,13 @@ export class BrowserStorage implements IStorage {
   async updateReminder(id: string, updates: Partial<Reminder>): Promise<void> {
     try {
       const reminders = await this.getReminders()
-      const index = reminders.findIndex(r => r.id === id)
+      const index = reminders.findIndex((r) => r.id === id)
       if (index !== -1) {
         reminders[index] = { ...reminders[index], ...updates }
         await storageSet({ [STORAGE_KEYS.REMINDERS]: reminders })
       }
     } catch (error) {
-      console.error('Failed to update reminder:', error)
+      console.error("Failed to update reminder:", error)
       throw error
     }
   }
@@ -117,10 +130,10 @@ export class BrowserStorage implements IStorage {
   async deleteReminder(id: string): Promise<void> {
     try {
       const reminders = await this.getReminders()
-      const filtered = reminders.filter(r => r.id !== id)
+      const filtered = reminders.filter((r) => r.id !== id)
       await storageSet({ [STORAGE_KEYS.REMINDERS]: filtered })
     } catch (error) {
-      console.error('Failed to delete reminder:', error)
+      console.error("Failed to delete reminder:", error)
       throw error
     }
   }
@@ -131,7 +144,7 @@ export class BrowserStorage implements IStorage {
       const products = result[STORAGE_KEYS.PRODUCTS] || {}
       return products[id] || null
     } catch (error) {
-      console.error('Failed to get product:', error)
+      console.error("Failed to get product:", error)
       return null
     }
   }
@@ -143,7 +156,23 @@ export class BrowserStorage implements IStorage {
       products[product.id] = product
       await storageSet({ [STORAGE_KEYS.PRODUCTS]: products })
     } catch (error) {
-      console.error('Failed to save product:', error)
+      console.error("Failed to save product:", error)
+      throw error
+    }
+  }
+
+  async updateProductState(id: string, state: Product["state"]): Promise<void> {
+    try {
+      const result = await storageGet(STORAGE_KEYS.PRODUCTS)
+      const products = result[STORAGE_KEYS.PRODUCTS] || {}
+      if (products[id]) {
+        products[id].state = state
+        await storageSet({ [STORAGE_KEYS.PRODUCTS]: products })
+      } else {
+        console.warn("Product not found for state update:", id)
+      }
+    } catch (error) {
+      console.error("Failed to update product state:", error)
       throw error
     }
   }
@@ -153,7 +182,7 @@ export class BrowserStorage implements IStorage {
       const result = await storageGet(STORAGE_KEYS.SETTINGS)
       return result[STORAGE_KEYS.SETTINGS] || DEFAULT_SETTINGS
     } catch (error) {
-      console.error('Failed to get settings:', error)
+      console.error("Failed to get settings:", error)
       return DEFAULT_SETTINGS
     }
   }
@@ -164,9 +193,8 @@ export class BrowserStorage implements IStorage {
       const updatedSettings = { ...currentSettings, ...settings }
       await storageSet({ [STORAGE_KEYS.SETTINGS]: updatedSettings })
     } catch (error) {
-      console.error('Failed to update settings:', error)
+      console.error("Failed to update settings:", error)
       throw error
     }
   }
 }
-

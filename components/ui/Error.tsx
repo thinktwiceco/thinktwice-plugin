@@ -1,4 +1,4 @@
-import { spacing, commonSpacing, textSize } from "../../design-system"
+import { commonSpacing, spacing, textSize } from "../../design-system"
 
 const Error = ({ message }) => {
   const style: React.CSSProperties = {
@@ -10,14 +10,14 @@ const Error = ({ message }) => {
     textAlign: "center",
     gap: spacing.md,
     backgroundColor: "var(--error-background-color)",
-    borderRadius: "12px",
+    borderRadius: "12px"
   }
 
   const messageStyle: React.CSSProperties = {
     fontSize: textSize.sm,
     lineHeight: "1.4",
     margin: "0",
-    color: "var(--error-color)",
+    color: "var(--error-color)"
   }
 
   return (

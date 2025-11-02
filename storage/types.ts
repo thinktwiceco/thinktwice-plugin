@@ -6,6 +6,7 @@ export interface Product {
   url: string
   timestamp: number
   marketplace: string
+  state?: "sleepingOnIt" | "achievement" | "iNeedThis" | "dontNeedIt" | null
 }
 
 export interface Reminder {
@@ -13,7 +14,7 @@ export interface Reminder {
   productId: string
   reminderTime: number
   duration: number
-  status: 'pending' | 'completed' | 'dismissed'
+  status: "pending" | "completed" | "dismissed"
 }
 
 export interface Settings {
@@ -29,13 +30,12 @@ export interface StorageData {
 
 export const DEFAULT_SETTINGS: Settings = {
   reminderDurations: [
-    1 * 60 * 1000,             // 1 minute (debug)
-    1 * 60 * 60 * 1000,        // 1 hour
-    6 * 60 * 60 * 1000,        // 6 hours
-    24 * 60 * 60 * 1000,       // 24 hours
-    3 * 24 * 60 * 60 * 1000,   // 3 days
-    7 * 24 * 60 * 60 * 1000    // 1 week
+    1 * 60 * 1000, // 1 minute (debug)
+    1 * 60 * 60 * 1000, // 1 hour
+    6 * 60 * 60 * 1000, // 6 hours
+    24 * 60 * 60 * 1000, // 24 hours
+    3 * 24 * 60 * 60 * 1000, // 3 days
+    7 * 24 * 60 * 60 * 1000 // 1 week
   ],
   defaultDuration: 24 * 60 * 60 * 1000 // 24 hours
 }
-

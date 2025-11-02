@@ -208,29 +208,32 @@ popup.tsx (Extension Popup)
 ## Data Models (storage/types.ts)
 
 ### Product
+
 ```typescript
 {
-  id: string              // Amazon product ID (e.g., "B0XXXXXXX")
-  name: string            // Product title
-  price: string | null    // Price string (e.g., "$99.99")
-  image: string | null    // Product image URL
-  url: string             // Full Amazon product URL
-  timestamp: number       // When saved (Date.now())
+  id: string // Amazon product ID (e.g., "B0XXXXXXX")
+  name: string // Product title
+  price: string | null // Price string (e.g., "$99.99")
+  image: string | null // Product image URL
+  url: string // Full Amazon product URL
+  timestamp: number // When saved (Date.now())
 }
 ```
 
 ### Reminder
+
 ```typescript
 {
-  id: string              // UUID for reminder
-  productId: string       // References Product.id
-  reminderTime: number    // When to remind (Date.now() + duration)
-  duration: number        // Duration in milliseconds
-  status: 'pending' | 'completed' | 'dismissed'
+  id: string // UUID for reminder
+  productId: string // References Product.id
+  reminderTime: number // When to remind (Date.now() + duration)
+  duration: number // Duration in milliseconds
+  status: "pending" | "completed" | "dismissed"
 }
 ```
 
 ### Settings
+
 ```typescript
 {
   reminderDurations: number[]  // Available duration options in ms
@@ -247,25 +250,30 @@ popup.tsx (Extension Popup)
 ## Why This Architecture?
 
 ### Abstraction Benefits
+
 1. **Testability**: Can swap storage implementation for testing
 2. **Flexibility**: Easy to migrate to different storage (sync, IndexedDB, etc.)
 3. **Type Safety**: TypeScript interfaces ensure consistency
 4. **Separation of Concerns**: Storage logic isolated from UI
 
 ### Storage Strategy
+
 - **Local Storage**: Persistent across sessions, fast access
 - **Normalized Data**: Products stored separately from reminders (avoid duplication)
 - **Defensive Coding**: All storage operations wrapped in try-catch
 - **Context-Aware**: Automatically uses message passing in content scripts, direct access in popup
 
 ### Message Passing Solution
+
 Chrome Extension architecture requires special handling:
+
 - **Content Scripts** don't have direct access to `chrome.storage` APIs
 - **Solution**: Background service worker acts as storage proxy
 - **BrowserStorage** detects execution context and chooses appropriate method
 - **Transparent**: Application code doesn't need to know the difference
 
 ### React Integration
+
 - **Custom Hook**: `useStorage()` provides reactive data access
 - **Automatic Refresh**: Hook reloads data after mutations
 - **Loading States**: Built-in loading and error handling
@@ -288,13 +296,16 @@ Chrome Extension architecture requires special handling:
 ## Notifications & Alarms System
 
 ### Chrome Alarms API
+
 - **Purpose**: Schedule reminder notifications at specific times
 - **Alarm naming**: `reminder_{reminderId}` for individual reminders, `badge_update` for periodic checks
 - **Persistence**: Alarms survive browser restarts and service worker termination
 - **Creation**: When user sets a reminder, `CREATE_ALARM` message sent to background worker
 
 ### Background Service Worker
+
 **Responsibilities:**
+
 1. **Message Handling**: Processes `STORAGE_GET`, `STORAGE_SET`, `CREATE_ALARM` messages
 2. **Alarm Management**: Creates, listens for, and processes alarm events
 3. **Notification Creation**: Generates browser notifications when reminders are due
@@ -302,6 +313,7 @@ Chrome Extension architecture requires special handling:
 5. **Lifecycle Management**: Restores alarms on startup, handles overdue reminders
 
 **Initialization Flow:**
+
 1. Service worker starts
 2. Checks for existing reminders in storage
 3. Recreates alarms for future reminders
@@ -309,7 +321,9 @@ Chrome Extension architecture requires special handling:
 5. Sets up periodic badge update (every 1 minute)
 
 ### Browser Notifications
+
 **When triggered:**
+
 - Alarm fires at reminder time
 - Background fetches product & reminder data
 - Creates notification with:
@@ -320,32 +334,37 @@ Chrome Extension architecture requires special handling:
   - Buttons: "View Product", "Not Interested"
 
 **User interactions:**
+
 - **Click notification**: Opens extension popup
 - **"View Product"**: Opens product page in new tab, marks reminder as completed
 - **"Not Interested"**: Marks reminder as dismissed
 - All actions update badge count and clear notification
 
 ### Badge Count System
+
 **Shows:** Number of pending reminders that are due (not all pending)
 
 **Updates triggered by:**
+
 - Alarm fires (new reminder becomes due)
 - Notification button clicked (reminder status changes)
 - Periodic check (every 1 minute via `badge_update` alarm)
 - Service worker startup/restart
 
 **Badge appearance:**
+
 - Count > 0: Shows number in purple badge (#8B5CF6)
 - Count = 0: No badge displayed
 
 ### Permissions Required
+
 - `storage`: Store reminders and product data
 - `alarms`: Schedule timed notifications
 - `notifications`: Display browser notifications
 
 ### Error Handling
+
 - All alarm/notification operations wrapped in availability checks
 - Gracefully degrades if APIs unavailable
 - Comprehensive logging for debugging
 - Service worker validates API availability on startup
-

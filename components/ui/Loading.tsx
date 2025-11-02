@@ -1,8 +1,8 @@
+import { commonSpacing, spacing, textSize } from "../../design-system"
+
 type LoadingProps = {
   message?: string
 }
-
-import { spacing, commonSpacing, textSize } from "../../design-system"
 
 const Loading = ({ message }: LoadingProps) => {
   const containerStyle: React.CSSProperties = {

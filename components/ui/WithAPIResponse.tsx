@@ -1,6 +1,5 @@
-import Loading from './Loading'
-import Error from './Error'
-
+import Error from "./Error"
+import Loading from "./Loading"
 
 type WithAPIResponseProps = {
   loading: boolean
@@ -11,7 +10,14 @@ type WithAPIResponseProps = {
   onLoadingComponent?: React.ReactNode
 }
 
-const WithAPIResponse = ({ children, loading, errorMessage, success, loadingMessage, onLoadingComponent }: WithAPIResponseProps) => {
+const WithAPIResponse = ({
+  children,
+  loading,
+  errorMessage,
+  success,
+  loadingMessage,
+  onLoadingComponent
+}: WithAPIResponseProps) => {
   if (loading) {
     if (onLoadingComponent) {
       return onLoadingComponent

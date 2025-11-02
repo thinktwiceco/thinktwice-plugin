@@ -1,45 +1,22 @@
-import Card from "../components/ui/Card"
-import Header from "../components/ui/Header"
-
 import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"
-import { spacing, textSize } from "../design-system"
+
+import Celebration from "./Celebration"
 
 type INeedItProps = {
   onBack: () => void
   onClose?: () => void
 }
 
-const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
-  fontWeight: "bold",
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.md} 0`,
-  lineHeight: "1.3",
-}
-
-const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.md,
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: 0,
-  opacity: "0.9",
-  lineHeight: "1.4",
-}
-
 const INeedIt = ({ onBack, onClose }: INeedItProps) => {
   return (
-    <Card>
-      <Header
-        onBack={onBack}
-        onClose={onClose}
-        centerIcon={<img src={trophyIcon} alt="trophy" style={{ width: '35px', height: '35px' }} />}
-        centerIconAlt="trophy"
-      />
-      
-      <h1 style={titleStyle}>Trusting yourself is powerful.</h1>
-      <p style={subtitleStyle}>Enjoy your new purchase.</p>
-    </Card>
+    <Celebration
+      icon={trophyIcon}
+      iconAlt="trophy"
+      title="Trusting yourself is powerful."
+      subtitle="Enjoy your new purchase."
+      onBack={onBack}
+      onClose={onClose}
+    />
   )
 }
 

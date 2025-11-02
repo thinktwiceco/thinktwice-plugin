@@ -26,6 +26,41 @@ const subtitleStyle: React.CSSProperties = {
   margin: 0
 }
 
+const sectionStyle: React.CSSProperties = {
+  marginBottom: "24px"
+}
+
+const sectionHeaderStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "12px",
+  paddingBottom: "8px",
+  borderBottom: "1px solid #E5E7EB"
+}
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontSize: "16px",
+  fontWeight: "600",
+  color: "#1F2937",
+  margin: 0
+}
+
+const totalSavingsStyle: React.CSSProperties = {
+  fontSize: "14px",
+  fontWeight: "600",
+  color: "#10B981",
+  margin: 0
+}
+
+const encouragingMessageStyle: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#6B7280",
+  fontStyle: "italic",
+  marginTop: "4px",
+  marginBottom: "12px"
+}
+
 const reminderCardStyle: React.CSSProperties = {
   display: "flex",
   gap: "12px",
@@ -85,13 +120,7 @@ const buttonStyle: React.CSSProperties = {
   transition: "all 0.2s ease"
 }
 
-const primaryButtonStyle: React.CSSProperties = {
-  ...buttonStyle,
-  backgroundColor: "#8B5CF6",
-  color: "white"
-}
-
-const secondaryButtonStyle: React.CSSProperties = {
+const changedMindButtonStyle: React.CSSProperties = {
   ...buttonStyle,
   backgroundColor: "#E5E7EB",
   color: "#374151"
@@ -110,7 +139,7 @@ const loadingStyle: React.CSSProperties = {
 }
 
 function IndexPopup() {
-  const { reminders, products, loading, deleteReminder, updateReminder } = useStorage()
+  const { reminders, products, loading, updateReminder } = useStorage()
 
   const formatTimeRemaining = (reminderTime: number): string => {
     const now = Date.now()
@@ -124,86 +153,139 @@ function IndexPopup() {
     const days = Math.floor(hours / 24)
 
     if (days > 0) {
-      return `in ${days} day${days !== 1 ? 's' : ''}`
+      return `in ${days} day${days !== 1 ? "s" : ""}`
     } else if (hours > 0) {
-      return `in ${hours} hour${hours !== 1 ? 's' : ''}`
+      return `in ${hours} hour${hours !== 1 ? "s" : ""}`
     } else {
       const minutes = Math.floor(diff / (1000 * 60))
-      return `in ${minutes} minute${minutes !== 1 ? 's' : ''}`
+      return `in ${minutes} minute${minutes !== 1 ? "s" : ""}`
     }
   }
 
-  const handleOpenProduct = (productUrl: string) => {
+  const parsePrice = (priceString: string | null): number => {
+    if (!priceString) return 0
+    const match = priceString.match(/[\d,]+\.?\d*/g)
+    if (!match) return 0
+    return parseFloat(match[0].replace(/,/g, ""))
+  }
+
+  const formatMoney = (amount: number): string => {
+    return `$${amount.toFixed(2)}`
+  }
+
+  const handleChangedMind = async (reminderId: string, productUrl: string) => {
+    await updateReminder(reminderId, { status: "dismissed" })
     chrome.tabs.create({ url: productUrl })
   }
 
-  const handleDismiss = async (reminderId: string) => {
-    await updateReminder(reminderId, { status: 'dismissed' })
-  }
+  const pendingReminders = reminders.filter((r) => r.status === "pending")
+  const now = Date.now()
 
-  const pendingReminders = reminders.filter(r => r.status === 'pending')
+  const sleepingOnItItems = pendingReminders.filter((r) => r.reminderTime > now)
+  const achievementItems = pendingReminders.filter((r) => r.reminderTime <= now)
+
+  const sleepingOnItTotal = sleepingOnItItems.reduce((sum, reminder) => {
+    const product = products[reminder.productId]
+    return sum + parsePrice(product?.price || null)
+  }, 0)
+
+  const achievementsTotal = achievementItems.reduce((sum, reminder) => {
+    const product = products[reminder.productId]
+    return sum + parsePrice(product?.price || null)
+  }, 0)
+
+  const renderReminderCard = (reminder: any, isAchievement: boolean) => {
+    const product = products[reminder.productId]
+    if (!product) return null
+
+    return (
+      <div key={reminder.id} style={reminderCardStyle}>
+        {product.image && (
+          <img
+            src={product.image}
+            alt={product.name}
+            style={reminderImageStyle}
+          />
+        )}
+        <div style={reminderContentStyle}>
+          <h3 style={reminderTitleStyle}>{product.name}</h3>
+          {product.price && (
+            <p style={reminderTimeStyle}>Price: {product.price}</p>
+          )}
+          {!isAchievement && (
+            <p style={reminderTimeStyle}>
+              Reminder: {formatTimeRemaining(reminder.reminderTime)}
+            </p>
+          )}
+          <div style={reminderActionsStyle}>
+            <button
+              style={changedMindButtonStyle}
+              onClick={() => handleChangedMind(reminder.id, product.url)}>
+              I changed my mind
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={containerStyle}>
       <div style={headerStyle}>
         <h2 style={titleStyle}>ThinkTwice</h2>
-        <p style={subtitleStyle}>Your saved reminders</p>
+        <p style={subtitleStyle}>Your impulse control journey</p>
       </div>
 
       {loading ? (
-        <div style={loadingStyle}>Loading reminders...</div>
+        <div style={loadingStyle}>Loading...</div>
       ) : pendingReminders.length === 0 ? (
         <div style={emptyStateStyle}>
           <div style={{ fontSize: "48px", marginBottom: "12px" }}>💭</div>
-          <div style={{ fontSize: "16px", fontWeight: "600", marginBottom: "8px" }}>
-            No reminders yet
+          <div
+            style={{
+              fontSize: "16px",
+              fontWeight: "600",
+              marginBottom: "8px"
+            }}>
+            No items yet
           </div>
           <div style={{ fontSize: "14px" }}>
-            Click "Sleep on it" on any Amazon product to save a reminder
+            Click "Sleep on it" on any Amazon product to start saving
           </div>
         </div>
       ) : (
-        <div>
-          {pendingReminders.map((reminder) => {
-            const product = products[reminder.productId]
-            if (!product) return null
-
-            return (
-              <div key={reminder.id} style={reminderCardStyle}>
-                {product.image && (
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    style={reminderImageStyle}
-                  />
-                )}
-                <div style={reminderContentStyle}>
-                  <h3 style={reminderTitleStyle}>{product.name}</h3>
-                  {product.price && (
-                    <p style={reminderTimeStyle}>Price: {product.price}</p>
-                  )}
-                  <p style={reminderTimeStyle}>
-                    Reminder: {formatTimeRemaining(reminder.reminderTime)}
-                  </p>
-                  <div style={reminderActionsStyle}>
-                    <button
-                      style={primaryButtonStyle}
-                      onClick={() => handleOpenProduct(product.url)}
-                    >
-                      Still interested
-                    </button>
-                    <button
-                      style={secondaryButtonStyle}
-                      onClick={() => handleDismiss(reminder.id)}
-                    >
-                      Not interested
-                    </button>
-                  </div>
-                </div>
+        <>
+          {sleepingOnItItems.length > 0 && (
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>
+                <h3 style={sectionTitleStyle}>Sleeping on it</h3>
+                <span style={totalSavingsStyle}>
+                  Saving: {formatMoney(sleepingOnItTotal)}
+                </span>
               </div>
-            )
-          })}
-        </div>
+              <p style={encouragingMessageStyle}>You can do this! 💪</p>
+              {sleepingOnItItems.map((reminder) =>
+                renderReminderCard(reminder, false)
+              )}
+            </div>
+          )}
+
+          {achievementItems.length > 0 && (
+            <div style={sectionStyle}>
+              <div style={sectionHeaderStyle}>
+                <h3 style={sectionTitleStyle}>
+                  Achievements - You resisted! 🎉
+                </h3>
+                <span style={totalSavingsStyle}>
+                  Saved: {formatMoney(achievementsTotal)}
+                </span>
+              </div>
+              {achievementItems.map((reminder) =>
+                renderReminderCard(reminder, true)
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

@@ -1,4 +1,4 @@
-import { spacing, textSize, commonSpacing } from "../../design-system"
+import { commonSpacing, spacing, textSize } from "../../design-system"
 
 const skeletonButtonStyle: React.CSSProperties = {
   width: "100%",
@@ -11,7 +11,7 @@ const skeletonButtonStyle: React.CSSProperties = {
   justifyContent: "center",
   gap: spacing.xs,
   position: "relative",
-  overflow: "hidden",
+  overflow: "hidden"
 }
 
 const shimmerStyle: React.CSSProperties = {
@@ -20,8 +20,9 @@ const shimmerStyle: React.CSSProperties = {
   left: "-100%",
   width: "100%",
   height: "100%",
-  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
-  animation: "shimmer 2s infinite",
+  background:
+    "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+  animation: "shimmer 2s infinite"
 }
 
 const skeletonTextStyle: React.CSSProperties = {
@@ -30,7 +31,7 @@ const skeletonTextStyle: React.CSSProperties = {
   borderRadius: spacing.xs,
   opacity: "0.3",
   position: "relative",
-  overflow: "hidden",
+  overflow: "hidden"
 }
 
 const skeletonSubtextStyle: React.CSSProperties = {
@@ -40,14 +41,14 @@ const skeletonSubtextStyle: React.CSSProperties = {
   opacity: "0.2",
   width: "80%",
   position: "relative",
-  overflow: "hidden",
+  overflow: "hidden"
 }
 
 const skeletonContainerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: spacing.md,
-  width: "100%",
+  width: "100%"
 }
 
 const Skeleton = ({ count = 3 }: { count?: number }) => {

@@ -7,11 +7,10 @@ const Card = ({ children }) => {
     padding: commonSpacing.cardPadding,
     color: "var(--text-color-light)",
     width: "100%",
-    boxSizing: "border-box",
+    boxSizing: "border-box"
   }
 
   return <div style={style}>{children}</div>
 }
 
 export default Card
-
