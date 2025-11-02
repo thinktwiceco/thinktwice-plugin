@@ -10,7 +10,8 @@ function extractAmazonProduct(productId: string): Product {
   const titleElement =
     document.querySelector("#productTitle") ||
     document.querySelector("#title") ||
-    document.querySelector("h1.product-title")
+    document.querySelector("h1.product-title") ||
+    document.querySelector("#bond-title-desktop")
   if (titleElement) {
     name = titleElement.textContent?.trim() || "Unknown Product"
   }

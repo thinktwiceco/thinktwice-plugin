@@ -35,63 +35,75 @@ const actionsStyle: React.CSSProperties = {
 const BackToAnOldFlame = ({
   product,
   reminderId,
-  onShowThoughtfulPurchase,
   onClose
 }: BackToAnOldFlameProps) => {
-  const [showCelebration, setShowCelebration] = useState(false)
+  const [celebrationType, setCelebrationType] = useState<
+    "dontNeed" | "needIt" | null
+  >(null)
   const [processing, setProcessing] = useState(false)
 
-  const handleDontNeedIt = async () => {
+  const handleDontNeedIt = () => {
     setProcessing(true)
-    setShowCelebration(true)
-
-    // Wait 2 seconds to show celebration message, then close tab
-    setTimeout(async () => {
-      console.log("[BackToAnOldFlame] Requesting tab close...")
-
-      try {
-        await ChromeMessaging.closeCurrentTab()
-        console.log("[BackToAnOldFlame] Tab close request successful")
-      } catch (error) {
-        console.error("[BackToAnOldFlame] Tab close failed:", error)
-        // Fallback: hide the overlay
-        if (onClose) {
-          onClose()
-        }
-      }
-    }, 2000)
+    setCelebrationType("dontNeed")
   }
 
   const handleINeedIt = async () => {
     setProcessing(true)
-    try {
-      // Update reminder status to completed
-      await storage.updateReminder(reminderId, { status: "completed" })
-      console.log("[BackToAnOldFlame] Reminder marked as completed")
 
-      // Update product state to iNeedThis
+    // Delete reminder and update product state
+    try {
+      await storage.deleteReminder(reminderId)
+      console.log("[BackToAnOldFlame] Reminder deleted")
+
       if (product) {
         await storage.updateProductState(product.id, "iNeedThis")
         console.log("[BackToAnOldFlame] Product state updated to iNeedThis")
       }
-
-      // Navigate to CelebrateThoughtfulPurchase view
-      onShowThoughtfulPurchase()
     } catch (error) {
-      console.error("[BackToAnOldFlame] Failed to update reminder:", error)
-      // Still navigate even if update fails
-      onShowThoughtfulPurchase()
+      console.error("[BackToAnOldFlame] Failed to delete reminder:", error)
+      // Continue to show celebration even if storage update fails
+    }
+
+    // Show celebration regardless of storage operation result
+    setCelebrationType("needIt")
+  }
+
+  const handleCelebrationClose = async () => {
+    console.log("[BackToAnOldFlame] Requesting tab close after celebration...")
+
+    try {
+      await ChromeMessaging.closeCurrentTab()
+      console.log("[BackToAnOldFlame] Tab close request successful")
+    } catch (error) {
+      console.error("[BackToAnOldFlame] Tab close failed:", error)
+      // Fallback: hide the overlay
+      if (onClose) {
+        onClose()
+      }
     }
   }
 
-  if (showCelebration) {
+  if (celebrationType === "dontNeed") {
     return (
       <Celebration
         icon={thoughtfulIcon}
         iconAlt="thoughtful"
         title="🎉 Awesome!"
         subtitle="Closing tab..."
-        onClose={onClose}
+        autoCloseDelay={2000}
+        onClose={handleCelebrationClose}
+      />
+    )
+  }
+
+  if (celebrationType === "needIt") {
+    return (
+      <Celebration
+        icon={thoughtfulIcon}
+        iconAlt="thoughtful"
+        title="🎉 Awesome!"
+        subtitle="You made a thoughtful choice! Enjoy your purchase!"
+        autoCloseDelay={4000}
       />
     )
   }
