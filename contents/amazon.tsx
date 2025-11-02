@@ -172,7 +172,6 @@ const App = () => {
 
       return (
         <ProductView
-          url={window.location.href}
           productId={productId}
           marketplace={MARKETPLACE}
           onShowIDontNeedIt={handleShowIDontNeedIt}

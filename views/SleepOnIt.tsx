@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import moonIcon from "url:../assets/icons/Icons/Moon.svg"
 
 import Button from "../components/ui/Button"
@@ -127,6 +127,31 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
       setSaving(false)
     }
   }
+
+  // Auto-close tab after 4 seconds when reminder is saved
+  useEffect(() => {
+    if (saved) {
+      console.log(
+        "[SleepOnIt] Reminder saved, scheduling tab close in 4 seconds..."
+      )
+      const timer = setTimeout(async () => {
+        console.log("[SleepOnIt] Requesting tab close...")
+
+        try {
+          await ChromeMessaging.closeCurrentTab()
+          console.log("[SleepOnIt] Tab close request successful")
+        } catch (error) {
+          console.error("[SleepOnIt] Tab close failed:", error)
+          // Fallback: hide the overlay
+          if (onClose) {
+            onClose()
+          }
+        }
+      }, 4000) // 4 seconds
+
+      return () => clearTimeout(timer)
+    }
+  }, [saved, onClose])
 
   return (
     <Card>
