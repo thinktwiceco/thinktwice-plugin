@@ -1,6 +1,5 @@
-
 body {
-  font-family: sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: #f0f0f0;
 }
 
@@ -8,14 +7,15 @@ body {
 #plasmo-shadow-container {
   --background-color: #2660a4;
   --secondary-background-color: #d4dfed;
-  --primary-button-color: #68c3d4;
-  --secondary-button-color: #ffe8d1;
-  --tertiary-button-color: #ffc6c6;
+  --primary-button-color: rgba(93, 169, 161, 0.85);
+  --secondary-button-color: rgba(160, 174, 192, 0.85);
+  --tertiary-button-color: rgba(255, 173, 173, 0.85);
   --light-button-color: #e7e7e7;
   --text-color-light: #FFFFFF;
   --text-color-dark: #000000;
   --error-color: #FFFFFF;
   --error-background-color: #E74C3C;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Root Container Positioning */

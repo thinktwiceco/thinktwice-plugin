@@ -16,6 +16,7 @@ export const textSize = {
   md: "14px",   // 16px
   lg: "16px",   // 20px
   xl: "18px",   // 24px
+  xxl: "22px",  // 28px
 } as const
 
 // Common spacing patterns

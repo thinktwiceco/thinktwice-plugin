@@ -22,13 +22,13 @@ const headerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: spacing.sm,
-  marginBottom: commonSpacing.sectionMargin,
+  marginBottom: spacing.md,
   textAlign: "center",
   position: "relative",
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
+  fontSize: textSize.xxl,
   fontWeight: "bold",
   margin: "0",
   display: "flex",
@@ -38,7 +38,7 @@ const titleStyle: React.CSSProperties = {
 }
 
 const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.md,
+  fontSize: textSize.lg,
   color: "var(--text-color-light)",
   opacity: "0.8",
   margin: "0",
@@ -51,7 +51,7 @@ const subtitleStyle: React.CSSProperties = {
 const bodyStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: spacing.xl,
+  gap: spacing.md,
 }
 
 const actionsStyle: React.CSSProperties = {
@@ -80,7 +80,7 @@ const ProductView = ({ url, productId, marketplace, onShowIDontNeedIt, onShowSle
         <div style={actionsStyle}>
           <Button variant="primary" icon={thoughtfulIcon} onClick={onShowIDontNeedIt}>I don't really need it</Button>
           <div style={actionsGroupStyle}>
-            <Button variant="tertiary" icon={clockIcon} onClick={onShowSleepOnIt}>Sleep on it</Button>
+            <Button variant="secondary" icon={clockIcon} onClick={onShowSleepOnIt}>Sleep on it</Button>
             <Button variant="tertiary" icon={trophyIcon} onClick={onShowINeedIt}>I need it</Button>
           </div>
         </div>

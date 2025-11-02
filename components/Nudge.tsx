@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { spacing } from "../design-system"
+import { spacing, textSize } from "../design-system"
 
 const MOCK_NUDGES = [
   {
@@ -28,8 +28,8 @@ const Nudge = () => {
   }, [])
 
   return (
-    <div className="info-container" style={{ textAlign: "center", marginBottom: spacing.sm }}>
-      <p className="info-container-text" style={{ fontWeight: "500" }}>{selectedNudge}</p>
+    <div className="info-container" style={{ textAlign: "center", marginBottom: spacing.sm, background: "linear-gradient(135deg, rgba(104, 195, 212, 0.3), rgba(255, 232, 209, 0.4))", border: "none" }}>
+      <p className="info-container-text" style={{ fontWeight: "600", fontSize: textSize.lg, color: "var(--text-color-dark)", fontStyle: "italic" }}>{selectedNudge}</p>
     </div>
   )
 }

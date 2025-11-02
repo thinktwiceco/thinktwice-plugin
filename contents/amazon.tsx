@@ -4,7 +4,7 @@ import IDontNeedIt from "~/views/IDontNeedIt"
 import SleepOnIt from "~/views/SleepOnIt"
 import INeedIt from "~/views/INeedIt"
 import styleText from "data-text:~style.css"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export const config: PlasmoCSConfig = {
   matches: ["*://*.amazon.com/*"],
@@ -26,6 +26,18 @@ export const getOverlayAnchor: PlasmoGetOverlayAnchor = () => {
 
 const App = () => {
   const [currentView, setCurrentView] = useState<'product' | 'idontneedit' | 'sleeponit' | 'ineedit'>('product')
+
+  // Inject Google Fonts link for Inter
+  useEffect(() => {
+    const linkId = 'plasmo-inter-font'
+    if (!document.getElementById(linkId)) {
+      const link = document.createElement('link')
+      link.id = linkId
+      link.rel = 'stylesheet'
+      link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
+      document.head.appendChild(link)
+    }
+  }, [])
 
   const handleBackToProduct = () => {
     setCurrentView('product')

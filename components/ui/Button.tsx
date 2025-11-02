@@ -13,7 +13,7 @@ const Button = ({ children, onClick, variant, icon }) => {
       gap: spacing.sm,
       width: "100%",
       justifyContent: "center",
-      fontWeight: "500",
+      fontWeight: "550",
     }
 
     switch (variant) {
