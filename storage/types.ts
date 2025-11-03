@@ -1,3 +1,9 @@
+export enum ProductState {
+  SLEEPING_ON_IT = "sleepingOnIt",
+  I_NEED_THIS = "iNeedThis",
+  DONT_NEED_IT = "dontNeedIt"
+}
+
 export interface Product {
   id: string
   name: string
@@ -6,7 +12,7 @@ export interface Product {
   url: string
   timestamp: number
   marketplace: string
-  state?: "sleepingOnIt" | "achievement" | "iNeedThis" | "dontNeedIt" | null
+  state?: ProductState | null
 }
 
 export interface Reminder {

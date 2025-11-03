@@ -9,8 +9,8 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import { spacing, textSize } from "../design-system"
+import { ProductActionManager } from "../managers/ProductActionManager"
 import type { Product } from "../storage"
-import { storage } from "../storage"
 import { extractProduct } from "../utils/productExtractor"
 
 type ProductViewProps = {
@@ -93,18 +93,23 @@ const ProductView = ({
     onShowSleepOnIt(extractedProduct)
   }
 
-  const handleIDontNeedIt = () => {
+  const handleIDontNeedIt = async () => {
+    if (extractedProduct) {
+      try {
+        await ProductActionManager.dontNeedIt(extractedProduct)
+      } catch (error) {
+        console.error("[ProductView] Failed to execute dontNeedIt:", error)
+      }
+    }
     onShowIDontNeedIt(extractedProduct)
   }
 
   const handleINeedIt = async () => {
-    // Save product with iNeedThis state
     if (extractedProduct) {
       try {
-        await storage.saveProduct({ ...extractedProduct, state: "iNeedThis" })
-        console.log("[ProductView] Product saved with iNeedThis state")
+        await ProductActionManager.needIt(extractedProduct.id)
       } catch (error) {
-        console.error("[ProductView] Failed to save product:", error)
+        console.error("[ProductView] Failed to execute needIt:", error)
       }
     }
     onShowINeedIt()

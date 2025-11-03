@@ -5,8 +5,8 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import { spacing, textSize } from "../design-system"
+import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
-import { storage } from "../storage"
 import type { Product } from "../storage"
 import Celebration from "./Celebration"
 
@@ -74,20 +74,18 @@ const EarlyReturnFromSleep = ({
   const handleINeedIt = async () => {
     setProcessing(true)
     try {
-      // Update reminder status to completed
-      await storage.updateReminder(reminderId, { status: "completed" })
-      console.log("[EarlyReturnFromSleep] Reminder marked as completed")
-
-      // Update product state to iNeedThis
+      // Update product state to iNeedThis and delete reminder
       if (product) {
-        await storage.updateProductState(product.id, "iNeedThis")
-        console.log("[EarlyReturnFromSleep] Product state updated to iNeedThis")
+        await ProductActionManager.needIt(product.id, reminderId)
+        console.log(
+          "[EarlyReturnFromSleep] Product marked as iNeedThis, reminder deleted"
+        )
       }
 
       // Navigate to INeedIt view
       onShowINeedIt()
     } catch (error) {
-      console.error("[EarlyReturnFromSleep] Failed to update reminder:", error)
+      console.error("[EarlyReturnFromSleep] Failed to execute needIt:", error)
       // Still navigate even if update fails
       onShowINeedIt()
     }

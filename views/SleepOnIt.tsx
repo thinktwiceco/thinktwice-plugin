@@ -5,8 +5,8 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import { spacing, textSize } from "../design-system"
+import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
-import { storage } from "../storage"
 import type { Product } from "../storage"
 
 type SleepOnItProps = {
@@ -82,7 +82,7 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
 
   const handleSaveReminder = async () => {
     if (!product) {
-      console.error("No product available")
+      console.error("[SleepOnIt] No product available")
       return
     }
 
@@ -92,32 +92,9 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
         "[SleepOnIt] Starting to save reminder for product:",
         product.id
       )
-      console.log("[SleepOnIt] Product:", product)
 
-      console.log("[SleepOnIt] Saving product with sleepingOnIt state...")
-      await storage.saveProduct({ ...product, state: "sleepingOnIt" })
-      console.log("[SleepOnIt] Product saved successfully")
-
-      const reminder = {
-        id: crypto.randomUUID(),
-        productId: product.id,
-        reminderTime: Date.now() + selectedDuration,
-        duration: selectedDuration,
-        status: "pending" as const
-      }
-
-      console.log("[SleepOnIt] Saving reminder...")
-      await storage.saveReminder(reminder)
+      await ProductActionManager.sleepOnIt(product, selectedDuration)
       console.log("[SleepOnIt] Reminder saved successfully")
-
-      // Create alarm for reminder
-      console.log("[SleepOnIt] Creating alarm for reminder...")
-      try {
-        await ChromeMessaging.createAlarm(reminder.id, reminder.reminderTime)
-        console.log("[SleepOnIt] Alarm created successfully")
-      } catch (error) {
-        console.error("[SleepOnIt] Failed to create alarm:", error)
-      }
 
       setSaved(true)
     } catch (error) {

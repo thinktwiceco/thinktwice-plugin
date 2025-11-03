@@ -6,6 +6,7 @@
  */
 
 import type { IStorage } from "../storage/IStorage"
+import { ProductState } from "../storage/types"
 
 const chromeAPI = globalThis.chrome || chrome
 
@@ -60,9 +61,12 @@ export class NotificationService {
         return
       }
 
-      // Update product state to "achievement" since reminder time has passed
-      await storage.updateProductState(reminder.productId, "achievement")
-      console.log("[NotificationService] Product state updated to achievement")
+      // Update product state to "dontNeedIt" since reminder time has passed
+      await storage.updateProductState(
+        reminder.productId,
+        ProductState.DONT_NEED_IT
+      )
+      console.log("[NotificationService] Product state updated to dontNeedIt")
 
       // Create celebration notification
       const notificationOptions: chrome.notifications.NotificationOptions<true> =

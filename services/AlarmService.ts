@@ -69,6 +69,24 @@ export class AlarmService {
   }
 
   /**
+   * Clear an alarm for a reminder
+   * @param reminderId - Unique identifier for the reminder
+   */
+  static clearAlarm(reminderId: string): void {
+    if (!this.isAvailable()) {
+      console.error("[AlarmService] chrome.alarms is not available")
+      return
+    }
+
+    try {
+      chromeAPI.alarms.clear(`reminder_${reminderId}`)
+      console.log("[AlarmService] Cleared alarm for reminder:", reminderId)
+    } catch (error) {
+      console.error("[AlarmService] Failed to clear alarm:", error)
+    }
+  }
+
+  /**
    * Register alarm listener
    * @param handler - Callback function when alarm fires
    */

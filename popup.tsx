@@ -1,6 +1,8 @@
 import { useStorage } from "./hooks/useStorage"
+import { ProductActionManager } from "./managers/ProductActionManager"
 import { ChromeMessaging } from "./services/ChromeMessaging"
-import type { Reminder } from "./storage"
+import type { Product, Reminder } from "./storage"
+import { ProductState } from "./storage/types"
 
 const containerStyle: React.CSSProperties = {
   width: "400px",
@@ -141,7 +143,9 @@ const loadingStyle: React.CSSProperties = {
 }
 
 function IndexPopup() {
-  const { reminders, products, loading, updateReminder } = useStorage()
+  const { reminders, products, loading } = useStorage()
+
+  console.log("---- ALL PRODUCTS ----", products)
 
   const formatTimeRemaining = (reminderTime: number): string => {
     const now = Date.now()
@@ -175,8 +179,17 @@ function IndexPopup() {
     return `$${amount.toFixed(2)}`
   }
 
-  const handleChangedMind = async (reminderId: string, productUrl: string) => {
-    await updateReminder(reminderId, { status: "dismissed" })
+  const handleChangedMind = async (
+    reminderId: string,
+    productId: string,
+    productUrl: string
+  ) => {
+    try {
+      await ProductActionManager.changedMyMind(productId, reminderId)
+      console.log("[Popup] Changed mind - reminder and product state updated")
+    } catch (error) {
+      console.error("[Popup] Failed to execute changedMyMind:", error)
+    }
     await ChromeMessaging.createTab(productUrl)
   }
 
@@ -184,15 +197,16 @@ function IndexPopup() {
   const now = Date.now()
 
   const sleepingOnItItems = pendingReminders.filter((r) => r.reminderTime > now)
-  const achievementItems = pendingReminders.filter((r) => r.reminderTime <= now)
+  const achievementProducts = Object.values(products).filter(
+    (p) => p.state === ProductState.DONT_NEED_IT
+  )
 
   const sleepingOnItTotal = sleepingOnItItems.reduce((sum, reminder) => {
     const product = products[reminder.productId]
     return sum + parsePrice(product?.price || null)
   }, 0)
 
-  const achievementsTotal = achievementItems.reduce((sum, reminder) => {
-    const product = products[reminder.productId]
+  const achievementsTotal = achievementProducts.reduce((sum, product) => {
     return sum + parsePrice(product?.price || null)
   }, 0)
 
@@ -222,10 +236,32 @@ function IndexPopup() {
           <div style={reminderActionsStyle}>
             <button
               style={changedMindButtonStyle}
-              onClick={() => handleChangedMind(reminder.id, product.url)}>
+              onClick={() =>
+                handleChangedMind(reminder.id, reminder.productId, product.url)
+              }>
               I changed my mind
             </button>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  const renderProductCard = (product: Product) => {
+    return (
+      <div key={product.id} style={reminderCardStyle}>
+        {product.image && (
+          <img
+            src={product.image}
+            alt={product.name}
+            style={reminderImageStyle}
+          />
+        )}
+        <div style={reminderContentStyle}>
+          <h3 style={reminderTitleStyle}>{product.name}</h3>
+          {product.price && (
+            <p style={reminderTimeStyle}>Price: {product.price}</p>
+          )}
         </div>
       </div>
     )
@@ -240,7 +276,7 @@ function IndexPopup() {
 
       {loading ? (
         <div style={loadingStyle}>Loading...</div>
-      ) : pendingReminders.length === 0 ? (
+      ) : pendingReminders.length === 0 && achievementProducts.length === 0 ? (
         <div style={emptyStateStyle}>
           <div style={{ fontSize: "48px", marginBottom: "12px" }}>💭</div>
           <div
@@ -252,7 +288,8 @@ function IndexPopup() {
             No items yet
           </div>
           <div style={{ fontSize: "14px" }}>
-            Click &quot;Sleep on it&quot; on any Amazon product to start saving
+            The more you DON&apos;T buy, the more you SAVE, the more you DON&apos;T need
+            it!
           </div>
         </div>
       ) : (
@@ -272,7 +309,7 @@ function IndexPopup() {
             </div>
           )}
 
-          {achievementItems.length > 0 && (
+          {achievementProducts.length > 0 && (
             <div style={sectionStyle}>
               <div style={sectionHeaderStyle}>
                 <h3 style={sectionTitleStyle}>
@@ -282,9 +319,7 @@ function IndexPopup() {
                   Saved: {formatMoney(achievementsTotal)}
                 </span>
               </div>
-              {achievementItems.map((reminder) =>
-                renderReminderCard(reminder, true)
-              )}
+              {achievementProducts.map((product) => renderProductCard(product))}
             </div>
           )}
         </>
