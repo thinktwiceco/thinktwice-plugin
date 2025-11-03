@@ -288,8 +288,8 @@ function IndexPopup() {
             No items yet
           </div>
           <div style={{ fontSize: "14px" }}>
-            The more you DON&apos;T buy, the more you SAVE, the more you DON&apos;T need
-            it!
+            The more you DON&apos;T buy, the more you SAVE, the more you
+            DON&apos;T need it!
           </div>
         </div>
       ) : (
