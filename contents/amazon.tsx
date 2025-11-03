@@ -8,8 +8,8 @@ import { useState } from "react"
 
 import { useGoogleFonts } from "~/hooks/useGoogleFonts"
 import { useProductPageState } from "~/hooks/useProductPageState"
+import { ProductActionManager } from "~/managers/ProductActionManager"
 import type { Product } from "~/storage"
-import { storage } from "~/storage"
 import BackToAnOldFlame from "~/views/BackToAnOldFlame"
 import CelebrateThoughtfulPurchase from "~/views/CelebrateThoughtfulPurchase"
 import EarlyReturnFromSleep from "~/views/EarlyReturnFromSleep"
@@ -79,13 +79,13 @@ const App = () => {
   }
 
   const handleShowIDontNeedIt = async (product: Product | null) => {
-    // Save product with dontNeedIt state
+    // Update product state to dontNeedIt
     if (product) {
       try {
-        await storage.saveProduct({ ...product, state: "dontNeedIt" })
-        console.log("[Amazon] Product saved with dontNeedIt state")
+        await ProductActionManager.dontNeedIt(product.id)
+        console.log("[Amazon] Product marked as dontNeedIt")
       } catch (error) {
-        console.error("[Amazon] Failed to save product:", error)
+        console.error("[Amazon] Failed to execute dontNeedIt:", error)
       }
     }
     setLocalView("idontneedit")

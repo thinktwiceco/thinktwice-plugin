@@ -5,8 +5,8 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import { spacing, textSize } from "../design-system"
+import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
-import { storage } from "../storage"
 import type { Product } from "../storage"
 import Celebration from "./Celebration"
 
@@ -42,26 +42,36 @@ const BackToAnOldFlame = ({
   >(null)
   const [processing, setProcessing] = useState(false)
 
-  const handleDontNeedIt = () => {
+  const handleDontNeedIt = async () => {
     setProcessing(true)
+
+    // Update product state to dontNeedIt
+    if (product) {
+      try {
+        await ProductActionManager.dontNeedIt(product.id)
+        console.log("[BackToAnOldFlame] Product marked as dontNeedIt")
+      } catch (error) {
+        console.error("[BackToAnOldFlame] Failed to mark as dontNeedIt:", error)
+      }
+    }
+
     setCelebrationType("dontNeed")
   }
 
   const handleINeedIt = async () => {
     setProcessing(true)
 
-    // Delete reminder and update product state
-    try {
-      await storage.deleteReminder(reminderId)
-      console.log("[BackToAnOldFlame] Reminder deleted")
-
-      if (product) {
-        await storage.updateProductState(product.id, "iNeedThis")
-        console.log("[BackToAnOldFlame] Product state updated to iNeedThis")
+    // Delete reminder and update product state to iNeedThis
+    if (product) {
+      try {
+        await ProductActionManager.needIt(product.id, reminderId)
+        console.log(
+          "[BackToAnOldFlame] Product marked as iNeedThis, reminder deleted"
+        )
+      } catch (error) {
+        console.error("[BackToAnOldFlame] Failed to execute needIt:", error)
+        // Continue to show celebration even if operation fails
       }
-    } catch (error) {
-      console.error("[BackToAnOldFlame] Failed to delete reminder:", error)
-      // Continue to show celebration even if storage update fails
     }
 
     // Show celebration regardless of storage operation result

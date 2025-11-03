@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { StorageProxyService } from "~/services/StorageProxyService"
 import type { Product } from "~/storage"
 import { storage } from "~/storage"
+import { ProductState } from "~/storage/types"
 import { extractProduct } from "~/utils/productExtractor"
 
 interface UseProductPageStateParams {
@@ -44,7 +45,7 @@ export function useProductPageState({
 
           // First check if this product has "iNeedThis" state - if so, hide overlay
           const existingProduct = await storage.getProduct(compositeKey)
-          if (existingProduct?.state === "iNeedThis") {
+          if (existingProduct?.state === ProductState.I_NEED_THIS) {
             console.log(
               "[useProductPageState] Product has iNeedThis state - hiding overlay"
             )
@@ -85,9 +86,9 @@ export function useProductPageState({
               )
               setCurrentView("earlyreturn")
             } else {
-              // Reminder time has passed - they already achieved by resisting
+              // Reminder time has passed - they resisted the urge to buy
               console.log(
-                "[useProductPageState] User returned after achievement - showing BackToAnOldFlame"
+                "[useProductPageState] User returned after resisting - showing BackToAnOldFlame"
               )
               setCurrentView("oldflame")
             }
