@@ -1,0 +1,61 @@
+name: Update Version
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify tag is on master branch
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          BRANCH=$(git branch -r --contains "$TAG_NAME" | grep 'origin/master' || echo "")
+          if [ -z "$BRANCH" ]; then
+            echo "Error: Tag $TAG_NAME is not on master branch"
+            exit 1
+          fi
+          echo "Tag $TAG_NAME is on master branch"
+
+      - name: Validate tag format
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          if [[ ! $TAG_NAME =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Tag format must be v0.0.1 (semantic versioning)"
+            exit 1
+          fi
+          echo "Tag format is valid: $TAG_NAME"
+
+      - name: Extract version number
+        id: extract_version
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update package.json version
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          npm version $VERSION --no-git-tag-version
+          echo "Updated package.json version to $VERSION"
+
+      - name: Commit and push changes
+        run: |
+          git add package.json
+          git commit -m "chore: update version to ${{ steps.extract_version.outputs.version }}"
+          git push origin master
