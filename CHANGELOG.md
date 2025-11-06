@@ -5,4 +5,5 @@ All notable changes to this project will be documented in this file. See [standa
 ## [0.0.1] - 2025-01-07
 
 ### Added
+
 - Initial version of the Maurice plugin

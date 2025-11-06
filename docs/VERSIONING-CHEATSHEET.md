@@ -23,19 +23,19 @@ Use these prefixes in your commit messages to trigger automatic version bumps:
 
 ### Version Bump Triggers
 
-| Commit Type | Version Bump | Example |
-|------------|--------------|---------|
-| `feat:` | **Minor** (0.0.1 → 0.1.0) | `feat: add notification system` |
-| `fix:` | **Patch** (0.0.1 → 0.0.2) | `fix: resolve timing bug` |
-| `feat!:` or `fix!:` | **Major** (0.0.1 → 1.0.0) | `feat!: breaking API change` |
-| `perf:` | **Patch** | `perf: optimize rendering` |
-| `refactor:` | **Patch** | `refactor: simplify state management` |
-| `chore:` | **None** (unless forced) | `chore: update dependencies` |
-| `docs:` | **None** (unless forced) | `docs: update README` |
-| `style:` | **None** | `style: format code` |
-| `test:` | **None** | `test: add unit tests` |
-| `build:` | **None** | `build: update webpack config` |
-| `ci:` | **None** | `ci: add GitHub Actions workflow` |
+| Commit Type         | Version Bump              | Example                               |
+| ------------------- | ------------------------- | ------------------------------------- |
+| `feat:`             | **Minor** (0.0.1 → 0.1.0) | `feat: add notification system`       |
+| `fix:`              | **Patch** (0.0.1 → 0.0.2) | `fix: resolve timing bug`             |
+| `feat!:` or `fix!:` | **Major** (0.0.1 → 1.0.0) | `feat!: breaking API change`          |
+| `perf:`             | **Patch**                 | `perf: optimize rendering`            |
+| `refactor:`         | **Patch**                 | `refactor: simplify state management` |
+| `chore:`            | **None** (unless forced)  | `chore: update dependencies`          |
+| `docs:`             | **None** (unless forced)  | `docs: update README`                 |
+| `style:`            | **None**                  | `style: format code`                  |
+| `test:`             | **None**                  | `test: add unit tests`                |
+| `build:`            | **None**                  | `build: update webpack config`        |
+| `ci:`               | **None**                  | `ci: add GitHub Actions workflow`     |
 
 ### Commit Message Format
 
@@ -48,6 +48,7 @@ Use these prefixes in your commit messages to trigger automatic version bumps:
 ```
 
 **Examples:**
+
 ```bash
 feat(notifications): add celebration notification
 fix(amazon): resolve product extraction failure
@@ -61,15 +62,18 @@ chore: update dependencies
 ### Standard Workflow (Recommended)
 
 1. **Make your changes and commit:**
+
    ```bash
    git add .
    git commit -m "feat: add new feature"
    ```
 
 2. **Create release:**
+
    ```bash
    npm run release
    ```
+
    This will:
    - Analyze commit messages since last release
    - Determine next version (patch/minor/major)
@@ -79,6 +83,7 @@ chore: update dependencies
    - Create git tag (e.g., `v0.1.0`)
 
 3. **Push tag to master:**
+
    ```bash
    git push --follow-tags origin master
    ```
@@ -118,6 +123,7 @@ npm run release:major
 ### Examples
 
 **Scenario 1: Feature addition**
+
 ```bash
 git commit -m "feat: add dark mode"
 npm run release
@@ -125,6 +131,7 @@ npm run release
 ```
 
 **Scenario 2: Bug fix**
+
 ```bash
 git commit -m "fix: resolve memory leak"
 npm run release
@@ -132,6 +139,7 @@ npm run release
 ```
 
 **Scenario 3: Breaking change**
+
 ```bash
 git commit -m "feat!: change API structure"
 npm run release
@@ -139,6 +147,7 @@ npm run release
 ```
 
 **Scenario 4: Multiple commits**
+
 ```bash
 git commit -m "feat: add feature A"
 git commit -m "fix: fix bug B"
@@ -155,12 +164,14 @@ v{major}.{minor}.{patch}
 ```
 
 **Valid examples:**
+
 - `v0.0.1`
 - `v0.1.0`
 - `v1.0.0`
 - `v2.5.3`
 
 **Invalid examples:**
+
 - `0.0.1` (missing `v` prefix)
 - `v0.0.1-beta` (no pre-release tags)
 - `v1.0` (missing patch version)
@@ -199,6 +210,7 @@ Both `development` and `master` branches are protected with:
 - ✅ Dismiss stale reviews when new commits are pushed
 
 **CODEOWNERS** (`.github/CODEOWNERS`):
+
 - `@vertefra`
 - `@emypeeler`
 
@@ -248,16 +260,16 @@ plugin-3/
 
 ## Quick Reference Table
 
-| Action | Command |
-|--------|---------|
-| Create release (auto) | `npm run release` |
-| Create patch release | `npm run release:patch` |
-| Create minor release | `npm run release:minor` |
-| Create major release | `npm run release:major` |
-| Validate tag | `npm run version:validate v0.1.0` |
-| Push tag | `git push --follow-tags origin master` |
-| View changelog | `cat CHANGELOG.md` |
-| Check current version | `cat package.json | grep version` |
+| Action                | Command                                |
+| --------------------- | -------------------------------------- | ------------- |
+| Create release (auto) | `npm run release`                      |
+| Create patch release  | `npm run release:patch`                |
+| Create minor release  | `npm run release:minor`                |
+| Create major release  | `npm run release:major`                |
+| Validate tag          | `npm run version:validate v0.1.0`      |
+| Push tag              | `git push --follow-tags origin master` |
+| View changelog        | `cat CHANGELOG.md`                     |
+| Check current version | `cat package.json                      | grep version` |
 
 ## Best Practices
 
@@ -321,4 +333,3 @@ git push --follow-tags origin master
 ---
 
 **Last Updated:** 2025-01-07
-
