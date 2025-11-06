@@ -68,6 +68,13 @@ export class NotificationService {
       )
       console.log("[NotificationService] Product state updated to dontNeedIt")
 
+      // Update reminder status to "completed" so it doesn't trigger again
+      await storage.updateReminder(reminderId, { status: "completed" })
+      console.log(
+        "[NotificationService] Reminder marked as completed:",
+        reminderId
+      )
+
       // Create celebration notification
       const notificationOptions: chrome.notifications.NotificationOptions<true> =
         {
