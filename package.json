@@ -1,7 +1,7 @@
 {
   "name": "maurice-plugin",
   "displayName": "Maurice plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Reminds you to think twice before buying!",
   "author": "Thinktwiceco",
   "engines": {
@@ -15,7 +15,11 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "version:validate": "bash scripts/validate-tag.sh"
+    "version:validate": "bash scripts/validate-tag.sh",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:patch": "standard-version --release-as patch"
   },
   "dependencies": {
     "plasmo": "^0.90.5",
@@ -34,6 +38,7 @@
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
+    "standard-version": "^9.5.0",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.46.2"
   },
