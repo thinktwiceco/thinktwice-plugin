@@ -68,7 +68,7 @@ chore: update dependencies
    git commit -m "feat: add new feature"
    ```
 
-2. **Create release:**
+2. **Create release (locally):**
 
    ```bash
    npm run release
@@ -89,10 +89,9 @@ chore: update dependencies
    ```
 
 4. **GitHub Actions automatically:**
-   - Validates tag format
+   - Validates tag format (must be v0.0.1)
    - Verifies tag is on master branch
-   - Updates version in package.json (safety net)
-   - Commits and pushes changes
+   - Verifies package.json version matches tag
 
 ### Manual Version Bump
 
