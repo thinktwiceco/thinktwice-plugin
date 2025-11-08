@@ -39,7 +39,7 @@ jobs:
           TAG_NAME=${GITHUB_REF#refs/tags/}
           TAG_VERSION=${TAG_NAME#v}
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          
+
           if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
             echo "❌ Error: package.json version ($PACKAGE_VERSION) does not match tag version ($TAG_VERSION)"
             echo "Did you run 'npm run release' before pushing the tag?"

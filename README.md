@@ -302,30 +302,6 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
 
 ---
 
-## 🤝 Contributing
-
-### Code Quality Standards
-
-- **TypeScript**: All code must be properly typed
-- **ESLint**: Code must pass linting (`npm run lint`)
-- **Prettier**: Code must be formatted (`npm run format`)
-- **React best practices**: Use functional components and hooks
-
-### Making Changes
-
-1. Create a new branch from `master`
-2. Make your changes
-3. Run linting and formatting:
-   ```bash
-   npm run lint:fix
-   npm run format
-   ```
-4. Test the extension thoroughly
-5. Commit with clear commit messages
-6. Push and create a pull request
-
----
-
 ## 📖 Documentation
 
 - **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture and data flow

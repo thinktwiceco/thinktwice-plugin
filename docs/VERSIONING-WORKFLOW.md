@@ -5,22 +5,26 @@
 When you're ready to create a new release, follow these steps:
 
 ### Step 1: Make Changes & Commit
+
 ```bash
 git add .
 git commit -m "feat: add new feature"    # Use conventional commits
 ```
 
 **Commit types:**
+
 - `feat:` → Minor version bump (0.0.1 → 0.1.0)
 - `fix:` → Patch version bump (0.0.1 → 0.0.2)
 - `feat!:` → Major version bump (0.0.1 → 1.0.0)
 
 ### Step 2: Create Release (Locally)
+
 ```bash
 npm run release
 ```
 
 **What this does:**
+
 - ✅ Analyzes commit messages since last release
 - ✅ Determines next version (patch/minor/major)
 - ✅ Updates `package.json` version
@@ -29,11 +33,13 @@ npm run release
 - ✅ Creates a git tag (e.g., `v0.1.0`)
 
 ### Step 3: Push to Master
+
 ```bash
 git push --follow-tags origin master
 ```
 
 **What happens:**
+
 - ✅ Pushes your commits and tag to master
 - ✅ GitHub Actions validates the tag format
 - ✅ GitHub Actions verifies version matches package.json
@@ -51,7 +57,7 @@ git commit -m "fix: resolve button styling"
 
 # 2. Create release (will bump to 0.1.0 because of "feat")
 npm run release
-# Output: 
+# Output:
 # ✔ bumping version in package.json from 0.0.1 to 0.1.0
 # ✔ outputting changes to CHANGELOG.md
 # ✔ created tag v0.1.0
@@ -92,9 +98,9 @@ git push --follow-tags origin master
 ## Summary
 
 **Three simple steps:**
+
 1. `git commit -m "feat: new feature"`
 2. `npm run release`
 3. `git push --follow-tags origin master`
 
 That's it!
-
