@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.4](https://github.com/thinktwiceco/plugin-3/compare/v0.0.3...v0.0.4) (2025-11-18)
+
+
+### Documentation
+
+* format documents ([3b4b6ab](https://github.com/thinktwiceco/plugin-3/commit/3b4b6ab80623287b5e5bb5dc1b555bc8a7be1f5c))
+
 ### 0.0.3 (2025-11-06)
 
 ### Bug Fixes
