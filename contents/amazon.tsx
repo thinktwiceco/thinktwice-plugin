@@ -65,7 +65,9 @@ const App = () => {
     currentView: reminderView,
     currentProduct,
     reminderId,
-    hideOverlay
+    hideOverlay,
+    pluginClosed,
+    setPluginClosed
   } = useProductPageState({
     getProductId: getAmazonProductId,
     marketplace: MARKETPLACE
@@ -82,7 +84,7 @@ const App = () => {
     // Update product state to dontNeedIt
     if (product) {
       try {
-        await ProductActionManager.dontNeedIt(product.id)
+        await ProductActionManager.dontNeedIt(product)
         console.log("[Amazon] Product marked as dontNeedIt")
       } catch (error) {
         console.error("[Amazon] Failed to execute dontNeedIt:", error)
@@ -106,8 +108,10 @@ const App = () => {
 
   // Allow "ineedit" view to show even if hideOverlay is true
   // (this allows the celebration to display before auto-closing)
-  const shouldShowOverlay = !hideOverlay || currentView === "ineedit"
+  const shouldShowOverlay =
+    !hideOverlay || currentView === "ineedit" || !pluginClosed
 
+  console.log("[PLUGIN CLOSED] Plugin closed:", shouldShowOverlay)
   // If hideOverlay is true and we're not showing the ineedit view, don't render anything
   if (!shouldShowOverlay) {
     return null
@@ -177,6 +181,7 @@ const App = () => {
           onShowIDontNeedIt={handleShowIDontNeedIt}
           onShowSleepOnIt={handleShowSleepOnIt}
           onShowINeedIt={handleShowINeedIt}
+          onClose={() => setPluginClosed(true)}
         />
       )
     }

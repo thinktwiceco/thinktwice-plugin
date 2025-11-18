@@ -9,6 +9,7 @@ export enum MessageType {
   CREATE_ALARM = "CREATE_ALARM",
   CLOSE_CURRENT_TAB = "CLOSE_CURRENT_TAB",
   CREATE_TAB = "CREATE_TAB",
+  GET_TAB_ID = "GET_TAB_ID",
   STORAGE_GET = "STORAGE_GET",
   STORAGE_SET = "STORAGE_SET",
   STORAGE_REMOVE = "STORAGE_REMOVE"
@@ -31,6 +32,10 @@ export interface CreateTabMessage {
   url: string
 }
 
+export interface GetTabIdMessage {
+  type: MessageType.GET_TAB_ID
+}
+
 export interface StorageGetMessage {
   type: MessageType.STORAGE_GET
   keys: string | string[]
@@ -51,6 +56,7 @@ export type Message =
   | CreateAlarmMessage
   | CloseCurrentTabMessage
   | CreateTabMessage
+  | GetTabIdMessage
   | StorageGetMessage
   | StorageSetMessage
   | StorageRemoveMessage

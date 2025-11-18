@@ -1,8 +1,31 @@
 /**
  * Chrome Storage Proxy Service
  *
- * Proxies storage operations for content scripts that don't have direct access.
- * Handles storage requests from content scripts via message passing.
+ * LOW-LEVEL storage service used ONLY by the background script.
+ *
+ * ROLE:
+ * - Provides direct chrome.storage.local operations with error handling
+ * - Used by background.ts to HANDLE incoming STORAGE_GET/SET/REMOVE messages
+ * - Provides storage change listener registration for React hooks
+ *
+ * CONTEXT: Background script (has direct chrome.storage access)
+ *
+ * WHEN TO USE:
+ * - In background.ts message listener to process storage requests
+ * - In hooks/components that need to listen for storage changes
+ *
+ * WHEN NOT TO USE:
+ * - DON'T use this for domain-specific operations (use BrowserStorage instead)
+ * - DON'T use this in content scripts (it assumes direct storage access)
+ *
+ * ARCHITECTURE:
+ * Content Script → sends STORAGE_GET message → Background Script
+ *                                               ↓
+ *                                         StorageProxyService.get()
+ *                                               ↓
+ *                                         chrome.storage.local
+ *
+ * See: BrowserStorage.ts for the high-level domain storage layer
  */
 
 const chromeAPI = globalThis.chrome || chrome

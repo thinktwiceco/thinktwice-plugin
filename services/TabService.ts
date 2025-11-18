@@ -13,6 +13,14 @@ export class TabService {
    * @param tabId - ID of the tab to close
    * @returns Promise that resolves when tab is closed or rejects on error
    */
+  static getTabId(): Promise<number> {
+    return new Promise((resolve, _reject) => {
+      chromeAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        resolve(tabs[0].id)
+      })
+    })
+  }
+
   static closeTab(tabId: number): Promise<void> {
     return new Promise((resolve, reject) => {
       chromeAPI.tabs.remove(tabId, () => {
