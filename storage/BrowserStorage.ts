@@ -1,13 +1,48 @@
+/**
+ * Browser Storage - Domain-Specific Storage Layer
+ *
+ * HIGH-LEVEL storage service for domain operations (Reminders, Products, Settings).
+ *
+ * ROLE:
+ * - Provides typed, domain-specific methods for all storage operations
+ * - Automatically adapts to the execution context (background vs content script)
+ * - Handles message passing when direct storage access is unavailable
+ *
+ * CONTEXT: Works in ALL contexts (background, popup, content scripts)
+ *
+ * WHEN TO USE:
+ * - ALWAYS use this for application-level storage operations
+ * - Use throughout the codebase via: import { storage } from "~/storage"
+ *
+ * WHEN NOT TO USE:
+ * - DON'T use this in background.ts message handlers (use StorageProxyService)
+ * - DON'T use this if you need low-level chrome.storage operations
+ *
+ * HOW IT WORKS:
+ * 1. Checks if direct chrome.storage.local access is available
+ * 2. If YES (background/popup): Uses chrome.storage.local directly
+ * 3. If NO (content script): Sends STORAGE_GET/SET messages to background
+ *
+ * ARCHITECTURE:
+ * Background Script:  BrowserStorage → chrome.storage.local (direct)
+ * Content Script:     BrowserStorage → Message → Background → StorageProxyService → chrome.storage.local
+ *
+ * EXPORTED AS: Singleton instance `storage` in storage/index.ts
+ *
+ * See: StorageProxyService.ts for the low-level storage proxy used by background.ts
+ */
+
 import { MessageType } from "../types/messages"
 import type { MessageResponse } from "../types/messages"
 import type { IStorage } from "./IStorage"
-import type { Product, Reminder, Settings } from "./types"
+import type { Product, Reminder, Settings, TabSessionState } from "./types"
 import { DEFAULT_SETTINGS } from "./types"
 
 const STORAGE_KEYS = {
   REMINDERS: "thinktwice_reminders",
   PRODUCTS: "thinktwice_products",
-  SETTINGS: "thinktwice_settings"
+  SETTINGS: "thinktwice_settings",
+  TAB_SESSION_STATE: "thinktwice_tab_session_state"
 }
 
 // Helper to determine if we're in a context with direct chrome.storage access
@@ -207,6 +242,35 @@ export class BrowserStorage implements IStorage {
       await storageSet({ [STORAGE_KEYS.SETTINGS]: updatedSettings })
     } catch (error) {
       console.error("Failed to update settings:", error)
+      throw error
+    }
+  }
+
+  async getCurrentTabSessionState(
+    _tabId: number
+  ): Promise<TabSessionState | null> {
+    try {
+      const result = await storageGet(STORAGE_KEYS.TAB_SESSION_STATE)
+
+      if (result[STORAGE_KEYS.TAB_SESSION_STATE]) {
+        return result[STORAGE_KEYS.TAB_SESSION_STATE] as TabSessionState
+      }
+
+      return null
+    } catch (error) {
+      console.error("Failed to get current tab session state:", error)
+      return {
+        tabId: null,
+        pluginClosed: false
+      }
+    }
+  }
+
+  async saveTabSessionState(state: TabSessionState): Promise<void> {
+    try {
+      await storageSet({ [STORAGE_KEYS.TAB_SESSION_STATE]: state })
+    } catch (error) {
+      console.error("Failed to save tab session state:", error)
       throw error
     }
   }

@@ -34,6 +34,11 @@ export interface StorageData {
   settings: Settings
 }
 
+export interface TabSessionState {
+  tabId: number | null
+  pluginClosed: boolean
+}
+
 export const DEFAULT_SETTINGS: Settings = {
   reminderDurations: [
     1 * 60 * 1000, // 1 minute (debug)

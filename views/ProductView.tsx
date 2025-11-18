@@ -19,6 +19,7 @@ type ProductViewProps = {
   onShowIDontNeedIt: (product: Product | null) => void
   onShowSleepOnIt: (product: Product | null) => void
   onShowINeedIt: () => void
+  onClose: () => void
 }
 
 const headerStyle: React.CSSProperties = {
@@ -73,7 +74,8 @@ const ProductView = ({
   marketplace,
   onShowIDontNeedIt,
   onShowSleepOnIt,
-  onShowINeedIt
+  onShowINeedIt,
+  onClose
 }: ProductViewProps) => {
   const [extractedProduct, setExtractedProduct] = useState<Product | null>(null)
 
@@ -118,7 +120,7 @@ const ProductView = ({
   return (
     <Card>
       <Header
-        onClose={() => {}}
+        onClose={onClose}
         centerIcon={<h2 style={titleStyle}>ThinkTwice</h2>}
       />
       <div style={headerStyle}>

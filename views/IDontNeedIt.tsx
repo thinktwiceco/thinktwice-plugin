@@ -1,10 +1,15 @@
 import lightbulbIcon from "url:../assets/icons/Icons/Lightbulb.svg"
 import starIcon from "url:../assets/icons/Icons/Star.svg"
+import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"
 
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import { commonSpacing, spacing, textSize } from "../design-system"
+import Celebration from "./Celebration"
+
+// Feature flag: Set to true to show investment options view
+const SHOW_INVESTMENT_OPTIONS = false
 
 type IDontNeedItProps = {
   onBack: () => void
@@ -37,6 +42,22 @@ const optionsContainerStyle: React.CSSProperties = {
 }
 
 const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
+  // When feature flag is disabled, show celebration instead of investment options
+  if (!SHOW_INVESTMENT_OPTIONS) {
+    return (
+      <Celebration
+        icon={trophyIcon}
+        iconAlt="trophy"
+        title="Great decision! You didn't need it!"
+        subtitle="Money saved for what matters."
+        autoCloseDelay={4000}
+        onBack={onBack}
+        onClose={onClose}
+      />
+    )
+  }
+
+  // Original investment options view (preserved for future use)
   const options = [
     {
       title: "Start investing",

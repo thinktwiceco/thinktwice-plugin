@@ -45,6 +45,16 @@ export class ChromeMessaging {
   }
 
   /**
+   * Get the current tab ID
+   * @returns Promise that resolves with the tab ID
+   */
+  static async getTabId(): Promise<number> {
+    return await this.sendMessage<number>({
+      type: MT.GET_TAB_ID
+    })
+  }
+
+  /**
    * Generic message sender with type safety and error handling
    * @private
    */

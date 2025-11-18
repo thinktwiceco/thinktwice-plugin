@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 
+import { ChromeMessaging } from "~/services/ChromeMessaging"
 import { StorageProxyService } from "~/services/StorageProxyService"
 import type { Product } from "~/storage"
 import { storage } from "~/storage"
@@ -16,6 +17,8 @@ interface UseProductPageStateReturn {
   currentProduct: Product | null
   reminderId: string | null
   hideOverlay: boolean
+  pluginClosed: boolean
+  setPluginClosed: (closed: boolean) => void
 }
 
 /**
@@ -32,6 +35,14 @@ export function useProductPageState({
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
   const [reminderId, setReminderId] = useState<string | null>(null)
   const [hideOverlay, setHideOverlay] = useState(true)
+  const [pluginClosed, setPluginClosedState] = useState(false)
+  const [tabIdSession, setTabIdSession] = useState<number | null>(null)
+
+  useEffect(() => {
+    ChromeMessaging.getTabId().then((tabId) => {
+      setTabIdSession(tabId)
+    })
+  }, [])
 
   useEffect(() => {
     const checkForPendingReminder = async () => {
@@ -104,9 +115,18 @@ export function useProductPageState({
       }
     }
 
-    checkForPendingReminder()
+    const checkForPluginClosed = async () => {
+      const currentTabSessionState =
+        await storage.getCurrentTabSessionState(tabIdSession)
+      if (currentTabSessionState) {
+        console.log(
+          "[useProductPageState] Plugin closed:",
+          currentTabSessionState.pluginClosed
+        )
+        setPluginClosedState(currentTabSessionState.pluginClosed)
+      }
+    }
 
-    // Set up storage change listener to re-check when products are updated
     const storageListener = (
       changes: chrome.storage.StorageChange,
       areaName: string
@@ -123,16 +143,43 @@ export function useProductPageState({
       }
     }
 
+    checkForPluginClosed()
+    checkForPendingReminder()
+
+    // Set up storage change listener to re-check when products are updated
+
     const removeListener =
       StorageProxyService.addChangeListener(storageListener)
 
     return removeListener
-  }, [getProductId, marketplace])
+  }, [getProductId, marketplace, tabIdSession])
+
+  const setPluginClosed = (closed: boolean) => {
+    console.log("[useProductPageState] Setting plugin closed:", closed)
+    storage
+      .getCurrentTabSessionState(tabIdSession)
+      .then((currentTabSessionState) => {
+        if (currentTabSessionState) {
+          storage.saveTabSessionState({
+            ...currentTabSessionState,
+            pluginClosed: closed
+          })
+        } else {
+          storage.saveTabSessionState({
+            tabId: tabIdSession,
+            pluginClosed: closed
+          })
+        }
+        console.log("[useProductPageState] Plugin closed saved")
+      })
+  }
 
   return {
     currentView,
     currentProduct,
     reminderId,
-    hideOverlay
+    hideOverlay,
+    pluginClosed,
+    setPluginClosed
   }
 }

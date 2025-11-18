@@ -159,6 +159,18 @@ chromeAPI.runtime.onMessage.addListener(
         return true
       }
 
+      if (request.type === MessageType.GET_TAB_ID) {
+        console.log("[Background] GET_TAB_ID request from tab:", sender.tab?.id)
+        if (!sender.tab?.id) {
+          console.error("[Background] No tab ID available")
+          sendResponse({ success: false, error: "No tab ID available" })
+          return false
+        }
+
+        sendResponse({ success: true, data: sender.tab.id })
+        return false
+      }
+
       // TypeScript exhaustiveness check - this should never be reached
       const _exhaustiveCheck: never = request
       console.log(
