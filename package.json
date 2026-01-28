@@ -4,9 +4,6 @@
   "version": "0.0.4",
   "description": "Reminds you to think twice before buying!",
   "author": "Thinktwiceco",
-  "engines": {
-    "node": ">=22.18.0"
-  },
   "scripts": {
     "dev": "export PARCEL_WORKERS=0 && plasmo dev",
     "build": "plasmo build",
