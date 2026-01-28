@@ -8,10 +8,13 @@ setup("Verify extension is loadable", async () => {
 
   const userDataDir = path.join(__dirname, "../../tmp/test-user-data-setup")
   const context = await chromium.launchPersistentContext(userDataDir, {
-    headless: process.env.CI ? false : process.env.HEADLESS === "true",
+    headless: true, // Always use headless for stability in CI
     args: [
       `--disable-extensions-except=${EXTENSION_PATH}`,
-      `--load-extension=${EXTENSION_PATH}`
+      `--load-extension=${EXTENSION_PATH}`,
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage"
     ]
   })
 
@@ -43,6 +46,17 @@ setup("Verify extension is loadable", async () => {
   )
   expect(isLoaded).toBe(true)
 
-  await context.close()
-  console.log("Setup: Extension verification successful")
+  // Ensure proper cleanup to prevent worker teardown timeout
+  try {
+    await context.close()
+    console.log("Setup: Extension verification successful")
+  } catch (error) {
+    console.error("Error closing context:", error)
+    // Force kill browser if normal close fails
+    try {
+      await context.browser()?.close()
+    } catch (e) {
+      console.error("Error force-closing browser:", e)
+    }
+  }
 })
