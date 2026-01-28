@@ -4,6 +4,24 @@
 
 A Chrome browser extension that helps users make more thoughtful purchasing decisions on Amazon by providing behavioral nudges, delayed gratification tools, and purchase alternatives.
 
+## 📑 Table of Contents
+
+- [🎯 Project Idea & Goal](#-project-idea--goal)
+- [📊 Project Status](#-project-status)
+- [🛠️ Technology Stack](#️-technology-stack)
+- [🚀 Local Development Setup](#-local-development-setup)
+- [📁 Project Structure](#-project-structure)
+- [🏗️ Architecture Overview](#️-architecture-overview)
+- [🔒 Privacy & Security](#-privacy--security)
+- [🔄 CI/CD & Workflows](#-cicd--workflows)
+- [📦 Versioning & Release Management](#-versioning--release-management)
+- [🤝 Contributing](#-contributing)
+- [🗄️ Data Models](#️-data-models)
+- [📖 Documentation](#-documentation)
+- [🛠️ Troubleshooting](#️-troubleshooting)
+
+---
+
 ## 🎯 Project Idea & Goal
 
 **ThinkTwice** intervenes at the moment of purchase to help users pause and reconsider whether they truly need an item. The extension appears on Amazon product pages and presents users with:
@@ -187,38 +205,75 @@ npm run format:check     # Check code formatting
 
 ```
 plugin-3/
+├── .github/             # GitHub configuration
+│   ├── workflows/       # CI/CD workflows
+│   │   ├── lint-and-format.yml    # Code quality checks
+│   │   ├── update-version.yml     # Release validation
+│   │   └── submit.yml             # Chrome Web Store submission
+│   └── CODEOWNERS       # Code ownership configuration
 ├── assets/              # Static assets (icons, images)
-│   └── icons/           # Extension icons and UI icons
+│   └── icons/           # Extension icons and UI icons (7 files)
 ├── components/          # Reusable React components
 │   ├── Nudge.tsx        # Behavioral nudge display
-│   └── ui/              # UI component library
+│   └── ui/              # UI component library (10 components)
+│       ├── Button.tsx
+│       ├── Card.tsx
+│       ├── Header.tsx
+│       ├── Loading.tsx
+│       ├── Skeleton.tsx
+│       └── ... (5 more)
 ├── contents/            # Content scripts (injected into web pages)
 │   └── amazon.tsx       # Main Amazon product page content script
-├── docs/                # Documentation
-│   ├── ARCHITECTURE.md  # System architecture overview
-│   ├── sleep-on-it-implementation.md  # Feature implementation details
-│   └── user-flows.md    # User flows and feature roadmap
-├── hooks/               # Custom React hooks
-│   ├── useStorage.ts    # Chrome storage hook
-│   └── usePendingReminder.ts  # Reminder state management
-├── storage/             # Storage abstraction layer
-│   ├── IStorage.ts      # Storage interface
+├── docs/                # Documentation (6 files)
+│   ├── ARCHITECTURE.md        # System architecture overview
+│   ├── TESTING-GUIDE.md       # Comprehensive testing procedures
+│   ├── VERSIONING-CHEATSHEET.md  # Version management quick reference
+│   ├── VERSIONING-WORKFLOW.md    # Release workflow guide
+│   ├── chrome-runtime-messages.md  # Message passing documentation
+│   └── sleep-on-it-implementation.md  # Feature implementation details
+├── hooks/               # Custom React hooks (4 files)
+│   ├── useStorage.ts           # Chrome storage reactive hook
+│   ├── usePendingReminder.ts   # Reminder state management
+│   ├── useProductPageState.ts  # Product page state management
+│   └── useGoogleFonts.ts       # Google Fonts loading hook
+├── managers/            # Business logic managers (2 files)
+│   └── ProductActionManager.ts # Product action orchestration
+├── scripts/             # Build and utility scripts
+│   └── validate-tag.sh  # Git tag validation script
+├── services/            # Core services (6 files)
+│   ├── AlarmService.ts          # Chrome alarms management
+│   ├── BadgeService.ts          # Extension badge updates
+│   ├── ChromeMessaging.ts       # Message passing utilities
+│   ├── NotificationService.ts   # Browser notifications
+│   ├── StorageProxyService.ts   # Storage proxy for content scripts
+│   └── TabService.ts            # Tab management operations
+├── storage/             # Storage abstraction layer (4 files)
+│   ├── IStorage.ts      # Storage interface definition
 │   ├── BrowserStorage.ts  # Chrome storage implementation
-│   ├── types.ts         # Data models
+│   ├── types.ts         # Data models (Product, Reminder, Settings)
 │   └── index.ts         # Storage singleton export
+├── types/               # TypeScript type definitions
+│   └── messages.ts      # Message type definitions
 ├── utils/               # Utility functions
 │   └── productExtractor.ts  # Extract product data from Amazon DOM
-├── views/               # View components (screen-level)
-│   ├── ProductView.tsx  # Main decision screen
-│   ├── IDontNeedIt.tsx  # Investment options screen
-│   ├── SleepOnIt.tsx    # Reminder duration selection
-│   ├── INeedIt.tsx      # Confirmation screen
-│   └── Celebration.tsx  # Success/celebration screen
-├── background.ts        # Background service worker
-├── popup.tsx            # Extension popup (click icon)
+├── views/               # View components (screen-level, 8 files)
+│   ├── ProductView.tsx              # Main decision screen
+│   ├── IDontNeedIt.tsx              # Investment options screen
+│   ├── SleepOnIt.tsx                # Reminder duration selection
+│   ├── INeedIt.tsx                  # Confirmation screen
+│   ├── Celebration.tsx              # Success/celebration screen
+│   ├── CelebrateThoughtfulPurchase.tsx
+│   ├── EarlyReturnFromSleep.tsx     # Early return flow
+│   └── BackToAnOldFlame.tsx         # Revisit product flow
+├── background.ts        # Background service worker (295 lines)
+├── popup.tsx            # Extension popup (332 lines)
 ├── style.css            # Global styles
 ├── design-system.ts     # Design tokens and theme
-└── package.json         # Dependencies and scripts
+├── package.json         # Dependencies and scripts
+├── tsconfig.json        # TypeScript configuration
+├── .versionrc.json      # Changelog generation config
+├── .prettierrc.mjs      # Prettier formatting config
+└── eslint.config.mts    # ESLint configuration
 ```
 
 ---
@@ -264,6 +319,213 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
 
 ---
 
+## 🔒 Privacy & Security
+
+- **Local storage only** - No data sent to external servers
+- **No tracking** - No analytics or telemetry
+- **User control** - Users can dismiss reminders and clear data
+- **Minimal data collection** - Only stores what's necessary for functionality
+
+---
+
+## 🔄 CI/CD & Workflows
+
+### GitHub Actions Workflows
+
+The project has three automated workflows:
+
+#### 1. **Lint and Format** (`lint-and-format.yml`)
+
+Runs on every push and pull request to `master`:
+
+- ✓ Checks code with ESLint
+- ✓ Validates formatting with Prettier
+- ✓ Uses Node.js 22.18.0
+
+```bash
+# Run locally before committing
+npm run lint        # Check for linting errors
+npm run lint:fix    # Auto-fix linting errors
+npm run format:check  # Check formatting
+npm run format      # Auto-format code
+```
+
+#### 2. **Validate Release** (`update-version.yml`)
+
+Runs when a new version tag is pushed (e.g., `v0.0.5`):
+
+- ✓ Verifies tag is on `master` branch
+- ✓ Validates tag format (semantic versioning: `vX.Y.Z`)
+- ✓ Confirms `package.json` version matches tag version
+
+#### 3. **Submit to Web Store** (`submit.yml`)
+
+Manual workflow for publishing to Chrome Web Store:
+
+- Builds production extension
+- Packages as `.zip` file
+- Submits to Chrome Web Store using secrets
+
+---
+
+## 📦 Versioning & Release Management
+
+### Version Scheme
+
+This project follows **[Semantic Versioning](https://semver.org/)** (SemVer):
+
+- **MAJOR** version (X.0.0): Breaking changes
+- **MINOR** version (0.X.0): New features (backwards compatible)
+- **PATCH** version (0.0.X): Bug fixes
+
+Current version: **0.0.4**
+
+### Creating a New Release
+
+The project uses [standard-version](https://github.com/conventional-changelog/standard-version) for automated versioning and changelog generation.
+
+#### Quick Release Commands
+
+```bash
+# Patch release (0.0.4 → 0.0.5) - Bug fixes only
+npm run release:patch
+
+# Minor release (0.0.4 → 0.1.0) - New features
+npm run release:minor
+
+# Major release (0.0.4 → 1.0.0) - Breaking changes
+npm run release:major
+
+# Auto-detect version bump based on commits
+npm run release
+```
+
+#### Release Workflow
+
+1. **Make your changes** and commit using [Conventional Commits](#commit-message-convention)
+2. **Run release script**:
+
+   ```bash
+   npm run release:patch  # or minor/major
+   ```
+
+   This will:
+   - Bump version in `package.json`
+   - Update `CHANGELOG.md` based on commits
+   - Create a git commit with message `chore(release): vX.Y.Z`
+   - Create a git tag `vX.Y.Z`
+
+3. **Push to GitHub**:
+
+   ```bash
+   git push --follow-tags origin master
+   ```
+
+4. **GitHub Actions** will validate the release automatically
+
+See [docs/VERSIONING-WORKFLOW.md](./docs/VERSIONING-WORKFLOW.md) for detailed release procedures.
+
+### Commit Message Convention
+
+This project follows **[Conventional Commits](https://www.conventionalcommits.org/)** specification:
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:**
+
+- `feat`: New features → appears in changelog
+- `fix`: Bug fixes → appears in changelog
+- `docs`: Documentation changes → appears in changelog
+- `refactor`: Code refactoring → appears in changelog
+- `perf`: Performance improvements → appears in changelog
+- `chore`: Maintenance tasks → appears in changelog
+- `style`: Formatting, no code change → hidden
+- `test`: Test changes → hidden
+- `ci`: CI/CD changes → appears in changelog
+- `build`: Build system changes → appears in changelog
+
+**Examples:**
+
+```bash
+# Feature commit
+git commit -m "feat(sleep-on-it): add custom reminder duration input"
+
+# Bug fix commit
+git commit -m "fix(notifications): correct badge count calculation"
+
+# Breaking change commit
+git commit -m "feat(storage)!: change reminder data model
+
+BREAKING CHANGE: Reminder schema now requires productId field"
+```
+
+Changelog configuration is in [.versionrc.json](./.versionrc.json).
+
+---
+
+## 🤝 Contributing
+
+### Development Workflow
+
+1. **Create a feature branch**:
+
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+
+2. **Make changes** following the code style
+
+3. **Test your changes**:
+
+   ```bash
+   npm run dev  # Start dev server
+   # Load extension in Chrome and test manually
+   ```
+
+4. **Lint and format**:
+
+   ```bash
+   npm run lint:fix
+   npm run format
+   ```
+
+5. **Commit using Conventional Commits**:
+
+   ```bash
+   git commit -m "feat(scope): description"
+   ```
+
+6. **Push and create Pull Request**
+
+### Code Quality Standards
+
+- **TypeScript**: All code must be typed (no `any` unless absolutely necessary)
+- **ESLint**: Must pass `npm run lint` with no errors
+- **Prettier**: Code must be formatted (run `npm run format`)
+- **React Best Practices**: Use hooks, functional components, proper prop types
+
+### Testing Checklist
+
+Before submitting a PR, test:
+
+- ✓ Extension loads without errors
+- ✓ Product page overlay appears on Amazon
+- ✓ All three decision flows work (I don't need it, Sleep on it, I need it)
+- ✓ Reminders save and alarms fire correctly
+- ✓ Notifications appear at scheduled times
+- ✓ Extension popup displays reminders properly
+- ✓ No console errors in any context (content script, background, popup)
+
+See [docs/TESTING-GUIDE.md](./docs/TESTING-GUIDE.md) for comprehensive testing procedures.
+
+---
+
 ## 🗄️ Data Models
 
 ### Product
@@ -276,6 +538,7 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
   image: string | null // Product image URL
   url: string // Full Amazon product URL
   timestamp: number // When saved (Date.now())
+  state?: "sleepingOnIt" | "dontNeedIt" | "iNeedThis" // Product decision state
 }
 ```
 
@@ -291,22 +554,65 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed architecture doc
 }
 ```
 
----
+### Settings
 
-## 🔒 Privacy & Security
-
-- **Local storage only** - No data sent to external servers
-- **No tracking** - No analytics or telemetry
-- **User control** - Users can dismiss reminders and clear data
-- **Minimal data collection** - Only stores what's necessary for functionality
+```typescript
+{
+  reminderDurations: number[]  // Available duration options in ms
+  defaultDuration: number      // Default selected duration in ms
+}
+```
 
 ---
 
 ## 📖 Documentation
 
-- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture and data flow
-- **[sleep-on-it-implementation.md](./docs/sleep-on-it-implementation.md)** - Implementation details
-- **[user-flows.md](./docs/user-flows.md)** - User flows and feature roadmap
+### Core Documentation
+
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture, data flow, and storage layer design
+- **[TESTING-GUIDE.md](./docs/TESTING-GUIDE.md)** - Comprehensive manual testing procedures with 50+ test cases
+- **[VERSIONING-WORKFLOW.md](./docs/VERSIONING-WORKFLOW.md)** - Release workflow and version management guide
+- **[VERSIONING-CHEATSHEET.md](./docs/VERSIONING-CHEATSHEET.md)** - Quick reference for versioning commands
+- **[chrome-runtime-messages.md](./docs/chrome-runtime-messages.md)** - Message passing architecture documentation
+- **[sleep-on-it-implementation.md](./docs/sleep-on-it-implementation.md)** - Detailed "Sleep on it" feature implementation
+
+### Quick Links
+
+- **Installation**: See [Local Development Setup](#-local-development-setup)
+- **Testing**: See [Testing the Extension](#testing-the-extension) and [TESTING-GUIDE.md](./docs/TESTING-GUIDE.md)
+- **Architecture**: See [Architecture Overview](#️-architecture-overview) and [ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- **Release**: See [Versioning & Release Management](#-versioning--release-management)
+- **Contributing**: See [Contributing](#-contributing)
+
+---
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+**Extension doesn't load:**
+
+- Ensure Node.js version is exactly 22.18.0
+- Delete `node_modules` and `build` directories, reinstall: `npm install`
+- Check for errors in `chrome://extensions/` console
+
+**Overlay doesn't appear on Amazon:**
+
+- Verify you're on a product page (URL contains `/dp/` or `/gp/product/`)
+- Check content script console in DevTools (F12)
+- Ensure extension permissions are granted
+
+**Reminders don't trigger:**
+
+- Check background service worker console for alarm events
+- Verify browser notifications are enabled
+- Ensure Chrome is running (service worker may sleep but will wake for alarms)
+
+**Build fails:**
+
+- Ensure you're using exact Node.js version: `nvm use 22.18.0`
+- Clear Plasmo cache: `rm -rf .plasmo`
+- Reinstall dependencies: `npm ci`
 
 ---
 
@@ -316,4 +622,10 @@ Built with [Plasmo](https://www.plasmo.com/) - The browser extension framework
 
 ---
 
-**Last Updated**: November 2, 2025
+## 📄 License
+
+Copyright © 2025 Thinktwiceco
+
+---
+
+**Last Updated**: January 28, 2026
