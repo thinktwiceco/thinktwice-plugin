@@ -319,4 +319,156 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
       "[Test] Successfully verified product moved to Achievements after reminder expired"
     )
   })
+
+  test('should handle "I changed my mind" button click', async () => {
+    const page = await context.newPage()
+
+    // 1. Find extension ID
+    let [worker] = context.serviceWorkers()
+    if (!worker) {
+      worker = await context.waitForEvent("serviceworker")
+    }
+    const extensionId = worker.url().split("/")[2]
+
+    // 2. Clear storage to ensure clean state
+    const popupPage = await context.newPage()
+    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`)
+    await popupPage.evaluate(() => chrome.storage.local.clear())
+    await popupPage.close()
+
+    // 3. Navigate to the test product page
+    await page.goto(
+      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
+      {
+        waitUntil: "load"
+      }
+    )
+
+    // 4. Wait for the overlay to be attached
+    const overlayHost = page
+      .locator(
+        'plasmo-csui, plasmo-cs-ui, plasmo-cs-overlay, [id^="plasmo-csui"]'
+      )
+      .first()
+    await expect(overlayHost).toBeAttached({ timeout: 20000 })
+
+    // 5. Extract product information
+    const productName = await page
+      .locator("#productTitle")
+      .first()
+      .textContent()
+    const productPriceElement = await page
+      .locator(".a-price .a-offscreen")
+      .first()
+      .textContent()
+
+    console.log(`[Test] Product Name: ${productName}`)
+    console.log(`[Test] Product Price: ${productPriceElement}`)
+
+    // 6. Click "Sleep on it"
+    const sleepOnItButton = overlayHost
+      .getByRole("button", { name: /Sleep on it/i })
+      .first()
+    await expect(sleepOnItButton).toBeVisible({ timeout: 10000 })
+    await sleepOnItButton.click()
+
+    // 7. Verify we're in the Sleep on it view
+    const sleepOnItTitle = overlayHost
+      .locator('text="Brilliant choice!"')
+      .first()
+    await expect(sleepOnItTitle).toBeVisible({ timeout: 10000 })
+
+    // 8. Select "24 hours" duration
+    const oneDayButton = overlayHost
+      .getByRole("button", { name: /24 hours/i })
+      .first()
+    await expect(oneDayButton).toBeVisible({ timeout: 5000 })
+    await oneDayButton.click()
+
+    // 9. Click "Set Reminder"
+    const setReminderButton = overlayHost
+      .getByRole("button", { name: /Set Reminder/i })
+      .first()
+    await expect(setReminderButton).toBeVisible({ timeout: 5000 })
+    await setReminderButton.click()
+
+    // 10. Wait for success message
+    const successMessage = overlayHost
+      .locator(
+        'text="✓ Reminder saved! Hold tight and remember about the goal!"'
+      )
+      .first()
+    await expect(successMessage).toBeVisible({ timeout: 10000 })
+
+    // 11. Wait for tab to close or overlay to disappear
+    try {
+      await page.waitForTimeout(5000)
+      if (!page.isClosed()) {
+        await page.close()
+      }
+    } catch {
+      console.log("[Test] Tab was closed as expected")
+    }
+
+    // 12. Open the popup
+    const popup = await context.newPage()
+    await popup.goto(`chrome-extension://${extensionId}/popup.html`)
+    await popup.waitForLoadState("load")
+
+    // 13. Verify "Sleeping on it" section is present
+    const sleepingOnItSection = popup.locator('h3:has-text("Sleeping on it")')
+    await expect(sleepingOnItSection).toBeVisible({ timeout: 10000 })
+
+    // 14. Verify the product is in the sleeping section
+    if (productName) {
+      const trimmedName = productName.trim()
+      const productNameInPopup = popup.locator(`text="${trimmedName}"`)
+      await expect(productNameInPopup).toBeVisible({ timeout: 5000 })
+    }
+
+    // 15. Click "I changed my mind" button
+    const changedMindButton = popup.getByRole("button", {
+      name: /I changed my mind/i
+    })
+    await expect(changedMindButton).toBeVisible({ timeout: 5000 })
+
+    // 16. Set up listener for new page (product page should open)
+    const newPagePromise = context.waitForEvent("page")
+    await changedMindButton.click()
+
+    // 17. Wait for the product page to open
+    const productPage = await newPagePromise
+    await productPage.waitForLoadState("load")
+
+    // 18. Verify we're on the correct product page
+    expect(productPage.url()).toContain(TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    console.log("[Test] Product page opened successfully")
+
+    // 19. Reload the popup to see updated state
+    await popup.reload()
+    await popup.waitForLoadState("load")
+
+    // 20. Verify the product is NO LONGER in "Sleeping on it" section
+    const sleepingOnItSectionAfter = popup.locator(
+      'h3:has-text("Sleeping on it")'
+    )
+    const sleepingItemsExist = await sleepingOnItSectionAfter.count()
+
+    if (sleepingItemsExist > 0 && productName) {
+      // If section still exists, verify the specific product is not there
+      const trimmedName = productName.trim()
+      const productInSleeping = popup.locator(`text="${trimmedName}"`)
+      await expect(productInSleeping).not.toBeVisible({ timeout: 5000 })
+    } else {
+      // Section should not exist if there are no sleeping items
+      await expect(sleepingOnItSectionAfter).not.toBeVisible({ timeout: 5000 })
+    }
+
+    console.log(
+      '[Test] Successfully verified "I changed my mind" flow - product removed from sleeping section'
+    )
+
+    // Clean up
+    await productPage.close()
+  })
 })
