@@ -6,6 +6,7 @@
   "author": "Thinktwiceco",
   "scripts": {
     "dev": "export PARCEL_WORKERS=0 && plasmo dev",
+    "build:test": "plasmo build --target=chrome-mv3 --dev",
     "build": "plasmo build",
     "package": "plasmo package",
     "lint": "eslint .",
