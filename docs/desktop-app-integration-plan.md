@@ -8,6 +8,7 @@
 ## Overview
 
 Build an Electron desktop application that:
+
 - Runs Agent Forge Go server locally
 - Provides AI-powered purchase advice via chat interface
 - Receives product data from Chrome extension
@@ -47,12 +48,14 @@ Build an Electron desktop application that:
 **Technology:** Go, using existing Agent Forge codebase
 
 **Requirements:**
+
 - Single main agent with comprehensive system prompt
 - HTTP API endpoints for product analysis
 - Conversation persistence for user history
 - LLM integration (OpenAI, TogetherAI, or DeepSeek)
 
 **System Prompt:**
+
 ```
 You are ThinkTwice, a thoughtful purchase decision advisor.
 
@@ -68,6 +71,7 @@ Be friendly, non-judgmental, and focus on empowering thoughtful choices.
 ```
 
 **API Endpoints:**
+
 - `POST /api/chat` - Send product info and user message, receive streaming response
 - `GET /api/history` - Retrieve conversation history
 - `GET /api/stats` - Get savings statistics
@@ -78,6 +82,7 @@ Be friendly, non-judgmental, and focus on empowering thoughtful choices.
 **Technology:** Electron, Node.js
 
 **Main Process Responsibilities:**
+
 - Spawn Agent Forge Go binary on startup
 - Register custom protocol handler (`thinktwice://`)
 - Create application window
@@ -85,6 +90,7 @@ Be friendly, non-judgmental, and focus on empowering thoughtful choices.
 - Handle graceful shutdown
 
 **Files:**
+
 - `main.js` - Electron main process
 - `preload.js` - Security bridge between renderer and main
 - `package.json` - Dependencies and build config
@@ -95,6 +101,7 @@ Be friendly, non-judgmental, and focus on empowering thoughtful choices.
 **Technology:** React + TypeScript, Vite
 
 **Features:**
+
 - Chat interface for AI interaction
 - Product card display (image, name, price)
 - Streaming response rendering
@@ -102,6 +109,7 @@ Be friendly, non-judgmental, and focus on empowering thoughtful choices.
 - Purchase history view
 
 **Key Components:**
+
 - `ProductAnalysisView.tsx` - Main view when product received
 - `ChatInterface.tsx` - Message input and response display
 - `StatsPanel.tsx` - Savings and decision statistics
@@ -112,22 +120,26 @@ Be friendly, non-judgmental, and focus on empowering thoughtful choices.
 **Changes Required:** Minimal
 
 **New Features:**
+
 - Button to "Ask ThinkTwice" on product pages
 - Send product data via custom protocol
 
 **Implementation:**
+
 ```typescript
 // New button handler
 async function openThinkTwiceDesktop(product: Product) {
-  const url = `thinktwice://analyze?` + new URLSearchParams({
-    productId: product.id,
-    name: product.name,
-    price: product.price || '0',
-    imageUrl: product.image || '',
-    url: product.url
-  });
-  
-  chrome.tabs.create({ url });
+  const url =
+    `thinktwice://analyze?` +
+    new URLSearchParams({
+      productId: product.id,
+      name: product.name,
+      price: product.price || "0",
+      imageUrl: product.image || "",
+      url: product.url
+    })
+
+  chrome.tabs.create({ url })
 }
 ```
 
@@ -141,19 +153,20 @@ async function openThinkTwiceDesktop(product: Product) {
 **Format:** `thinktwice://analyze?productId=X&name=Y&price=Z&imageUrl=A&url=B`
 
 **Electron Handler:**
+
 ```javascript
-app.on('open-url', (event, url) => {
-  event.preventDefault();
-  const params = new URLSearchParams(url.split('?')[1]);
-  mainWindow.webContents.send('product-received', {
-    productId: params.get('productId'),
-    name: params.get('name'),
-    price: params.get('price'),
-    imageUrl: params.get('imageUrl'),
-    url: params.get('url')
-  });
-  mainWindow.show();
-});
+app.on("open-url", (event, url) => {
+  event.preventDefault()
+  const params = new URLSearchParams(url.split("?")[1])
+  mainWindow.webContents.send("product-received", {
+    productId: params.get("productId"),
+    name: params.get("name"),
+    price: params.get("price"),
+    imageUrl: params.get("imageUrl"),
+    url: params.get("url")
+  })
+  mainWindow.show()
+})
 ```
 
 ### Frontend → Agent Forge
@@ -162,6 +175,7 @@ app.on('open-url', (event, url) => {
 **Format:** JSON
 
 **Example Request:**
+
 ```json
 POST http://localhost:8000/api/chat
 {
@@ -191,6 +205,7 @@ cd thinktwice-desktop && npm run dev
 ### Production Build
 
 1. **Compile Agent Forge:**
+
    ```bash
    GOOS=darwin GOARCH=arm64 go build -o server-mac
    GOOS=windows GOARCH=amd64 go build -o server.exe
@@ -198,6 +213,7 @@ cd thinktwice-desktop && npm run dev
    ```
 
 2. **Package Electron:**
+
    ```bash
    npm run build
    npm run package  # Creates .dmg, .exe, .AppImage
@@ -213,6 +229,7 @@ cd thinktwice-desktop && npm run dev
    ```
 
 ### Installer Size Estimate
+
 - Electron: ~100 MB
 - Agent Forge binary: ~15-20 MB
 - Frontend assets: ~5 MB
@@ -223,15 +240,18 @@ cd thinktwice-desktop && npm run dev
 ## Cloud Migration Strategy
 
 ### Phase 1: Local Only (MVP)
+
 - Everything runs locally
 - No external dependencies except LLM API
 
 ### Phase 2: Hybrid
+
 - Try local server first
 - Fallback to cloud if unavailable
 - Sync conversation history
 
 ### Phase 3: Full Cloud
+
 - Deploy Agent Forge to cloud service
 - Electron becomes optional
 - Chrome extension can call cloud directly
