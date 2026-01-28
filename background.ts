@@ -202,6 +202,7 @@ AlarmService.registerListener(async (alarm) => {
 
 // ===== Notification Click Handlers =====
 NotificationService.registerClickListener()
+NotificationService.registerButtonClickListener(storage)
 
 // ===== Storage Change Listener =====
 // Watch for changes to reminders storage and update badge count immediately

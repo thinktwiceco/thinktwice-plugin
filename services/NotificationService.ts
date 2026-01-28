@@ -75,7 +75,7 @@ export class NotificationService {
         reminderId
       )
 
-      // Create celebration notification
+      // Create celebration notification with action buttons
       const notificationOptions: chrome.notifications.NotificationOptions<true> =
         {
           type: "basic" as const,
@@ -86,7 +86,8 @@ export class NotificationService {
             ? `You saved ${product.price}`
             : "Great job resisting!",
           requireInteraction: false,
-          priority: 2
+          priority: 2,
+          buttons: [{ title: "View Product" }, { title: "Not Interested" }]
         }
 
       chromeAPI.notifications.create(
@@ -126,6 +127,98 @@ export class NotificationService {
       chromeAPI.notifications.clear(notificationId)
     })
 
-    console.log("[NotificationService] Notification listener registered")
+    console.log("[NotificationService] Notification click listener registered")
+  }
+
+  /**
+   * Register notification button click handler
+   * Handles "View Product" and "Not Interested" button clicks
+   * @param storage - Storage interface for accessing reminders and products
+   */
+  static registerButtonClickListener(storage: IStorage): void {
+    if (!this.isAvailable()) {
+      console.error(
+        "[NotificationService] Cannot register button listener - chrome.notifications is undefined"
+      )
+      return
+    }
+
+    chromeAPI.notifications.onButtonClicked.addListener(
+      async (notificationId, buttonIndex) => {
+        console.log(
+          "[NotificationService] Notification button clicked:",
+          notificationId,
+          "buttonIndex:",
+          buttonIndex
+        )
+
+        try {
+          // notificationId is the reminderId
+          const reminderId = notificationId
+          const reminder = await storage.getReminderById(reminderId)
+
+          if (!reminder) {
+            console.error(
+              "[NotificationService] Reminder not found:",
+              reminderId
+            )
+            chromeAPI.notifications.clear(notificationId)
+            return
+          }
+
+          const product = await storage.getProduct(reminder.productId)
+
+          if (!product) {
+            console.error(
+              "[NotificationService] Product not found:",
+              reminder.productId
+            )
+            chromeAPI.notifications.clear(notificationId)
+            return
+          }
+
+          // Button index 0 = "View Product", index 1 = "Not Interested"
+          if (buttonIndex === 0) {
+            // View Product: Open product page in new tab and mark reminder as completed
+            console.log(
+              "[NotificationService] View Product clicked - opening:",
+              product.url
+            )
+            const { TabService } = await import("./TabService")
+            await TabService.createTab(product.url)
+            await storage.updateReminder(reminderId, { status: "completed" })
+            console.log(
+              "[NotificationService] Reminder marked as completed:",
+              reminderId
+            )
+          } else if (buttonIndex === 1) {
+            // Not Interested: Mark reminder as dismissed
+            console.log(
+              "[NotificationService] Not Interested clicked - dismissing reminder:",
+              reminderId
+            )
+            await storage.updateReminder(reminderId, { status: "dismissed" })
+            console.log(
+              "[NotificationService] Reminder marked as dismissed:",
+              reminderId
+            )
+          }
+
+          // Clear the notification
+          chromeAPI.notifications.clear(notificationId)
+        } catch (error) {
+          console.error(
+            "[NotificationService] Error handling button click:",
+            error
+          )
+          // Clear notification even on error
+          chromeAPI.notifications.clear(notificationId)
+        }
+      }
+    )
+
+    console.log(
+      "[NotificationService] Notification button click listener registered"
+    )
   }
 }
