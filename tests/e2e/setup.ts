@@ -19,32 +19,27 @@ setup("Verify extension is loadable", async () => {
   })
 
   const page = await context.newPage()
-  await page.goto("chrome://extensions")
 
-  // Wait for the extensions list to load
-  await page.waitForTimeout(2000)
+  // In headless mode, we can't navigate to chrome:// URLs
+  // Instead, verify the extension by loading a real Amazon page
+  // and checking if the extension's content script loads
+  console.log("Setup: Loading Amazon product page to verify extension...")
 
-  // Try to find the extension name to verify it's loaded
-  const extensionNames = await page.evaluate(() => {
-    const manager = document.querySelector("extensions-manager")
-    if (!manager) return []
-    const itemList = manager.shadowRoot?.querySelector("extensions-item-list")
-    if (!itemList) return []
-    const items = Array.from(
-      itemList.shadowRoot?.querySelectorAll("extensions-item") || []
-    )
-    return items.map(
-      (item) => item.shadowRoot?.querySelector("#name")?.textContent
-    )
+  await page.goto(
+    "https://www.amazon.com/dp/B0CX23V2ZK",
+    { waitUntil: "domcontentloaded" }
+  )
+
+  // Wait for the extension to inject its content script
+  await page.waitForTimeout(3000)
+
+  // Check if the extension's overlay element exists
+  const overlayExists = await page.evaluate(() => {
+    return document.querySelector("plasmo-csui") !== null
   })
 
-  console.log("Extensions found during setup:", extensionNames)
-
-  // Check if "Maurice plugin" or "ThinkTwice" is in the list
-  const isLoaded = extensionNames.some(
-    (name) => name?.includes("Maurice plugin") || name?.includes("ThinkTwice")
-  )
-  expect(isLoaded).toBe(true)
+  console.log("Setup: Extension overlay detected:", overlayExists)
+  expect(overlayExists).toBe(true)
 
   // Ensure proper cleanup to prevent worker teardown timeout
   try {
