@@ -65,6 +65,7 @@ const App = () => {
     currentView: reminderView,
     currentProduct,
     reminderId,
+    reminderStartTime,
     hideOverlay,
     pluginClosed,
     setPluginClosed
@@ -109,9 +110,13 @@ const App = () => {
   // Allow "ineedit" view to show even if hideOverlay is true
   // (this allows the celebration to display before auto-closing)
   const shouldShowOverlay =
-    !hideOverlay || currentView === "ineedit" || !pluginClosed
+    (!hideOverlay && !pluginClosed) || currentView === "ineedit"
 
-  console.log("[PLUGIN CLOSED] Plugin closed:", shouldShowOverlay)
+  console.log("[PLUGIN CLOSED] Should show overlay:", shouldShowOverlay, {
+    hideOverlay,
+    pluginClosed,
+    currentView
+  })
   // If hideOverlay is true and we're not showing the ineedit view, don't render anything
   if (!shouldShowOverlay) {
     return null
@@ -128,6 +133,7 @@ const App = () => {
           <EarlyReturnFromSleep
             product={currentProduct}
             reminderId={reminderId || ""}
+            reminderStartTime={reminderStartTime || 0}
             onShowINeedIt={handleShowINeedIt}
             onClose={handleBackToProduct}
           />
@@ -139,6 +145,7 @@ const App = () => {
           <BackToAnOldFlame
             product={currentProduct}
             reminderId={reminderId || ""}
+            reminderStartTime={reminderStartTime || 0}
             onShowThoughtfulPurchase={handleShowThoughtfulPurchase}
             onClose={handleBackToProduct}
           />
@@ -153,7 +160,7 @@ const App = () => {
         return (
           <IDontNeedIt
             onBack={handleBackToProduct}
-            onClose={handleBackToProduct}
+            onClose={() => setPluginClosed(true)}
           />
         )
       }
@@ -162,7 +169,7 @@ const App = () => {
         return (
           <SleepOnIt
             onBack={handleBackToProduct}
-            onClose={handleBackToProduct}
+            onClose={() => setPluginClosed(true)}
             product={localProduct}
           />
         )
@@ -170,7 +177,10 @@ const App = () => {
 
       if (currentView === "ineedit") {
         return (
-          <INeedIt onBack={handleBackToProduct} onClose={handleBackToProduct} />
+          <INeedIt
+            onBack={handleBackToProduct}
+            onClose={() => setPluginClosed(true)}
+          />
         )
       }
 

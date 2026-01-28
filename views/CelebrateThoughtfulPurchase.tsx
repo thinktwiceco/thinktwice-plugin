@@ -13,7 +13,7 @@ const CelebrateThoughtfulPurchase = ({
     <Celebration
       icon={trophyIcon}
       iconAlt="trophy"
-      title="Congrats on making a thoughtful purchase! 🎉"
+      title="Well done! You made a thoughtful choice! 🎉"
       subtitle="You took the time to think it through."
       autoCloseDelay={2000}
       onClose={onClose}

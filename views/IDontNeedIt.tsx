@@ -5,6 +5,7 @@ import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
+import PrivacyBadge from "../components/ui/PrivacyBadge"
 import { commonSpacing, spacing, textSize } from "../design-system"
 import Celebration from "./Celebration"
 
@@ -48,8 +49,8 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
       <Celebration
         icon={trophyIcon}
         iconAlt="trophy"
-        title="Great decision! You didn't need it!"
-        subtitle="Money saved for what matters."
+        title="Well done for choosing not to buy! 🎉"
+        subtitle="Your future self will thank you for being so thoughtful."
         autoCloseDelay={4000}
         onBack={onBack}
         onClose={onClose}
@@ -74,7 +75,7 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
   ]
 
   return (
-    <Card>
+    <Card footer={<PrivacyBadge />}>
       <Header
         onBack={onBack}
         onClose={onClose}

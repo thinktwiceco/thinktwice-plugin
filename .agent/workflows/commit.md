@@ -27,11 +27,12 @@ Commit the current changes following Conventional Commits specification.
 - If breaking change, add `!` after scope or include `BREAKING CHANGE:` in footer
 - Scope is optional but recommended
 
-## Linting and formatting
+## Linting, testing and formatting
 
-- Before committing execute linting and formatting checks:
+- Before committing execute linting, testing and formatting checks:
   - `npm run lint` or `npm run lint:fix`
   - `npm run format:check` or `npm run format`
+  - `npm run test:e2e`
 
 ## CRITICAL
 

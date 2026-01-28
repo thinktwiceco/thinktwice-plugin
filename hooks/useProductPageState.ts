@@ -16,6 +16,8 @@ interface UseProductPageStateReturn {
   currentView: "product" | "earlyreturn" | "oldflame" | null
   currentProduct: Product | null
   reminderId: string | null
+  reminderDuration: number | null
+  reminderStartTime: number | null
   hideOverlay: boolean
   pluginClosed: boolean
   setPluginClosed: (closed: boolean) => void
@@ -34,6 +36,10 @@ export function useProductPageState({
   >(null)
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
   const [reminderId, setReminderId] = useState<string | null>(null)
+  const [reminderDuration, setReminderDuration] = useState<number | null>(null)
+  const [reminderStartTime, setReminderStartTime] = useState<number | null>(
+    null
+  )
   const [hideOverlay, setHideOverlay] = useState(true)
   const [pluginClosed, setPluginClosedState] = useState(false)
   const [tabIdSession, setTabIdSession] = useState<number | null>(null)
@@ -48,14 +54,54 @@ export function useProductPageState({
     const checkForPendingReminder = async () => {
       const url = window.location.href
       const productId = getProductId(url)
+      console.log(
+        "[useProductPageState] Extracted productId:",
+        productId,
+        "from url:",
+        url
+      )
 
       if (productId) {
         try {
+          // Check if there's an active global snooze first
+          console.log("[useProductPageState] Checking for global snooze...")
+          const snoozedUntil = await storage.getGlobalSnooze()
+          console.log(
+            "[useProductPageState] Global snooze value:",
+            snoozedUntil
+          )
+
+          if (snoozedUntil) {
+            const now = Date.now()
+            if (snoozedUntil > now) {
+              // Snooze is still active - hide overlay
+              console.log(
+                "[useProductPageState] Global snooze active until:",
+                new Date(snoozedUntil)
+              )
+              setHideOverlay(true)
+              setCurrentView(null)
+              return
+            } else {
+              // Snooze has expired - clear it
+              console.log("[useProductPageState] Snooze expired, clearing...")
+              await storage.clearGlobalSnooze()
+            }
+          }
+
           // Create composite key for storage lookup
           const compositeKey = `${marketplace}-${productId}`
+          console.log(
+            "[useProductPageState] Checking product storage for key:",
+            compositeKey
+          )
 
           // First check if this product has "iNeedThis" state - if so, hide overlay
           const existingProduct = await storage.getProduct(compositeKey)
+          console.log(
+            "[useProductPageState] Existing product state:",
+            existingProduct?.state
+          )
           if (existingProduct?.state === ProductState.I_NEED_THIS) {
             console.log(
               "[useProductPageState] Product has iNeedThis state - hiding overlay"
@@ -81,7 +127,10 @@ export function useProductPageState({
               "[useProductPageState] Found pending reminder for this product:",
               pendingReminder.id
             )
-            setReminderId(pendingReminder.id)
+            setReminderDuration(pendingReminder.duration)
+            setReminderStartTime(
+              pendingReminder.reminderTime - pendingReminder.duration
+            )
 
             // Extract product info
             const product = extractProduct(marketplace, productId)
@@ -104,6 +153,9 @@ export function useProductPageState({
               setCurrentView("oldflame")
             }
           } else {
+            setReminderId(null)
+            setReminderDuration(null)
+            setReminderStartTime(null)
             setCurrentView(null)
           }
         } catch (error) {
@@ -119,10 +171,6 @@ export function useProductPageState({
       const currentTabSessionState =
         await storage.getCurrentTabSessionState(tabIdSession)
       if (currentTabSessionState) {
-        console.log(
-          "[useProductPageState] Plugin closed:",
-          currentTabSessionState.pluginClosed
-        )
         setPluginClosedState(currentTabSessionState.pluginClosed)
       }
     }
@@ -141,6 +189,36 @@ export function useProductPageState({
         )
         checkForPendingReminder()
       }
+
+      // Check if snooze storage changed - need to re-check visibility
+      if ("thinktwice_snooze" in changes) {
+        console.log(
+          "[useProductPageState] Snooze storage changed, re-checking..."
+        )
+
+        // If snooze was cleared (newValue is undefined or null), also reset pluginClosed
+        const snoozeChange = changes["thinktwice_snooze"] as {
+          oldValue?: number | null
+          newValue?: number | null
+        }
+        if (!snoozeChange?.newValue || snoozeChange.newValue < Date.now()) {
+          console.log(
+            "[useProductPageState] Snooze cleared or expired - resetting pluginClosed state"
+          )
+          // Reset the pluginClosed state for this tab so overlay can appear again
+          storage.getCurrentTabSessionState(tabIdSession).then((state) => {
+            if (state && state.pluginClosed) {
+              storage.saveTabSessionState({
+                ...state,
+                pluginClosed: false
+              })
+              setPluginClosedState(false)
+            }
+          })
+        }
+
+        checkForPendingReminder()
+      }
     }
 
     checkForPluginClosed()
@@ -156,6 +234,7 @@ export function useProductPageState({
 
   const setPluginClosed = (closed: boolean) => {
     console.log("[useProductPageState] Setting plugin closed:", closed)
+    setPluginClosedState(closed)
     storage
       .getCurrentTabSessionState(tabIdSession)
       .then((currentTabSessionState) => {
@@ -178,6 +257,8 @@ export function useProductPageState({
     currentView,
     currentProduct,
     reminderId,
+    reminderDuration,
+    reminderStartTime,
     hideOverlay,
     pluginClosed,
     setPluginClosed

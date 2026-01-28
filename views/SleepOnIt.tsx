@@ -4,6 +4,7 @@ import moonIcon from "url:../assets/icons/Icons/Moon.svg"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
+import PrivacyBadge from "../components/ui/PrivacyBadge"
 import { spacing, textSize } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
@@ -131,7 +132,7 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
   }, [saved, onClose])
 
   return (
-    <Card>
+    <Card footer={<PrivacyBadge />}>
       <Header
         onBack={onBack}
         onClose={onClose}
@@ -145,7 +146,7 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
       />
       <h1 style={titleStyle}>Brilliant choice!</h1>
       <p style={subtitleStyle}>
-        3 out of 4 people change their mind within 24 hours.
+        Taking time to think is a superpower. How long would you like to wait?
       </p>
 
       {!saved ? (

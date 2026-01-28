@@ -42,7 +42,8 @@ const STORAGE_KEYS = {
   REMINDERS: "thinktwice_reminders",
   PRODUCTS: "thinktwice_products",
   SETTINGS: "thinktwice_settings",
-  TAB_SESSION_STATE: "thinktwice_tab_session_state"
+  TAB_SESSION_STATE: "thinktwice_tab_session_state",
+  SNOOZE: "thinktwice_snooze"
 }
 
 // Helper to determine if we're in a context with direct chrome.storage access
@@ -247,30 +248,79 @@ export class BrowserStorage implements IStorage {
   }
 
   async getCurrentTabSessionState(
-    _tabId: number
+    tabId: number | null
   ): Promise<TabSessionState | null> {
     try {
+      if (tabId === null) return null
       const result = await storageGet(STORAGE_KEYS.TAB_SESSION_STATE)
-
-      if (result[STORAGE_KEYS.TAB_SESSION_STATE]) {
-        return result[STORAGE_KEYS.TAB_SESSION_STATE] as TabSessionState
-      }
-
-      return null
+      const states =
+        (result[STORAGE_KEYS.TAB_SESSION_STATE] as Record<
+          number,
+          TabSessionState
+        >) || {}
+      return states[tabId] || null
     } catch (error) {
       console.error("Failed to get current tab session state:", error)
-      return {
-        tabId: null,
-        pluginClosed: false
-      }
+      return null
     }
   }
 
   async saveTabSessionState(state: TabSessionState): Promise<void> {
     try {
-      await storageSet({ [STORAGE_KEYS.TAB_SESSION_STATE]: state })
+      if (state.tabId === null) return
+      const result = await storageGet(STORAGE_KEYS.TAB_SESSION_STATE)
+      const states =
+        (result[STORAGE_KEYS.TAB_SESSION_STATE] as Record<
+          number,
+          TabSessionState
+        >) || {}
+      states[state.tabId] = state
+      await storageSet({ [STORAGE_KEYS.TAB_SESSION_STATE]: states })
     } catch (error) {
       console.error("Failed to save tab session state:", error)
+      throw error
+    }
+  }
+
+  async getGlobalSnooze(): Promise<number | null> {
+    try {
+      const result = await storageGet(STORAGE_KEYS.SNOOZE)
+      const snoozedUntil = result[STORAGE_KEYS.SNOOZE] as number | undefined
+      return snoozedUntil || null
+    } catch (error) {
+      console.error("Failed to get global snooze:", error)
+      return null
+    }
+  }
+
+  async setGlobalSnooze(timestamp: number): Promise<void> {
+    try {
+      await storageSet({ [STORAGE_KEYS.SNOOZE]: timestamp })
+      console.log(
+        "[BrowserStorage] Global snooze set until:",
+        new Date(timestamp)
+      )
+    } catch (error) {
+      console.error("Failed to set global snooze:", error)
+      throw error
+    }
+  }
+
+  async clearGlobalSnooze(): Promise<void> {
+    try {
+      const hasDirect = hasDirectStorageAccess()
+      if (hasDirect) {
+        return new Promise((resolve) => {
+          chrome.storage.local.remove(STORAGE_KEYS.SNOOZE, resolve)
+        })
+      } else {
+        await sendStorageMessage(MessageType.STORAGE_REMOVE, {
+          keys: [STORAGE_KEYS.SNOOZE]
+        })
+      }
+      console.log("[BrowserStorage] Global snooze cleared")
+    } catch (error) {
+      console.error("Failed to clear global snooze:", error)
       throw error
     }
   }

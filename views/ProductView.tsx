@@ -8,9 +8,12 @@ import Nudge from "../components/Nudge"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
+import PauseMenu, { type PauseDuration } from "../components/ui/PauseMenu"
+import PrivacyBadge from "../components/ui/PrivacyBadge"
 import { spacing, textSize } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import type { Product } from "../storage"
+import { storage } from "../storage"
 import { extractProduct } from "../utils/productExtractor"
 
 type ProductViewProps = {
@@ -78,6 +81,8 @@ const ProductView = ({
   onClose
 }: ProductViewProps) => {
   const [extractedProduct, setExtractedProduct] = useState<Product | null>(null)
+  const [showPauseMenu, setShowPauseMenu] = useState(false)
+  const [showPrivacyInfo, setShowPrivacyInfo] = useState(false)
 
   useEffect(() => {
     if (productId) {
@@ -117,12 +122,114 @@ const ProductView = ({
     onShowINeedIt()
   }
 
+  const handleCloseClick = () => {
+    setShowPauseMenu(true)
+  }
+
+  const handlePauseMenuSelect = async (duration: PauseDuration) => {
+    setShowPauseMenu(false)
+
+    switch (duration) {
+      case "close":
+        // Just close for now - no snooze
+        onClose()
+        break
+      case "5min":
+        // Snooze for 5 minutes (debug only)
+        try {
+          const snoozedUntil = Date.now() + 5 * 60 * 1000
+          await storage.setGlobalSnooze(snoozedUntil)
+          onClose()
+        } catch (error) {
+          console.error("[ProductView] Failed to set 5 minute snooze:", error)
+        }
+        break
+      case "1hour":
+        // Snooze for 1 hour
+        try {
+          const snoozedUntil = Date.now() + 60 * 60 * 1000
+          await storage.setGlobalSnooze(snoozedUntil)
+          onClose()
+        } catch (error) {
+          console.error("[ProductView] Failed to set 1 hour snooze:", error)
+        }
+        break
+      case "1day":
+        // Snooze for 1 day
+        try {
+          const snoozedUntil = Date.now() + 24 * 60 * 60 * 1000
+          await storage.setGlobalSnooze(snoozedUntil)
+          onClose()
+        } catch (error) {
+          console.error("[ProductView] Failed to set 1 day snooze:", error)
+        }
+        break
+    }
+  }
+
+  const handlePauseMenuCancel = () => {
+    setShowPauseMenu(false)
+  }
+
+  const handleInfoClick = () => {
+    setShowPrivacyInfo(!showPrivacyInfo)
+  }
+
   return (
-    <Card>
+    <Card footer={<PrivacyBadge />}>
       <Header
-        onClose={onClose}
+        onClose={handleCloseClick}
+        onInfo={handleInfoClick}
         centerIcon={<h2 style={titleStyle}>ThinkTwice</h2>}
       />
+      {showPauseMenu && (
+        <PauseMenu
+          onSelect={handlePauseMenuSelect}
+          onCancel={handlePauseMenuCancel}
+        />
+      )}
+      {showPrivacyInfo && (
+        <div
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            borderRadius: "12px",
+            padding: spacing.md,
+            marginBottom: spacing.md,
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            fontSize: textSize.sm,
+            lineHeight: "1.5"
+          }}>
+          <h3
+            style={{
+              margin: `0 0 ${spacing.xs} 0`,
+              fontSize: textSize.md,
+              color: "var(--primary-button-color)"
+            }}>
+            💡 Why ThinkTwice?
+          </h3>
+          <p style={{ margin: 0 }}>
+            ThinkTwice is built to help you regain control over impulse
+            spending.
+            <strong> Your data is yours.</strong> Everything is stored{" "}
+            <strong>locally</strong> in your browser. We never see, share, or
+            sell your personal information or browsing history.
+          </p>
+          <button
+            onClick={() => setShowPrivacyInfo(false)}
+            style={{
+              marginTop: spacing.sm,
+              background: "none",
+              border: "none",
+              color: "var(--secondary-button-color)",
+              cursor: "pointer",
+              padding: 0,
+              fontSize: textSize.xs,
+              textDecoration: "underline"
+            }}>
+            Got it, thanks!
+          </button>
+        </div>
+      )}
       <div style={headerStyle}>
         <p style={subtitleStyle}>
           <img
