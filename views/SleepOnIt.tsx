@@ -8,12 +8,14 @@ import PrivacyBadge from "../components/ui/PrivacyBadge"
 import { spacing, textSize } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
+import { storage } from "../storage"
 import type { Product } from "../storage"
 
 type SleepOnItProps = {
   onBack: () => void
   onClose?: () => void
   product: Product | null
+  setPluginClosed: (closed: boolean) => void
 }
 
 const titleStyle: React.CSSProperties = {
@@ -94,7 +96,29 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
         product.id
       )
 
-      await ProductActionManager.sleepOnIt(product, selectedDuration)
+      // Generate reminder ID first
+      const reminderId = crypto.randomUUID()
+      console.log("[SleepOnIt] Generated reminder ID:", reminderId)
+
+      // Mark this reminder as just created in the tab session state BEFORE saving
+      // This prevents the early return view from appearing immediately
+      const tabId = await ChromeMessaging.getTabId()
+      const currentState = await storage.getCurrentTabSessionState(tabId)
+      await storage.saveTabSessionState({
+        tabId,
+        pluginClosed: currentState?.pluginClosed || false,
+        justCreatedReminderId: reminderId
+      })
+      console.log(
+        "[SleepOnIt] Marked reminder as just created in session state"
+      )
+
+      // Now save the reminder with the pre-generated ID
+      await ProductActionManager.sleepOnIt(
+        product,
+        selectedDuration,
+        reminderId
+      )
       console.log("[SleepOnIt] Reminder saved successfully")
 
       setSaved(true)

@@ -56,9 +56,14 @@ export class ProductActionManager {
    * Creates Chrome alarm for notification
    * @param product - Product to sleep on
    * @param duration - Duration in milliseconds
+   * @param reminderId - Optional pre-generated reminder ID
    * @returns reminderId
    */
-  static async sleepOnIt(product: Product, duration: number): Promise<string> {
+  static async sleepOnIt(
+    product: Product,
+    duration: number,
+    reminderId?: string
+  ): Promise<string> {
     try {
       console.log(
         "[ProductActionManager] sleepOnIt - product:",
@@ -76,9 +81,9 @@ export class ProductActionManager {
         "[ProductActionManager] Product saved with sleepingOnIt state"
       )
 
-      // Create reminder
+      // Create reminder with provided ID or generate new one
       const reminder: Reminder = {
-        id: crypto.randomUUID(),
+        id: reminderId || crypto.randomUUID(),
         productId: product.id,
         reminderTime: Date.now() + duration,
         duration: duration,

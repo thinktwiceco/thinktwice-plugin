@@ -37,6 +37,7 @@ export interface StorageData {
 export interface TabSessionState {
   tabId: number | null
   pluginClosed: boolean
+  justCreatedReminderId?: string | null
 }
 
 export const DEFAULT_SETTINGS: Settings = {

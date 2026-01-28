@@ -471,4 +471,119 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
     // Clean up
     await productPage.close()
   })
+
+  test("should show 'You're back!' view when returning to product page before reminder expires", async () => {
+    const page = await context.newPage()
+
+    // 1. Find extension ID
+    let [worker] = context.serviceWorkers()
+    if (!worker) {
+      worker = await context.waitForEvent("serviceworker")
+    }
+    const extensionId = worker.url().split("/")[2]
+
+    // 2. Clear storage to ensure clean state
+    const popupPage = await context.newPage()
+    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`)
+    await popupPage.evaluate(() => chrome.storage.local.clear())
+    await popupPage.close()
+
+    const productUrl = `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`
+
+    // 3. Navigate to the test product page
+    await page.goto(productUrl, {
+      waitUntil: "load"
+    })
+
+    // 4. Wait for the overlay to be attached
+    const overlayHost = page
+      .locator(
+        'plasmo-csui, plasmo-cs-ui, plasmo-cs-overlay, [id^="plasmo-csui"]'
+      )
+      .first()
+    await expect(overlayHost).toBeAttached({ timeout: 20000 })
+
+    // 5. Click "Sleep on it"
+    const sleepOnItButton = overlayHost
+      .getByRole("button", { name: /Sleep on it/i })
+      .first()
+    await expect(sleepOnItButton).toBeVisible({ timeout: 10000 })
+    await sleepOnItButton.click()
+
+    // 6. Select "3 days" duration
+    const threeDaysButton = overlayHost
+      .getByRole("button", { name: /3 days/i })
+      .first()
+    await expect(threeDaysButton).toBeVisible({ timeout: 5000 })
+    await threeDaysButton.click()
+
+    // 7. Click "Set Reminder"
+    const setReminderButton = overlayHost
+      .getByRole("button", { name: /Set Reminder/i })
+      .first()
+    await expect(setReminderButton).toBeVisible({ timeout: 5000 })
+    await setReminderButton.click()
+
+    // 8. Wait for success message
+    const successMessage = overlayHost
+      .locator(
+        'text="✓ Reminder saved! Hold tight and remember about the goal!"'
+      )
+      .first()
+    await expect(successMessage).toBeVisible({ timeout: 10000 })
+
+    // 9. Wait for tab to close
+    try {
+      await page.waitForTimeout(6000) // Wait longer than the 4s delay
+      if (!page.isClosed()) {
+        await page.close()
+      }
+    } catch {
+      // Expected: page.waitForTimeout throws when tab is closed
+    }
+
+    // 10. Go back to the same product url
+    const newPage = await context.newPage()
+    await newPage.goto(productUrl, {
+      waitUntil: "load"
+    })
+
+    // 11. Wait for overlay on the new page
+    const newOverlayHost = newPage
+      .locator(
+        'plasmo-csui, plasmo-cs-ui, plasmo-cs-overlay, [id^="plasmo-csui"]'
+      )
+      .first()
+    await expect(newOverlayHost).toBeAttached({ timeout: 20000 })
+
+    // 12. Verify "You're back!" view is open
+    // We look for text that matches "You're back! You waited for"
+    const welcomeBackText = newOverlayHost.locator(
+      "text=/You're back! You waited for/i"
+    )
+    await expect(welcomeBackText).toBeVisible({ timeout: 10000 })
+
+    const decisionText = newOverlayHost.locator(
+      'text="Have you made a decision?"'
+    )
+    await expect(decisionText).toBeVisible({ timeout: 5000 })
+
+    // 13. Verify buttons are present
+    const iNeedThisButton = newOverlayHost.getByRole("button", {
+      name: /I need this now/i
+    })
+    await expect(iNeedThisButton).toBeVisible()
+
+    const illWaitButton = newOverlayHost.getByRole("button", {
+      name: /I'll wait/i
+    }) // Note: Button text might have apostrophe escaped or not, regex handles case verify
+    await expect(illWaitButton).toBeVisible()
+
+    const dontNeedButton = newOverlayHost.getByRole("button", {
+      name: /I don't need/i
+    })
+    await expect(dontNeedButton).toBeVisible()
+
+    await newPage.close()
+  })
 })

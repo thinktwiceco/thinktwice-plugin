@@ -65,9 +65,9 @@ export const getOverlayAnchor: PlasmoGetOverlayAnchor = () => {
 }
 
 const App = () => {
-  const [localView, setLocalView] = useState<
-    typeof VIEW[keyof typeof VIEW]
-  >(VIEW.PRODUCT)
+  const [localView, setLocalView] = useState<(typeof VIEW)[keyof typeof VIEW]>(
+    VIEW.PRODUCT
+  )
   const [localProduct, setLocalProduct] = useState<Product | null>(null)
 
   // Use custom hooks
@@ -182,6 +182,7 @@ const App = () => {
             onBack={handleBackToProduct}
             onClose={() => setPluginClosed(true)}
             product={localProduct}
+            setPluginClosed={setPluginClosed}
           />
         )
       }

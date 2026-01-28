@@ -2,7 +2,7 @@ import React from "react"
 
 import { spacing, textSize } from "../../design-system"
 
-export type PauseDuration = "close" | "5min" | "1hour" | "1day"
+export type PauseDuration = "close" | "30s" | "1hour" | "1day"
 
 type PauseMenuProps = {
   onSelect: (duration: PauseDuration) => void
@@ -97,7 +97,7 @@ const PauseMenu = ({ onSelect, onCancel }: PauseMenuProps) => {
           {isDebugMode && (
             <button
               style={optionButtonStyle}
-              onClick={() => handleSelect("5min")}
+              onClick={() => handleSelect("30s")}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "#e8e8e8"
                 e.currentTarget.style.transform = "translateY(-1px)"
@@ -106,7 +106,7 @@ const PauseMenu = ({ onSelect, onCancel }: PauseMenuProps) => {
                 e.currentTarget.style.backgroundColor = "#f5f5f5"
                 e.currentTarget.style.transform = "translateY(0)"
               }}>
-              🐛 Pause for 5 minutes (debug)
+              🐛 Pause for 30 seconds (debug)
             </button>
           )}
           <button

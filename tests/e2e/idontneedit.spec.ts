@@ -1,6 +1,8 @@
 import path from "path"
 import { chromium, expect, test, type BrowserContext } from "@playwright/test"
 
+import { TEST_CONFIG } from "./test-config"
+
 const EXTENSION_PATH = path.resolve(__dirname, "../../build/chrome-mv3-dev")
 
 test.describe('ThinkTwice "I don\'t really need it" Flow', () => {
@@ -42,9 +44,12 @@ test.describe('ThinkTwice "I don\'t really need it" Flow', () => {
     await popupPage.close()
 
     // 3. Navigate to a known valid Amazon product page
-    await page.goto("https://www.amazon.com/dp/B005EJH6Z4", {
-      waitUntil: "load"
-    })
+    await page.goto(
+      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
+      {
+        waitUntil: "load"
+      }
+    )
 
     // 4. Wait for the overlay to be attached
     const overlayHost = page

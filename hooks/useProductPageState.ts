@@ -113,7 +113,7 @@ export function useProductPageState({
 
           // Product doesn't have iNeedThis state, show overlay
           console.log(
-            "[useProductPageState] Product has not iNeedThis state - showing overlay"
+            "[useProductPageState] Product has not iNeedThis state - setting hideOverlay: false"
           )
           setHideOverlay(false)
 
@@ -127,6 +127,30 @@ export function useProductPageState({
               "[useProductPageState] Found pending reminder for this product:",
               pendingReminder.id
             )
+
+            // Check if this reminder was just created in the current session
+            const currentTabSessionState =
+              await storage.getCurrentTabSessionState(tabIdSession)
+            if (
+              currentTabSessionState?.justCreatedReminderId ===
+              pendingReminder.id
+            ) {
+              console.log(
+                "[useProductPageState] Reminder was just created in this session, skipping early return view"
+              )
+              // Clear the flag so future checks work normally
+              await storage.saveTabSessionState({
+                ...currentTabSessionState,
+                justCreatedReminderId: null
+              })
+              // Don't show any reminder view, let the success message display
+              setReminderId(null)
+              setReminderDuration(null)
+              setReminderStartTime(null)
+              setCurrentView(null)
+              return
+            }
+
             setReminderDuration(pendingReminder.duration)
             setReminderStartTime(
               pendingReminder.reminderTime - pendingReminder.duration

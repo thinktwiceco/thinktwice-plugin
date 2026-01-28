@@ -134,14 +134,14 @@ const ProductView = ({
         // Just close for now - no snooze
         onClose()
         break
-      case "5min":
-        // Snooze for 5 minutes (debug only)
+      case "30s":
+        // Snooze for 30 seconds (debug only)
         try {
-          const snoozedUntil = Date.now() + 5 * 60 * 1000
+          const snoozedUntil = Date.now() + 30 * 1000
           await storage.setGlobalSnooze(snoozedUntil)
           onClose()
         } catch (error) {
-          console.error("[ProductView] Failed to set 5 minute snooze:", error)
+          console.error("[ProductView] Failed to set 30 second snooze:", error)
         }
         break
       case "1hour":
