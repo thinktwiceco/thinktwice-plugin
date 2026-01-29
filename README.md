@@ -89,7 +89,7 @@ The extension is designed around behavioral economics principles:
 - **Multi-marketplace support** - Expand beyond Amazon (eBay, Walmart, etc.)
 - **Social features** - Share decisions, group savings challenges
 
-See [docs/user-flows.md](./docs/user-flows.md) for detailed feature roadmap.
+See test flow documentation in `tests/flows/` for detailed user flow testing scenarios.
 
 ---
 
@@ -192,6 +192,9 @@ npm run dev              # Start development server with hot reload
 npm run build            # Build production-ready extension
 npm run package          # Package extension for distribution
 
+# Testing
+npm run test:e2e         # Run end-to-end tests with Playwright
+
 # Code Quality
 npm run lint             # Run ESLint
 npm run lint:fix         # Fix ESLint errors automatically
@@ -226,17 +229,18 @@ plugin-3/
 │   └── amazon.tsx       # Main Amazon product page content script
 ├── docs/                # Documentation (6 files)
 │   ├── ARCHITECTURE.md        # System architecture overview
-│   ├── TESTING-GUIDE.md       # Comprehensive testing procedures
 │   ├── VERSIONING-CHEATSHEET.md  # Version management quick reference
 │   ├── VERSIONING-WORKFLOW.md    # Release workflow guide
 │   ├── chrome-runtime-messages.md  # Message passing documentation
-│   └── sleep-on-it-implementation.md  # Feature implementation details
+│   ├── sleep-on-it-implementation.md  # Feature implementation details
+│   └── desktop-app-integration-plan.md  # Desktop app integration plan
 ├── hooks/               # Custom React hooks (4 files)
 │   ├── useStorage.ts           # Chrome storage reactive hook
 │   ├── usePendingReminder.ts   # Reminder state management
 │   ├── useProductPageState.ts  # Product page state management
 │   └── useGoogleFonts.ts       # Google Fonts loading hook
 ├── managers/            # Business logic managers (2 files)
+│   ├── index.ts                # Manager exports
 │   └── ProductActionManager.ts # Product action orchestration
 ├── scripts/             # Build and utility scripts
 │   └── validate-tag.sh  # Git tag validation script
@@ -255,7 +259,8 @@ plugin-3/
 ├── types/               # TypeScript type definitions
 │   └── messages.ts      # Message type definitions
 ├── utils/               # Utility functions
-│   └── productExtractor.ts  # Extract product data from Amazon DOM
+│   ├── productExtractor.ts  # Extract product data from Amazon DOM
+│   └── time.ts              # Time formatting utilities
 ├── views/               # View components (screen-level, 8 files)
 │   ├── ProductView.tsx              # Main decision screen
 │   ├── IDontNeedIt.tsx              # Investment options screen
@@ -265,10 +270,19 @@ plugin-3/
 │   ├── CelebrateThoughtfulPurchase.tsx
 │   ├── EarlyReturnFromSleep.tsx     # Early return flow
 │   └── BackToAnOldFlame.tsx         # Revisit product flow
+├── tests/               # Test files
+│   ├── e2e/             # End-to-end tests with Playwright (16 files)
+│   │   ├── *.spec.ts    # Test specifications
+│   │   ├── fixtures.ts  # Test fixtures
+│   │   ├── setup.ts     # Test setup
+│   │   ├── page-objects/ # Page object models
+│   │   └── utils/       # Test utilities
+│   └── flows/           # User flow documentation (4 files)
 ├── background.ts        # Background service worker (295 lines)
 ├── popup.tsx            # Extension popup (332 lines)
 ├── style.css            # Global styles
 ├── design-system.ts     # Design tokens and theme
+├── playwright.config.ts # Playwright test configuration
 ├── package.json         # Dependencies and scripts
 ├── tsconfig.json        # TypeScript configuration
 ├── .versionrc.json      # Changelog generation config
@@ -378,7 +392,7 @@ This project follows **[Semantic Versioning](https://semver.org/)** (SemVer):
 - **MINOR** version (0.X.0): New features (backwards compatible)
 - **PATCH** version (0.0.X): Bug fixes
 
-Current version: **0.0.4**
+Current version: **0.1.0**
 
 ### Creating a New Release
 
@@ -522,7 +536,35 @@ Before submitting a PR, test:
 - ✓ Extension popup displays reminders properly
 - ✓ No console errors in any context (content script, background, popup)
 
-See [docs/TESTING-GUIDE.md](./docs/TESTING-GUIDE.md) for comprehensive testing procedures.
+### Automated Testing
+
+This project uses **Playwright** for end-to-end testing:
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run specific test file
+npx playwright test tests/e2e/sleeponit.spec.ts
+
+# Run tests in headed mode (see browser)
+npx playwright test --headed
+
+# Run tests in debug mode
+npx playwright test --debug
+```
+
+**Test Coverage:**
+
+- Close flow (closing overlay)
+- "I don't need it" flow
+- "I need it" flow
+- "Sleep on it" flow with reminders
+- Extension initialization
+- Storage operations
+- Product extraction
+
+See automated E2E tests in `tests/e2e/` and flow documentation in `tests/flows/` for comprehensive testing procedures.
 
 ---
 
@@ -531,6 +573,12 @@ See [docs/TESTING-GUIDE.md](./docs/TESTING-GUIDE.md) for comprehensive testing p
 ### Product
 
 ```typescript
+enum ProductState {
+  SLEEPING_ON_IT = "sleepingOnIt"
+  I_NEED_THIS = "iNeedThis"
+  DONT_NEED_IT = "dontNeedIt"
+}
+
 {
   id: string // Amazon product ID (e.g., "B0XXXXXXX")
   name: string // Product title
@@ -538,7 +586,8 @@ See [docs/TESTING-GUIDE.md](./docs/TESTING-GUIDE.md) for comprehensive testing p
   image: string | null // Product image URL
   url: string // Full Amazon product URL
   timestamp: number // When saved (Date.now())
-  state?: "sleepingOnIt" | "dontNeedIt" | "iNeedThis" // Product decision state
+  marketplace: string // Marketplace identifier (e.g., "amazon.com")
+  state?: ProductState | null // Product decision state
 }
 ```
 
@@ -563,6 +612,25 @@ See [docs/TESTING-GUIDE.md](./docs/TESTING-GUIDE.md) for comprehensive testing p
 }
 ```
 
+### StorageData
+
+```typescript
+{
+  reminders: Reminder[]  // Array of all reminders
+  products: { [productId: string]: Product }  // Product map by ID
+  settings: Settings  // User settings
+}
+```
+
+### TabSessionState
+
+```typescript
+{
+  tabId: number | null  // Current tab ID
+  justCreatedReminderId?: string | null  // Recently created reminder ID
+}
+```
+
 ---
 
 ## 📖 Documentation
@@ -570,16 +638,16 @@ See [docs/TESTING-GUIDE.md](./docs/TESTING-GUIDE.md) for comprehensive testing p
 ### Core Documentation
 
 - **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture, data flow, and storage layer design
-- **[TESTING-GUIDE.md](./docs/TESTING-GUIDE.md)** - Comprehensive manual testing procedures with 50+ test cases
 - **[VERSIONING-WORKFLOW.md](./docs/VERSIONING-WORKFLOW.md)** - Release workflow and version management guide
 - **[VERSIONING-CHEATSHEET.md](./docs/VERSIONING-CHEATSHEET.md)** - Quick reference for versioning commands
 - **[chrome-runtime-messages.md](./docs/chrome-runtime-messages.md)** - Message passing architecture documentation
 - **[sleep-on-it-implementation.md](./docs/sleep-on-it-implementation.md)** - Detailed "Sleep on it" feature implementation
+- **[desktop-app-integration-plan.md](./docs/desktop-app-integration-plan.md)** - Desktop app integration with Agent Forge backend
 
 ### Quick Links
 
 - **Installation**: See [Local Development Setup](#-local-development-setup)
-- **Testing**: See [Testing the Extension](#testing-the-extension) and [TESTING-GUIDE.md](./docs/TESTING-GUIDE.md)
+- **Testing**: See [Testing the Extension](#testing-the-extension) and `tests/e2e/` for automated tests
 - **Architecture**: See [Architecture Overview](#️-architecture-overview) and [ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 - **Release**: See [Versioning & Release Management](#-versioning--release-management)
 - **Contributing**: See [Contributing](#-contributing)

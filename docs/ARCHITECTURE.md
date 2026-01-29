@@ -210,6 +210,12 @@ popup.tsx (Extension Popup)
 ### Product
 
 ```typescript
+enum ProductState {
+  SLEEPING_ON_IT = "sleepingOnIt"
+  I_NEED_THIS = "iNeedThis"
+  DONT_NEED_IT = "dontNeedIt"
+}
+
 {
   id: string // Amazon product ID (e.g., "B0XXXXXXX")
   name: string // Product title
@@ -217,6 +223,8 @@ popup.tsx (Extension Popup)
   image: string | null // Product image URL
   url: string // Full Amazon product URL
   timestamp: number // When saved (Date.now())
+  marketplace: string // Marketplace identifier (e.g., "amazon.com")
+  state?: ProductState | null // Product decision state
 }
 ```
 
@@ -238,6 +246,25 @@ popup.tsx (Extension Popup)
 {
   reminderDurations: number[]  // Available duration options in ms
   defaultDuration: number      // Default selected duration in ms
+}
+```
+
+### StorageData
+
+```typescript
+{
+  reminders: Reminder[]  // Array of all reminders
+  products: { [productId: string]: Product }  // Product map by ID
+  settings: Settings  // User settings
+}
+```
+
+### TabSessionState
+
+```typescript
+{
+  tabId: number | null  // Current tab ID
+  justCreatedReminderId?: string | null  // Recently created reminder ID
 }
 ```
 

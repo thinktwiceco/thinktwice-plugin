@@ -179,9 +179,48 @@ const removeSnoozeButtonStyle: React.CSSProperties = {
   whiteSpace: "nowrap"
 }
 
+const pluginDisabledContainerStyle: React.CSSProperties = {
+  backgroundColor: "var(--popup-card-background)",
+  border: "2px solid var(--popup-border)",
+  borderRadius: "8px",
+  padding: "16px",
+  marginBottom: "16px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: "12px"
+}
+
+const pluginDisabledTextStyle: React.CSSProperties = {
+  fontSize: "15px",
+  fontWeight: "600",
+  color: "var(--popup-text-primary)",
+  margin: 0,
+  textAlign: "center"
+}
+
+const enablePluginButtonStyle: React.CSSProperties = {
+  padding: "8px 16px",
+  fontSize: "14px",
+  fontWeight: "600",
+  borderRadius: "6px",
+  border: "none",
+  backgroundColor: "var(--popup-button-background)",
+  color: "var(--popup-button-text)",
+  cursor: "pointer",
+  transition: "all 0.2s ease"
+}
+
 function IndexPopup() {
-  const { reminders, products, snoozeUntil, loading, clearSnooze } =
-    useStorage()
+  const {
+    reminders,
+    products,
+    snoozeUntil,
+    globalPluginClosed,
+    loading,
+    clearSnooze,
+    enablePlugin
+  } = useStorage()
 
   console.log("---- ALL PRODUCTS ----", products)
 
@@ -234,6 +273,14 @@ function IndexPopup() {
       await clearSnooze()
     } catch (error) {
       console.error("[Popup] Failed to remove snooze:", error)
+    }
+  }
+
+  const handleEnablePlugin = async () => {
+    try {
+      await enablePlugin()
+    } catch (error) {
+      console.error("[Popup] Failed to enable plugin:", error)
     }
   }
 
@@ -352,6 +399,25 @@ function IndexPopup() {
           </p>
         </div>
       </div>
+
+      {globalPluginClosed && (
+        <div style={pluginDisabledContainerStyle}>
+          <p style={pluginDisabledTextStyle}>🔴 Plugin is currently disabled</p>
+          <button
+            style={enablePluginButtonStyle}
+            onClick={handleEnablePlugin}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--button-secondary-hover-bg)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--popup-button-background)"
+            }}>
+            Re-enable ThinkTwice
+          </button>
+        </div>
+      )}
 
       {snoozeUntil && snoozeUntil > Date.now() && (
         <div style={snoozeContainerStyle}>

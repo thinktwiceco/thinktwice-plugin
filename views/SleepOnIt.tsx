@@ -67,7 +67,12 @@ const successStyle: React.CSSProperties = {
   fontWeight: "600"
 }
 
-const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
+const SleepOnIt = ({
+  onBack,
+  onClose,
+  product,
+  setPluginClosed: _setPluginClosed
+}: SleepOnItProps) => {
   const [selectedDuration, setSelectedDuration] = useState<number>(
     24 * 60 * 60 * 1000
   ) // Default: 24 hours
