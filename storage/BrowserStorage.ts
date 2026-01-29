@@ -43,7 +43,8 @@ const STORAGE_KEYS = {
   PRODUCTS: "thinktwice_products",
   SETTINGS: "thinktwice_settings",
   TAB_SESSION_STATE: "thinktwice_tab_session_state",
-  SNOOZE: "thinktwice_snooze"
+  SNOOZE: "thinktwice_snooze",
+  GLOBAL_PLUGIN_CLOSED: "thinktwice_global_plugin_closed"
 }
 
 // Helper to determine if we're in a context with direct chrome.storage access
@@ -321,6 +322,26 @@ export class BrowserStorage implements IStorage {
       console.log("[BrowserStorage] Global snooze cleared")
     } catch (error) {
       console.error("Failed to clear global snooze:", error)
+      throw error
+    }
+  }
+
+  async getGlobalPluginClosed(): Promise<boolean> {
+    try {
+      const result = await storageGet(STORAGE_KEYS.GLOBAL_PLUGIN_CLOSED)
+      return (result[STORAGE_KEYS.GLOBAL_PLUGIN_CLOSED] as boolean) || false
+    } catch (error) {
+      console.error("Failed to get global plugin closed:", error)
+      return false
+    }
+  }
+
+  async setGlobalPluginClosed(closed: boolean): Promise<void> {
+    try {
+      await storageSet({ [STORAGE_KEYS.GLOBAL_PLUGIN_CLOSED]: closed })
+      console.log("[BrowserStorage] Global plugin closed set to:", closed)
+    } catch (error) {
+      console.error("Failed to set global plugin closed:", error)
       throw error
     }
   }

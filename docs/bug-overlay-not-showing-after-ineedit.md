@@ -28,6 +28,7 @@ The overlay does not appear when navigating to a different product after clickin
 ## Test Case
 
 A test case has been created to reproduce this bug:
+
 - **File**: `tests/e2e/ineedit.spec.ts`
 - **Test Name**: `should show overlay for different product after clicking "I need it" on first product`
 - **Status**: Currently failing (reproducing the bug)
@@ -43,6 +44,7 @@ A test case has been created to reproduce this bug:
 ### Test Configuration
 
 The test uses two different product IDs from `tests/e2e/test-config.ts`:
+
 - **PRIMARY**: `B005EJH6Z4` (Anker PowerCore 10000 Portable Charger)
 - **SECONDARY**: `B07BMKXBVW`
 
@@ -77,4 +79,3 @@ The issue likely stems from one of the following:
 - The overlay correctly prevents reappearing for the same product after "I need it" is clicked (this is expected behavior)
 - The bug only affects navigation to different products
 - The celebration view and auto-close functionality work correctly
-

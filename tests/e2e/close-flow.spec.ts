@@ -1,279 +1,191 @@
-import path from "path"
-import { chromium, expect, test, type BrowserContext } from "@playwright/test"
-
+import { expect, test } from "./fixtures"
+import { OverlayPage } from "./page-objects/OverlayPage"
 import { TEST_CONFIG } from "./test-config"
-
-const EXTENSION_PATH = path.resolve(__dirname, "../../build/chrome-mv3-dev")
+import { navigateToProduct } from "./utils/extension-helpers"
 
 test.describe('ThinkTwice "Close and Pause" Flow', () => {
-  let context: BrowserContext
-  let userDataDir: string
+  test('should handle "Close for now" (Global Close)', async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    const page = await extensionContext.newPage()
 
-  test.beforeEach(async () => {
-    userDataDir = path.join(
-      __dirname,
-      "../../tmp/test-user-data-" + Math.random().toString(36).substring(7)
-    )
-    context = await chromium.launchPersistentContext(userDataDir, {
-      headless: !!process.env.CI || process.env.HEADLESS === "true",
-      args: [
-        `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`,
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage"
-      ]
-    })
-  })
+    // Clear storage
+    await extensionHelper.clearStorage()
 
-  test.afterEach(async () => {
-    await context.close()
-  })
+    // Navigate to Amazon product page
+    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
-  async function getOverlayHost(page) {
-    const overlayHost = page.locator('plasmo-csui, [id^="plasmo-csui"]').first()
-    await expect(overlayHost).toBeAttached({ timeout: 20000 })
-    return overlayHost
-  }
+    // Create overlay page object
+    const overlayPage = new OverlayPage(page, extensionId)
 
-  async function clearExtensionStorage(extensionId) {
-    const popupPage = await context.newPage()
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`)
-    await popupPage.evaluate(() => chrome.storage.local.clear())
-    await popupPage.close()
-  }
+    // Wait for the overlay
+    await overlayPage.expectAttached()
 
-  test('should handle "Close for now" (Tab Session Only)', async () => {
-    const page = await context.newPage()
+    // Click the Close (X) button in the header
+    await overlayPage.clickClose()
 
-    // 1. Find extension ID
-    let [worker] = context.serviceWorkers()
-    if (!worker) {
-      worker = await context.waitForEvent("serviceworker")
-    }
-    const extensionId = worker.url().split("/")[2]
+    // Verify Pause Menu is visible
+    await overlayPage.expectTextVisible(TEST_CONFIG.TEXT.PAUSE_MENU_TITLE, 5000)
 
-    // 2. Clear storage
-    await clearExtensionStorage(extensionId)
-
-    // 3. Navigate to Amazon product page
-    await page.goto(
-      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
-      {
-        waitUntil: "load"
-      }
-    )
-
-    // 4. Wait for the overlay
-    const overlayHost = await getOverlayHost(page)
-
-    // 5. Click the Close (X) button in the header
-    const closeButton = overlayHost.locator('button:has-text("✕")')
-    await expect(closeButton).toBeVisible({ timeout: 10000 })
-    await closeButton.click()
-
-    // 6. Verify Pause Menu is visible
-    const pauseMenuTitle = overlayHost.locator('text="Pause notifications?"')
-    await expect(pauseMenuTitle).toBeVisible({ timeout: 5000 })
-
-    // 7. Click "Close for now"
-    const closeForNowButton = overlayHost.locator(
-      'button:has-text("Close for now")'
-    )
+    // Click "Close for now"
+    const closeForNowButton = overlayPage
+      .getOverlayHost()
+      .locator('button:has-text("Close for now")')
     await closeForNowButton.click()
 
-    // 8. Verify overlay is gone
-    await expect(overlayHost).not.toBeVisible({ timeout: 5000 })
+    // Verify overlay is gone
+    await overlayPage.expectHidden(5000)
 
-    // 9. Reload the same page
+    // Reload the same page
     await page.reload({ waitUntil: "load" })
 
-    // 10. Verify overlay remains hidden in this tab
-    // Note: The overlay host might still be attached but its content should be null (hidden)
-    // or the host itself might not be visible.
-    await expect(overlayHost).not.toBeVisible({ timeout: 5000 })
+    // Verify overlay remains hidden in this tab
+    await overlayPage.expectHidden(5000)
 
-    // 11. Open a NEW tab to the same product
-    const newPage = await context.newPage()
-    await newPage.goto(
-      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
-      {
-        waitUntil: "load"
-      }
-    )
+    // Open a NEW tab to the same product
+    const newPage = await extensionContext.newPage()
+    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
-    // 12. Verify overlay IS visible in the new tab (since it's not a snooze)
-    const newOverlayHost = await getOverlayHost(newPage)
-    await expect(
-      newOverlayHost.locator('text="ThinkTwice"').first()
-    ).toBeVisible({ timeout: 20000 })
+    // Verify overlay is NOT visible in the new tab (global close affects all tabs)
+    const newOverlayPage = new OverlayPage(newPage, extensionId)
+    await newOverlayPage.expectHidden(10000)
   })
 
-  test('should handle "Pause for 1 hour" (Global Snooze)', async () => {
-    const page = await context.newPage()
+  test('should handle "Pause for 1 hour" (Global Snooze)', async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    const page = await extensionContext.newPage()
 
-    // 1. Find extension ID
-    let [worker] = context.serviceWorkers()
-    if (!worker) {
-      worker = await context.waitForEvent("serviceworker")
-    }
-    const extensionId = worker.url().split("/")[2]
+    // Clear storage
+    await extensionHelper.clearStorage()
 
-    // 2. Clear storage
-    await clearExtensionStorage(extensionId)
+    // Navigate to Amazon product page
+    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
-    // 3. Navigate to Amazon product page
-    await page.goto(
-      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
-      {
-        waitUntil: "load"
-      }
-    )
+    // Create overlay page object
+    const overlayPage = new OverlayPage(page, extensionId)
 
-    // 4. Wait for the overlay
-    const overlayHost = await getOverlayHost(page)
+    // Wait for the overlay
+    await overlayPage.expectAttached()
 
-    // 5. Open Pause Menu
-    const closeButton = overlayHost.locator('button:has-text("✕")')
-    await closeButton.click()
+    // Open Pause Menu
+    await overlayPage.clickClose()
 
-    // 6. Click "Pause for 1 hour"
-    const pause1HourButton = overlayHost.locator(
-      'button:has-text("Pause for 1 hour")'
-    )
+    // Click "Pause for 1 hour"
+    const pause1HourButton = overlayPage
+      .getOverlayHost()
+      .locator('button:has-text("Pause for 1 hour")')
     await pause1HourButton.click()
 
-    // 7. Verify overlay is gone
-    await expect(overlayHost).not.toBeVisible({ timeout: 5000 })
+    // Verify overlay is gone
+    await overlayPage.expectHidden(5000)
 
-    // 8. Navigate to a DIFFERENT product page in a NEW tab
-    const newPage = await context.newPage()
-    await newPage.goto(
-      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.SECONDARY}`,
-      {
-        waitUntil: "load"
-      }
-    )
+    // Navigate to a DIFFERENT product page in a NEW tab
+    const newPage = await extensionContext.newPage()
+    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.SECONDARY)
 
-    // 9. Verify overlay is NOT shown (global snooze active)
-    const newOverlayHost = newPage
-      .locator('plasmo-csui, [id^="plasmo-csui"]')
-      .first()
-    // Since it's global snooze, hideOverlay returns true, and the component returns null
-    await expect(newOverlayHost).not.toBeVisible({ timeout: 10000 })
+    // Verify overlay is NOT shown (global snooze active)
+    const newOverlayPage = new OverlayPage(newPage, extensionId)
+    await newOverlayPage.expectHidden(10000)
   })
 
-  test('should handle "Cancel" in Pause Menu', async () => {
-    const page = await context.newPage()
+  test('should handle "Cancel" in Pause Menu', async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    const page = await extensionContext.newPage()
 
-    // 1. Find extension ID
-    let [worker] = context.serviceWorkers()
-    if (!worker) {
-      worker = await context.waitForEvent("serviceworker")
-    }
-    const extensionId = worker.url().split("/")[2]
+    // Clear storage
+    await extensionHelper.clearStorage()
 
-    // 2. Clear storage
-    await clearExtensionStorage(extensionId)
+    // Navigate to Amazon product page
+    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
-    // 3. Navigate to Amazon product page
-    await page.goto(
-      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
-      {
-        waitUntil: "load"
-      }
-    )
+    // Create overlay page object
+    const overlayPage = new OverlayPage(page, extensionId)
 
-    // 4. Wait for the overlay
-    const overlayHost = await getOverlayHost(page)
+    // Wait for the overlay
+    await overlayPage.expectAttached()
 
-    // 5. Open Pause Menu
-    const closeButton = overlayHost.locator('button:has-text("✕")')
-    await closeButton.click()
+    // Open Pause Menu
+    await overlayPage.clickClose()
 
-    // 6. Click "Cancel"
-    const cancelButton = overlayHost.locator('button:has-text("Cancel")')
+    // Click "Cancel"
+    const cancelButton = overlayPage
+      .getOverlayHost()
+      .locator('button:has-text("Cancel")')
     await cancelButton.click()
 
-    // 7. Verify Pause Menu is gone but Overlay is still there
-    const pauseMenuTitle = overlayHost.locator('text="Pause notifications?"')
-    await expect(pauseMenuTitle).not.toBeVisible({ timeout: 5000 })
+    // Verify Pause Menu is gone but Overlay is still there
+    await overlayPage.expectTextHidden(TEST_CONFIG.TEXT.PAUSE_MENU_TITLE, 5000)
 
-    const iDontNeedItButton = overlayHost.getByRole("button", {
-      name: /I don't really need it/i
+    await expect(overlayPage.getButton(/I don't really need it/i)).toBeVisible({
+      timeout: 5000
     })
-    await expect(iDontNeedItButton).toBeVisible({ timeout: 5000 })
   })
 
-  test("should handle debug pause for 30 seconds globally and expire", async () => {
+  test("should handle debug pause for 30 seconds globally and expire", async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
     // Increase timeout for this test as it involves waiting for 30s
     test.setTimeout(70000)
 
-    const page = await context.newPage()
+    const page = await extensionContext.newPage()
 
-    // 1. Find extension ID
-    let [worker] = context.serviceWorkers()
-    if (!worker) {
-      worker = await context.waitForEvent("serviceworker")
-    }
-    const extensionId = worker.url().split("/")[2]
+    // Clear storage
+    await extensionHelper.clearStorage()
 
-    // 2. Clear storage
-    await clearExtensionStorage(extensionId)
+    // Navigate to Amazon product page
+    await navigateToProduct(page, "B005EJH6Z4")
 
-    // 3. Navigate to Amazon product page
-    await page.goto("https://www.amazon.com/dp/B005EJH6Z4", {
-      waitUntil: "load"
-    })
+    // Create overlay page object
+    const overlayPage = new OverlayPage(page, extensionId)
 
-    // 4. Wait for the overlay
-    const overlayHost = await getOverlayHost(page)
+    // Wait for the overlay
+    await overlayPage.expectAttached()
 
-    // 5. Open Pause Menu
-    const closeButton = overlayHost.locator('button:has-text("✕")')
-    await closeButton.click()
+    // Open Pause Menu
+    await overlayPage.clickClose()
 
-    // 6. Click "Pause for 30 seconds"
-    const pause30sButton = overlayHost.locator(
-      'button:has-text("Pause for 30 seconds")'
-    )
+    // Click "Pause for 30 seconds"
+    const pause30sButton = overlayPage
+      .getOverlayHost()
+      .locator('button:has-text("Pause for 30 seconds")')
     await expect(pause30sButton).toBeVisible({ timeout: 5000 })
     await pause30sButton.click()
 
-    // 7. Verify overlay is gone in CURRENT tab
-    await expect(overlayHost).not.toBeVisible({ timeout: 5000 })
+    // Verify overlay is gone in CURRENT tab
+    await overlayPage.expectHidden(5000)
 
-    // 8. Open a NEW tab immediately
+    // Open a NEW tab immediately
     console.log("Opening new tab to verify global snooze...")
-    const newPage = await context.newPage()
-    await newPage.goto(
-      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.SECONDARY}`,
-      {
-        waitUntil: "load"
-      }
-    )
+    const newPage = await extensionContext.newPage()
+    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.SECONDARY)
 
-    // 9. Verify overlay is NOT visible in the new tab (global snooze active)
-    const newOverlayHost = newPage
-      .locator('plasmo-csui, [id^="plasmo-csui"]')
-      .first()
-    await expect(newOverlayHost).not.toBeVisible({ timeout: 10000 })
+    // Verify overlay is NOT visible in the new tab (global snooze active)
+    const newOverlayPage = new OverlayPage(newPage, extensionId)
+    await newOverlayPage.expectHidden(10000)
     console.log("Verified: Overlay hidden in new tab due to global snooze.")
 
-    // 10. Wait for snooze to expire (31 seconds to be safe)
+    // Wait for snooze to expire (31 seconds to be safe)
     console.log("Waiting 31 seconds for snooze to expire...")
-    await page.waitForTimeout(31000)
+    await page.waitForTimeout(TEST_CONFIG.TIMEOUTS.SNOOZE_30S)
 
-    // 11. Reload the NEW tab
+    // Reload the NEW tab
     console.log("Reloading new tab...")
     await newPage.reload({ waitUntil: "load" })
 
-    // 12. Verify overlay IS visible again in the new tab
+    // Verify overlay IS visible again in the new tab
     console.log("Waiting for overlay to reappear in new tab...")
-    await expect(newOverlayHost).toBeAttached({ timeout: 30000 })
-    await expect(
-      newOverlayHost.locator('text="ThinkTwice"').first()
-    ).toBeVisible({ timeout: 20000 })
+    await newOverlayPage.expectAttached(30000)
+    await newOverlayPage.expectTextVisible("ThinkTwice")
     console.log("Overlay reappeared successfully in new tab!")
   })
 })

@@ -103,10 +103,8 @@ const SleepOnIt = ({ onBack, onClose, product }: SleepOnItProps) => {
       // Mark this reminder as just created in the tab session state BEFORE saving
       // This prevents the early return view from appearing immediately
       const tabId = await ChromeMessaging.getTabId()
-      const currentState = await storage.getCurrentTabSessionState(tabId)
       await storage.saveTabSessionState({
         tabId,
-        pluginClosed: currentState?.pluginClosed || false,
         justCreatedReminderId: reminderId
       })
       console.log(

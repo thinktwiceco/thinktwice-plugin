@@ -1,104 +1,50 @@
-import path from "path"
-import { chromium, expect, test, type BrowserContext } from "@playwright/test"
-
+import { test } from "./fixtures"
+import { OverlayPage } from "./page-objects/OverlayPage"
 import { TEST_CONFIG } from "./test-config"
-
-const EXTENSION_PATH = path.resolve(__dirname, "../../build/chrome-mv3-dev")
+import { navigateToProduct } from "./utils/extension-helpers"
+import { buildProductId } from "./utils/product-helpers"
 
 test.describe('ThinkTwice "I don\'t really need it" Flow', () => {
-  let context: BrowserContext
-  let userDataDir: string
+  test('should complete the "I don\'t really need it" flow', async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    const page = await extensionContext.newPage()
 
-  test.beforeEach(async () => {
-    userDataDir = path.join(
-      __dirname,
-      "../../tmp/test-user-data-" + Math.random().toString(36).substring(7)
-    )
-    context = await chromium.launchPersistentContext(userDataDir, {
-      headless: !!process.env.CI || process.env.HEADLESS === "true",
-      args: [
-        `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`,
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage"
-      ]
-    })
-  })
+    // Clear storage to ensure clean state
+    await extensionHelper.clearStorage()
 
-  test.afterEach(async () => {
-    await context.close()
-  })
+    // Navigate to a known valid Amazon product page
+    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
-  test('should complete the "I don\'t really need it" flow', async () => {
-    const page = await context.newPage()
+    // Create overlay page object
+    const overlayPage = new OverlayPage(page, extensionId)
 
-    // 1. Find extension ID
-    let [worker] = context.serviceWorkers()
-    if (!worker) {
-      worker = await context.waitForEvent("serviceworker")
-    }
-    const extensionId = worker.url().split("/")[2]
+    // Wait for the overlay to be attached
+    await overlayPage.expectAttached()
 
-    // 2. Clear storage to ensure clean state
-    const popupPage = await context.newPage()
-    await popupPage.goto(`chrome-extension://${extensionId}/popup.html`)
-    await popupPage.evaluate(() => chrome.storage.local.clear())
-    await popupPage.close()
+    // Click "I don't really need it"
+    await overlayPage.clickIDontNeedIt()
 
-    // 3. Navigate to a known valid Amazon product page
-    await page.goto(
-      `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
-      {
-        waitUntil: "load"
-      }
+    // Verify Celebration View
+    await overlayPage.expectCelebrationVisible(
+      TEST_CONFIG.TEXT.CELEBRATION_DONT_NEED
     )
 
-    // 4. Wait for the overlay to be attached
-    const overlayHost = page
-      .locator(
-        'plasmo-csui, plasmo-cs-ui, plasmo-cs-overlay, [id^="plasmo-csui"]'
-      )
-      .first()
-    await expect(overlayHost).toBeAttached({ timeout: 20000 })
+    // Verify product state is saved to storage
+    const expectedProductId = buildProductId(
+      "amazon",
+      TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY
+    )
+    await extensionHelper.assertProductState(
+      expectedProductId,
+      TEST_CONFIG.STATES.DONT_NEED_IT
+    )
 
-    // 5. Click "I don't really need it"
-    const dontNeedItButton = overlayHost
-      .getByRole("button", { name: /I don't really need it/i })
-      .first()
-    await expect(dontNeedItButton).toBeVisible({ timeout: 10000 })
-    await dontNeedItButton.click()
-
-    // 6. Verify Celebration View
-    const celebrationText = overlayHost
-      .locator('text="Well done for choosing not to buy! 🎉"')
-      .first()
-    await expect(celebrationText).toBeVisible({ timeout: 10000 })
-
-    // 7. Verify product state is saved to storage
-    const expectedProductId = `amazon-${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`
-    const storagePage = await context.newPage()
-    await storagePage.goto(`chrome-extension://${extensionId}/popup.html`)
-    const storageData = (await storagePage.evaluate(() => {
-      return new Promise<Record<string, { state?: string }>>((resolve) => {
-        chrome.storage.local.get("thinktwice_products", (result) => {
-          resolve(
-            (result.thinktwice_products as Record<
-              string,
-              { state?: string }
-            >) || {}
-          )
-        })
-      })
-    })) as Record<string, { state?: string }>
-    await storagePage.close()
-
-    expect(storageData).toBeDefined()
-    expect(storageData[expectedProductId]).toBeDefined()
-    expect(storageData[expectedProductId].state).toBe("dontNeedIt")
-
-    // 8. Verify it auto-closes after roughly 4 seconds
-    // Returning null in the component should make the content invisible/gone
-    await expect(celebrationText).not.toBeVisible({ timeout: 10000 })
+    // Verify it auto-closes after roughly 4 seconds
+    await overlayPage.expectCelebrationHidden(
+      TEST_CONFIG.TEXT.CELEBRATION_DONT_NEED
+    )
   })
 })

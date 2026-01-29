@@ -77,7 +77,6 @@ const App = () => {
     currentProduct,
     reminderId,
     reminderStartTime,
-    hideOverlay,
     pluginClosed,
     setPluginClosed
   } = useProductPageState({
@@ -118,19 +117,14 @@ const App = () => {
     setLocalView(VIEW.THOUGHTFUL_PURCHASE)
   }
 
-  // Allow "ineedit" view to show even if hideOverlay is true
-  // (this allows the celebration to display before auto-closing)
-  // But if pluginClosed is true, don't show even for I_NEED_IT view
-  const shouldShowOverlay =
-    (!hideOverlay && !pluginClosed) ||
-    (currentView === VIEW.I_NEED_IT && !pluginClosed)
+  // Special case: Allow celebration views even when pluginClosed=true
+  const shouldShowOverlay = !pluginClosed || currentView === VIEW.I_NEED_IT
 
   console.log("[PLUGIN CLOSED] Should show overlay:", shouldShowOverlay, {
-    hideOverlay,
     pluginClosed,
     currentView
   })
-  // If hideOverlay is true and we're not showing the ineedit view, don't render anything
+
   if (!shouldShowOverlay) {
     return null
   }
@@ -173,7 +167,7 @@ const App = () => {
         return (
           <IDontNeedIt
             onBack={handleBackToProduct}
-            onClose={() => setPluginClosed(true)}
+            onClose={handleBackToProduct}
           />
         )
       }
@@ -191,10 +185,7 @@ const App = () => {
 
       if (currentView === VIEW.I_NEED_IT) {
         return (
-          <INeedIt
-            onBack={handleBackToProduct}
-            onClose={() => setPluginClosed(true)}
-          />
+          <INeedIt onBack={handleBackToProduct} onClose={handleBackToProduct} />
         )
       }
 

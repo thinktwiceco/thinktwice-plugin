@@ -12,6 +12,8 @@ export interface IStorage {
   getGlobalSnooze(): Promise<number | null>
   setGlobalSnooze(timestamp: number): Promise<void>
   clearGlobalSnooze(): Promise<void>
+  getGlobalPluginClosed(): Promise<boolean>
+  setGlobalPluginClosed(closed: boolean): Promise<void>
 
   getProduct(id: string): Promise<Product | null>
   saveProduct(product: Product): Promise<void>

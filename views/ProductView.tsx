@@ -136,30 +136,33 @@ const ProductView = ({
         break
       case "30s":
         // Snooze for 30 seconds (debug only)
+        // Note: We don't call onClose() here because the global snooze will hide the overlay
+        // and we want it to reappear after the snooze expires
         try {
           const snoozedUntil = Date.now() + 30 * 1000
           await storage.setGlobalSnooze(snoozedUntil)
-          onClose()
         } catch (error) {
           console.error("[ProductView] Failed to set 30 second snooze:", error)
         }
         break
       case "1hour":
         // Snooze for 1 hour
+        // Note: We don't call onClose() here because the global snooze will hide the overlay
+        // and we want it to reappear after the snooze expires
         try {
           const snoozedUntil = Date.now() + 60 * 60 * 1000
           await storage.setGlobalSnooze(snoozedUntil)
-          onClose()
         } catch (error) {
           console.error("[ProductView] Failed to set 1 hour snooze:", error)
         }
         break
       case "1day":
         // Snooze for 1 day
+        // Note: We don't call onClose() here because the global snooze will hide the overlay
+        // and we want it to reappear after the snooze expires
         try {
           const snoozedUntil = Date.now() + 24 * 60 * 60 * 1000
           await storage.setGlobalSnooze(snoozedUntil)
-          onClose()
         } catch (error) {
           console.error("[ProductView] Failed to set 1 day snooze:", error)
         }
