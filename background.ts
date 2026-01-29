@@ -178,12 +178,12 @@ chromeAPI.runtime.onMessage.addListener(
         (_exhaustiveCheck as Message).type
       )
       sendResponse({ success: false, error: "Unknown message type" })
+      return false
     } catch (error) {
       console.error("[Background] Error handling message:", error)
       sendResponse({ success: false, error: (error as Error).message })
+      return false
     }
-
-    return false
   }
 )
 
@@ -202,7 +202,6 @@ AlarmService.registerListener(async (alarm) => {
 
 // ===== Notification Click Handlers =====
 NotificationService.registerClickListener()
-NotificationService.registerButtonClickListener(storage)
 
 // ===== Storage Change Listener =====
 // Watch for changes to reminders storage and update badge count immediately

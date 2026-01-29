@@ -7,6 +7,7 @@ interface UseStorageReturn {
   products: { [productId: string]: Product }
   settings: Settings
   snoozeUntil: number | null
+  globalPluginClosed: boolean
   loading: boolean
   error: Error | null
   saveReminder: (reminder: Reminder) => Promise<void>
@@ -16,6 +17,7 @@ interface UseStorageReturn {
   saveProduct: (product: Product) => Promise<void>
   refreshReminders: () => Promise<void>
   clearSnooze: () => Promise<void>
+  enablePlugin: () => Promise<void>
 }
 
 export function useStorage(): UseStorageReturn {
@@ -26,21 +28,25 @@ export function useStorage(): UseStorageReturn {
     defaultDuration: 0
   })
   const [snoozeUntil, setSnoozeUntil] = useState<number | null>(null)
+  const [globalPluginClosed, setGlobalPluginClosed] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true)
-      const [remindersData, settingsData, snoozeData] = await Promise.all([
-        storage.getReminders(),
-        storage.getSettings(),
-        storage.getGlobalSnooze()
-      ])
+      const [remindersData, settingsData, snoozeData, pluginClosedData] =
+        await Promise.all([
+          storage.getReminders(),
+          storage.getSettings(),
+          storage.getGlobalSnooze(),
+          storage.getGlobalPluginClosed()
+        ])
 
       setReminders(remindersData)
       setSettings(settingsData)
       setSnoozeUntil(snoozeData)
+      setGlobalPluginClosed(pluginClosedData)
 
       const productsMap: { [productId: string]: Product } = {}
       for (const reminder of remindersData) {
@@ -108,11 +114,17 @@ export function useStorage(): UseStorageReturn {
     await loadData()
   }, [loadData])
 
+  const enablePlugin = useCallback(async () => {
+    await storage.setGlobalPluginClosed(false)
+    await loadData()
+  }, [loadData])
+
   return {
     reminders,
     products,
     settings,
     snoozeUntil,
+    globalPluginClosed,
     loading,
     error,
     saveReminder,
@@ -121,6 +133,7 @@ export function useStorage(): UseStorageReturn {
     getProduct,
     saveProduct,
     refreshReminders,
-    clearSnooze
+    clearSnooze,
+    enablePlugin
   }
 }

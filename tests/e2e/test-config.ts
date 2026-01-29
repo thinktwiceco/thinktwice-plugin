@@ -72,7 +72,8 @@ export const TEST_CONFIG = {
   STORAGE: {
     PRODUCTS: "thinktwice_products",
     REMINDERS: "thinktwice_reminders",
-    SNOOZE: "thinktwice_snooze"
+    SNOOZE: "thinktwice_snooze",
+    GLOBAL_PLUGIN_CLOSED: "thinktwice_global_plugin_closed"
   },
 
   /**

@@ -192,4 +192,47 @@ export class PopupPage {
     await this.page.reload()
     await this.page.waitForLoadState("load")
   }
+
+  /**
+   * Get the plugin disabled banner
+   */
+  getPluginDisabledBanner(): Locator {
+    return this.page.locator('text="🔴 Plugin is currently disabled"')
+  }
+
+  /**
+   * Get the re-enable button
+   */
+  getReEnableButton(): Locator {
+    return this.page.getByRole("button", { name: /Re-enable ThinkTwice/i })
+  }
+
+  /**
+   * Click the re-enable button
+   */
+  async clickReEnable(): Promise<void> {
+    const button = this.getReEnableButton()
+    await expect(button).toBeVisible({
+      timeout: TEST_CONFIG.TIMEOUTS.BUTTON_VISIBLE
+    })
+    await button.click()
+  }
+
+  /**
+   * Expect plugin to be disabled (banner visible)
+   */
+  async expectPluginDisabled(timeout?: number): Promise<void> {
+    await expect(this.getPluginDisabledBanner()).toBeVisible({
+      timeout: timeout || TEST_CONFIG.TIMEOUTS.BUTTON_VISIBLE
+    })
+  }
+
+  /**
+   * Expect plugin to be enabled (banner not visible)
+   */
+  async expectPluginEnabled(timeout?: number): Promise<void> {
+    await expect(this.getPluginDisabledBanner()).not.toBeVisible({
+      timeout: timeout || TEST_CONFIG.TIMEOUTS.OVERLAY_HIDE
+    })
+  }
 }
