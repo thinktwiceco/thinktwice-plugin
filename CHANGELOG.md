@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.1.0...v0.2.1) (2026-01-29)
+
+
+### Features
+
+* **popup:** add re-enable button when plugin is globally closed ([49567be](https://github.com/thinktwiceco/thinktwice-plugin/commit/49567be192d42955a36434e23d8daa38a098ebc0))
+
+
+### Miscellaneous Chores
+
+* **docs:** format changelog ([a01fa06](https://github.com/thinktwiceco/thinktwice-plugin/commit/a01fa06c0b78c60c9c43578a02f27b45d81d2a08))
+* **docs:** update documenation ([48fae23](https://github.com/thinktwiceco/thinktwice-plugin/commit/48fae233894225f262cc7c307a394f230328db1f))
+* **release:** 0.2.0 ([0f3f4d8](https://github.com/thinktwiceco/thinktwice-plugin/commit/0f3f4d836d067f8e152073c253bdd055015f2e45))
+
 ## [0.2.0](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.1.0...v0.2.0) (2026-01-29)
 
 
