@@ -12,8 +12,8 @@ const INeedIt = ({ onBack, onClose }: INeedItProps) => {
     <Celebration
       icon={trophyIcon}
       iconAlt="trophy"
-      title="Trusting yourself is powerful."
-      subtitle="Enjoy your new purchase."
+      title="Trusting your decision is powerful! 🎉"
+      subtitle="Enjoy your purchase, you've been thoughtful about it."
       autoCloseDelay={4000}
       onBack={onBack}
       onClose={onClose}

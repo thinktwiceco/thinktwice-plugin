@@ -18,6 +18,17 @@ import INeedIt from "~/views/INeedIt"
 import ProductView from "~/views/ProductView"
 import SleepOnIt from "~/views/SleepOnIt"
 
+// View constants
+const VIEW = {
+  PRODUCT: "product",
+  I_DONT_NEED_IT: "idontneedit",
+  SLEEP_ON_IT: "sleeponit",
+  I_NEED_IT: "ineedit",
+  THOUGHTFUL_PURCHASE: "thoughtfulpurchase",
+  EARLY_RETURN: "earlyreturn",
+  OLD_FLAME: "oldflame"
+} as const
+
 export const config: PlasmoCSConfig = {
   matches: ["*://*.amazon.com/*"]
 }
@@ -54,9 +65,9 @@ export const getOverlayAnchor: PlasmoGetOverlayAnchor = () => {
 }
 
 const App = () => {
-  const [localView, setLocalView] = useState<
-    "product" | "idontneedit" | "sleeponit" | "ineedit" | "thoughtfulpurchase"
-  >("product")
+  const [localView, setLocalView] = useState<(typeof VIEW)[keyof typeof VIEW]>(
+    VIEW.PRODUCT
+  )
   const [localProduct, setLocalProduct] = useState<Product | null>(null)
 
   // Use custom hooks
@@ -65,7 +76,7 @@ const App = () => {
     currentView: reminderView,
     currentProduct,
     reminderId,
-    hideOverlay,
+    reminderStartTime,
     pluginClosed,
     setPluginClosed
   } = useProductPageState({
@@ -77,7 +88,7 @@ const App = () => {
   const currentView = reminderView || localView
 
   const handleBackToProduct = () => {
-    setLocalView("product")
+    setLocalView(VIEW.PRODUCT)
   }
 
   const handleShowIDontNeedIt = async (product: Product | null) => {
@@ -90,29 +101,30 @@ const App = () => {
         console.error("[Amazon] Failed to execute dontNeedIt:", error)
       }
     }
-    setLocalView("idontneedit")
+    setLocalView(VIEW.I_DONT_NEED_IT)
   }
 
   const handleShowSleepOnIt = (product: Product | null) => {
     setLocalProduct(product)
-    setLocalView("sleeponit")
+    setLocalView(VIEW.SLEEP_ON_IT)
   }
 
   const handleShowINeedIt = () => {
-    setLocalView("ineedit")
+    setLocalView(VIEW.I_NEED_IT)
   }
 
   const handleShowThoughtfulPurchase = () => {
-    setLocalView("thoughtfulpurchase")
+    setLocalView(VIEW.THOUGHTFUL_PURCHASE)
   }
 
-  // Allow "ineedit" view to show even if hideOverlay is true
-  // (this allows the celebration to display before auto-closing)
-  const shouldShowOverlay =
-    !hideOverlay || currentView === "ineedit" || !pluginClosed
+  // Special case: Allow celebration views even when pluginClosed=true
+  const shouldShowOverlay = !pluginClosed || currentView === VIEW.I_NEED_IT
 
-  console.log("[PLUGIN CLOSED] Plugin closed:", shouldShowOverlay)
-  // If hideOverlay is true and we're not showing the ineedit view, don't render anything
+  console.log("[PLUGIN CLOSED] Should show overlay:", shouldShowOverlay, {
+    pluginClosed,
+    currentView
+  })
+
   if (!shouldShowOverlay) {
     return null
   }
@@ -123,33 +135,35 @@ const App = () => {
       const url = window.location.href
       const productId = getAmazonProductId(url)
 
-      if (currentView === "earlyreturn") {
+      if (currentView === VIEW.EARLY_RETURN) {
         return (
           <EarlyReturnFromSleep
             product={currentProduct}
             reminderId={reminderId || ""}
+            reminderStartTime={reminderStartTime || 0}
             onShowINeedIt={handleShowINeedIt}
             onClose={handleBackToProduct}
           />
         )
       }
 
-      if (currentView === "oldflame") {
+      if (currentView === VIEW.OLD_FLAME) {
         return (
           <BackToAnOldFlame
             product={currentProduct}
             reminderId={reminderId || ""}
+            reminderStartTime={reminderStartTime || 0}
             onShowThoughtfulPurchase={handleShowThoughtfulPurchase}
             onClose={handleBackToProduct}
           />
         )
       }
 
-      if (currentView === "thoughtfulpurchase") {
+      if (currentView === VIEW.THOUGHTFUL_PURCHASE) {
         return <CelebrateThoughtfulPurchase onClose={handleBackToProduct} />
       }
 
-      if (currentView === "idontneedit") {
+      if (currentView === VIEW.I_DONT_NEED_IT) {
         return (
           <IDontNeedIt
             onBack={handleBackToProduct}
@@ -158,17 +172,18 @@ const App = () => {
         )
       }
 
-      if (currentView === "sleeponit") {
+      if (currentView === VIEW.SLEEP_ON_IT) {
         return (
           <SleepOnIt
             onBack={handleBackToProduct}
-            onClose={handleBackToProduct}
+            onClose={() => setPluginClosed(true)}
             product={localProduct}
+            setPluginClosed={setPluginClosed}
           />
         )
       }
 
-      if (currentView === "ineedit") {
+      if (currentView === VIEW.I_NEED_IT) {
         return (
           <INeedIt onBack={handleBackToProduct} onClose={handleBackToProduct} />
         )

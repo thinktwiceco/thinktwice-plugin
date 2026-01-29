@@ -6,6 +6,7 @@ interface UseStorageReturn {
   reminders: Reminder[]
   products: { [productId: string]: Product }
   settings: Settings
+  snoozeUntil: number | null
   loading: boolean
   error: Error | null
   saveReminder: (reminder: Reminder) => Promise<void>
@@ -14,6 +15,7 @@ interface UseStorageReturn {
   getProduct: (id: string) => Promise<Product | null>
   saveProduct: (product: Product) => Promise<void>
   refreshReminders: () => Promise<void>
+  clearSnooze: () => Promise<void>
 }
 
 export function useStorage(): UseStorageReturn {
@@ -23,19 +25,22 @@ export function useStorage(): UseStorageReturn {
     reminderDurations: [],
     defaultDuration: 0
   })
+  const [snoozeUntil, setSnoozeUntil] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true)
-      const [remindersData, settingsData] = await Promise.all([
+      const [remindersData, settingsData, snoozeData] = await Promise.all([
         storage.getReminders(),
-        storage.getSettings()
+        storage.getSettings(),
+        storage.getGlobalSnooze()
       ])
 
       setReminders(remindersData)
       setSettings(settingsData)
+      setSnoozeUntil(snoozeData)
 
       const productsMap: { [productId: string]: Product } = {}
       for (const reminder of remindersData) {
@@ -98,10 +103,16 @@ export function useStorage(): UseStorageReturn {
     await loadData()
   }, [loadData])
 
+  const clearSnooze = useCallback(async () => {
+    await storage.clearGlobalSnooze()
+    await loadData()
+  }, [loadData])
+
   return {
     reminders,
     products,
     settings,
+    snoozeUntil,
     loading,
     error,
     saveReminder,
@@ -109,6 +120,7 @@ export function useStorage(): UseStorageReturn {
     deleteReminder,
     getProduct,
     saveProduct,
-    refreshReminders
+    refreshReminders,
+    clearSnooze
   }
 }

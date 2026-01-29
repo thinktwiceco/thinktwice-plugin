@@ -142,8 +142,46 @@ const loadingStyle: React.CSSProperties = {
   color: "var(--popup-text-secondary)"
 }
 
+const snoozeContainerStyle: React.CSSProperties = {
+  backgroundColor: "var(--popup-card-background)",
+  border: "1px solid var(--popup-border)",
+  borderRadius: "8px",
+  padding: "12px 16px",
+  marginBottom: "16px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "12px"
+}
+
+const snoozeTextStyle: React.CSSProperties = {
+  fontSize: "14px",
+  color: "var(--popup-text-primary)",
+  margin: 0,
+  flex: 1
+}
+
+const snoozeTimeStyle: React.CSSProperties = {
+  fontWeight: "600",
+  color: "var(--popup-text-secondary)"
+}
+
+const removeSnoozeButtonStyle: React.CSSProperties = {
+  padding: "6px 12px",
+  fontSize: "12px",
+  fontWeight: "500",
+  borderRadius: "6px",
+  border: "1px solid var(--popup-border)",
+  backgroundColor: "var(--popup-button-background)",
+  color: "var(--popup-button-text)",
+  cursor: "pointer",
+  transition: "all 0.2s ease",
+  whiteSpace: "nowrap"
+}
+
 function IndexPopup() {
-  const { reminders, products, loading } = useStorage()
+  const { reminders, products, snoozeUntil, loading, clearSnooze } =
+    useStorage()
 
   console.log("---- ALL PRODUCTS ----", products)
 
@@ -165,6 +203,37 @@ function IndexPopup() {
     } else {
       const minutes = Math.floor(diff / (1000 * 60))
       return `in ${minutes} minute${minutes !== 1 ? "s" : ""}`
+    }
+  }
+
+  const formatSnoozeTime = (timestamp: number): string => {
+    const date = new Date(timestamp)
+    const now = new Date()
+    const isToday = date.toDateString() === now.toDateString()
+
+    const timeString = date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true
+    })
+
+    if (isToday) {
+      return timeString
+    }
+
+    const dateString = date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric"
+    })
+
+    return `${dateString} at ${timeString}`
+  }
+
+  const handleRemoveSnooze = async () => {
+    try {
+      await clearSnooze()
+    } catch (error) {
+      console.error("[Popup] Failed to remove snooze:", error)
     }
   }
 
@@ -271,8 +340,40 @@ function IndexPopup() {
     <div style={containerStyle}>
       <div style={headerStyle}>
         <h2 style={titleStyle}>ThinkTwice</h2>
-        <p style={subtitleStyle}>Your impulse control journey</p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline"
+          }}>
+          <p style={subtitleStyle}>Your impulse control journey</p>
+          <p style={{ ...subtitleStyle, fontSize: "10px", opacity: 0.6 }}>
+            🔒 Private & Local
+          </p>
+        </div>
       </div>
+
+      {snoozeUntil && snoozeUntil > Date.now() && (
+        <div style={snoozeContainerStyle}>
+          <p style={snoozeTextStyle}>
+            ⏸️ Snoozed until{" "}
+            <span style={snoozeTimeStyle}>{formatSnoozeTime(snoozeUntil)}</span>
+          </p>
+          <button
+            style={removeSnoozeButtonStyle}
+            onClick={handleRemoveSnooze}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--button-secondary-hover-bg)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--popup-button-background)"
+            }}>
+            Remove Snooze
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <div style={loadingStyle}>Loading...</div>

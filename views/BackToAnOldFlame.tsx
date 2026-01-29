@@ -8,11 +8,13 @@ import { spacing, textSize } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
 import type { Product } from "../storage"
+import { formatDuration } from "../utils/time"
 import Celebration from "./Celebration"
 
 type BackToAnOldFlameProps = {
   product: Product | null
   reminderId: string
+  reminderStartTime: number
   onShowThoughtfulPurchase: () => void
   onClose?: () => void
 }
@@ -35,6 +37,7 @@ const actionsStyle: React.CSSProperties = {
 const BackToAnOldFlame = ({
   product,
   reminderId,
+  reminderStartTime,
   onClose
 }: BackToAnOldFlameProps) => {
   const [celebrationType, setCelebrationType] = useState<
@@ -42,13 +45,16 @@ const BackToAnOldFlame = ({
   >(null)
   const [processing, setProcessing] = useState(false)
 
+  // Calculate actual time waited
+  const timeWaitedFormatted = formatDuration(Date.now() - reminderStartTime)
+
   const handleDontNeedIt = async () => {
     setProcessing(true)
 
     // Update product state to dontNeedIt
     if (product) {
       try {
-        await ProductActionManager.dontNeedIt(product.id)
+        await ProductActionManager.dontNeedIt(product)
         console.log("[BackToAnOldFlame] Product marked as dontNeedIt")
       } catch (error) {
         console.error("[BackToAnOldFlame] Failed to mark as dontNeedIt:", error)
@@ -64,7 +70,7 @@ const BackToAnOldFlame = ({
     // Delete reminder and update product state to iNeedThis
     if (product) {
       try {
-        await ProductActionManager.needIt(product.id, reminderId)
+        await ProductActionManager.needIt(product, reminderId)
         console.log(
           "[BackToAnOldFlame] Product marked as iNeedThis, reminder deleted"
         )
@@ -132,21 +138,30 @@ const BackToAnOldFlame = ({
       />
 
       <h1 style={titleStyle}>
-        You said you didn&apos;t need this, did you change your mind?
+        You&apos;re back! You&apos;ve been thoughtful for {timeWaitedFormatted}.
       </h1>
+      <p
+        style={{
+          ...titleStyle,
+          fontSize: textSize.lg,
+          fontWeight: "normal",
+          marginBottom: spacing.xxl
+        }}>
+        Have you made up your mind?
+      </p>
 
       <div style={actionsStyle}>
-        <Button
-          variant="primary"
-          onClick={handleDontNeedIt}
-          disabled={processing}>
-          You are right I don&apos;t need this
+        <Button variant="primary" onClick={handleINeedIt} disabled={processing}>
+          Yes, I want it
         </Button>
         <Button
-          variant="tertiary"
-          onClick={handleINeedIt}
+          variant="secondary"
+          onClick={handleDontNeedIt}
           disabled={processing}>
-          I need this now
+          I don&apos;t need it
+        </Button>
+        <Button variant="tertiary" onClick={onClose} disabled={processing}>
+          I&apos;m still not sure
         </Button>
       </div>
     </Card>

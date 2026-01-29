@@ -8,11 +8,13 @@ import { spacing, textSize } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
 import type { Product } from "../storage"
+import { formatDuration } from "../utils/time"
 import Celebration from "./Celebration"
 
 type EarlyReturnFromSleepProps = {
   product: Product | null
   reminderId: string
+  reminderStartTime: number
   onShowINeedIt: () => void
   onClose?: () => void
 }
@@ -44,11 +46,15 @@ const actionsStyle: React.CSSProperties = {
 const EarlyReturnFromSleep = ({
   product,
   reminderId,
+  reminderStartTime,
   onShowINeedIt,
   onClose
 }: EarlyReturnFromSleepProps) => {
   const [showCelebration, setShowCelebration] = useState(false)
   const [processing, setProcessing] = useState(false)
+
+  // Calculate actual time waited
+  const timeWaitedFormatted = formatDuration(Date.now() - reminderStartTime)
 
   const handleKeepWaiting = async () => {
     setProcessing(true)
@@ -76,7 +82,7 @@ const EarlyReturnFromSleep = ({
     try {
       // Update product state to iNeedThis and delete reminder
       if (product) {
-        await ProductActionManager.needIt(product.id, reminderId)
+        await ProductActionManager.needIt(product, reminderId)
         console.log(
           "[EarlyReturnFromSleep] Product marked as iNeedThis, reminder deleted"
         )
@@ -89,6 +95,32 @@ const EarlyReturnFromSleep = ({
       // Still navigate even if update fails
       onShowINeedIt()
     }
+  }
+
+  const handleIDontNeedIt = async () => {
+    setProcessing(true)
+    if (product) {
+      try {
+        await ProductActionManager.dontNeedIt(product)
+        console.log("[EarlyReturnFromSleep] Product marked as dontNeedIt")
+      } catch (error) {
+        console.error(
+          "[EarlyReturnFromSleep] Failed to mark as dontNeedIt:",
+          error
+        )
+      }
+    }
+    setShowCelebration(true)
+
+    // Wait 2 seconds to show celebration message, then close tab
+    setTimeout(async () => {
+      try {
+        await ChromeMessaging.closeCurrentTab()
+      } catch (error) {
+        console.error("[EarlyReturnFromSleep] Tab close failed:", error)
+        if (onClose) onClose()
+      }
+    }, 2000)
   }
 
   if (showCelebration) {
@@ -116,21 +148,26 @@ const EarlyReturnFromSleep = ({
         }
       />
 
-      <h1 style={titleStyle}>Hey there! You&apos;re back early.</h1>
-      <p style={subtitleStyle}>Did you change your mind about waiting?</p>
+      <h1 style={titleStyle}>
+        You&apos;re back! You waited for {timeWaitedFormatted}.
+      </h1>
+      <p style={subtitleStyle}>Have you made a decision?</p>
 
       <div style={actionsStyle}>
+        <Button variant="primary" onClick={handleINeedIt} disabled={processing}>
+          I need this now
+        </Button>
         <Button
-          variant="primary"
+          variant="secondary"
           onClick={handleKeepWaiting}
           disabled={processing}>
-          You&apos;re right, I&apos;ll wait
+          I&apos;ll wait
         </Button>
         <Button
           variant="tertiary"
-          onClick={handleINeedIt}
+          onClick={handleIDontNeedIt}
           disabled={processing}>
-          I need this now
+          I don&apos;t need it
         </Button>
       </div>
     </Card>

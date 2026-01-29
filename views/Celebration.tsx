@@ -2,6 +2,7 @@ import { useEffect } from "react"
 
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
+import PrivacyBadge from "../components/ui/PrivacyBadge"
 import { spacing, textSize } from "../design-system"
 
 type CelebrationProps = {
@@ -53,7 +54,7 @@ const Celebration = ({
   }, [autoCloseDelay, onClose])
 
   return (
-    <Card>
+    <Card footer={<PrivacyBadge />}>
       <Header
         onBack={onBack}
         onClose={onClose}
