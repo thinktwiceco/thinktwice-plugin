@@ -4,6 +4,7 @@ import { test as base, chromium, type BrowserContext } from "@playwright/test"
 import { ExtensionHelper } from "./page-objects/ExtensionHelper"
 import { OverlayPage } from "./page-objects/OverlayPage"
 import { PopupPage } from "./page-objects/PopupPage"
+import { setAntiDetectionHeaders } from "./utils/extension-helpers"
 
 const EXTENSION_PATH = path.resolve(__dirname, "../../build/chrome-mv3-dev")
 
@@ -38,13 +39,42 @@ export const test = base.extend<TestFixtures>({
 
     const context = await chromium.launchPersistentContext(userDataDir, {
       headless: !!process.env.CI || process.env.HEADLESS === "true",
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      locale: "en-US",
+      timezoneId: "America/New_York",
       args: [
         `--disable-extensions-except=${EXTENSION_PATH}`,
         `--load-extension=${EXTENSION_PATH}`,
         "--no-sandbox",
         "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage"
+        "--disable-dev-shm-usage",
+        "--disable-blink-features=AutomationControlled",
+        "--disable-features=IsolateOrigins,site-per-process",
+        "--disable-site-isolation-trials"
       ]
+    })
+
+    // Mask automation indicators to avoid bot detection
+    await context.addInitScript(() => {
+      // Remove webdriver property
+      Object.defineProperty(navigator, "webdriver", {
+        get: () => undefined
+      })
+
+      // Mock plugins to appear like a real browser
+      Object.defineProperty(navigator, "plugins", {
+        get: () => [1, 2, 3, 4, 5]
+      })
+
+      // Mock languages
+      Object.defineProperty(navigator, "languages", {
+        get: () => ["en-US", "en"]
+      })
+
+      // Add chrome object
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(window as any).chrome = { runtime: {} }
     })
 
     await use(context)
@@ -70,6 +100,7 @@ export async function createOverlayPage(
   extensionId: string
 ) {
   const page = await extensionContext.newPage()
+  await setAntiDetectionHeaders(page)
   return new OverlayPage(page, extensionId)
 }
 

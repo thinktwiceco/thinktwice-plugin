@@ -2,7 +2,7 @@ import { expect, test } from "./fixtures"
 import { OverlayPage } from "./page-objects/OverlayPage"
 import { TEST_CONFIG } from "./test-config"
 import { navigateToProduct } from "./utils/extension-helpers"
-import { buildProductId, buildProductUrl } from "./utils/product-helpers"
+import { buildProductId } from "./utils/product-helpers"
 
 test.describe('ThinkTwice "I need it" Flow', () => {
   test('should complete the "I need it" flow and prevent overlay from reappearing', async ({
@@ -16,7 +16,6 @@ test.describe('ThinkTwice "I need it" Flow', () => {
     await extensionHelper.clearStorage()
 
     // Navigate to product page
-    const productUrl = buildProductUrl(TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
     await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
     // Create overlay page object
@@ -60,7 +59,7 @@ test.describe('ThinkTwice "I need it" Flow', () => {
 
     // Navigate to the same product URL again
     const newPage = await extensionContext.newPage()
-    await newPage.goto(productUrl, { waitUntil: "load" })
+    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
     // Wait a bit for the extension to check the product state
     await newPage.waitForTimeout(2000)

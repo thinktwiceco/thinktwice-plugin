@@ -237,10 +237,8 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
     // Clear storage to ensure clean state
     await extensionHelper.clearStorage()
 
-    const productUrl = `${TEST_CONFIG.BASE_URL}/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`
-
     // Navigate to the test product page
-    await page.goto(productUrl, { waitUntil: "load" })
+    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
     // Create overlay page object and complete sleep on it flow
     const overlayPage = new OverlayPage(page, extensionId)
@@ -262,7 +260,7 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
 
     // Go back to the same product url
     const newPage = await extensionContext.newPage()
-    await newPage.goto(productUrl, { waitUntil: "load" })
+    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
 
     // Create overlay page object for the new page
     const newOverlayPage = new OverlayPage(newPage, extensionId)

@@ -27,12 +27,28 @@ export async function clearExtensionStorage(
 }
 
 /**
+ * Set anti-detection headers on a page
+ */
+export async function setAntiDetectionHeaders(page: Page): Promise<void> {
+  await page.setExtraHTTPHeaders({
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-ch-ua":
+      '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"'
+  })
+}
+
+/**
  * Navigate to an Amazon product page
  */
 export async function navigateToProduct(
   page: Page,
   productId: string
 ): Promise<void> {
+  // Set anti-detection headers before navigating
+  await setAntiDetectionHeaders(page)
+
   await page.goto(`${TEST_CONFIG.BASE_URL}/dp/${productId}`, {
     waitUntil: "load"
   })

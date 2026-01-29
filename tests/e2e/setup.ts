@@ -12,23 +12,59 @@ setup("Verify extension is loadable", async () => {
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: process.env.CI ? true : false, // Headless in CI, headed locally for debugging
     userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     viewport: { width: 1280, height: 720 },
+    locale: "en-US",
+    timezoneId: "America/New_York",
     args: [
       `--disable-extensions-except=${EXTENSION_PATH}`,
       `--load-extension=${EXTENSION_PATH}`,
       "--no-sandbox",
       "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage"
+      "--disable-dev-shm-usage",
+      "--disable-blink-features=AutomationControlled",
+      "--disable-features=IsolateOrigins,site-per-process",
+      "--disable-site-isolation-trials"
     ]
   })
 
   const page = await context.newPage()
 
+  // Mask automation indicators to avoid bot detection
+  await page.addInitScript(() => {
+    // Remove webdriver property
+    Object.defineProperty(navigator, "webdriver", {
+      get: () => undefined
+    })
+
+    // Mock plugins to appear like a real browser
+    Object.defineProperty(navigator, "plugins", {
+      get: () => [1, 2, 3, 4, 5]
+    })
+
+    // Mock languages
+    Object.defineProperty(navigator, "languages", {
+      get: () => ["en-US", "en"]
+    })
+
+    // Add chrome object
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).chrome = { runtime: {} }
+  })
+
   // In headless mode, we can't navigate to chrome:// URLs
   // Instead, verify the extension by loading a real Amazon page
   // and checking if the extension's content script loads
   console.log("Setup: Loading Amazon product page to verify extension...")
+
+  // Set additional headers to mimic real browser
+  await page.setExtraHTTPHeaders({
+    "Accept-Language": "en-US,en;q=0.9",
+    "sec-ch-ua":
+      '"Not_A Brand";v="8", "Chromium";v="131", "Google Chrome";v="131"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"'
+  })
 
   await page.goto(
     `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,

@@ -103,7 +103,9 @@ export class ExtensionHelper {
    */
   async hasReminder(productId: string): Promise<boolean> {
     const reminders = await this.getAllReminders()
-    return reminders.some((r) => r.productId === productId)
+    return reminders.some(
+      (r: { productId: string }) => r.productId === productId
+    )
   }
 
   /**
