@@ -43,6 +43,7 @@ export function useProductPageState({
   const [hideOverlay, setHideOverlay] = useState(true)
   const [pluginClosed, setPluginClosedState] = useState(false)
   const [tabIdSession, setTabIdSession] = useState<number | null>(null)
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null)
 
   useEffect(() => {
     ChromeMessaging.getTabId().then((tabId) => {
@@ -51,14 +52,56 @@ export function useProductPageState({
   }, [])
 
   useEffect(() => {
-    const checkForPendingReminder = async () => {
+    const updateProductId = () => {
       const url = window.location.href
       const productId = getProductId(url)
+      setCurrentProductId((prev) => {
+        if (prev !== productId) {
+          console.log(
+            "[useProductPageState] ProductId changed:",
+            prev,
+            "->",
+            productId
+          )
+          return productId
+        }
+        return prev
+      })
+    }
+
+    // Set initial productId
+    updateProductId()
+
+    // Listen for popstate (browser back/forward)
+    window.addEventListener("popstate", updateProductId)
+
+    // Intercept pushState and replaceState
+    const originalPushState = history.pushState
+    const originalReplaceState = history.replaceState
+
+    history.pushState = function (...args) {
+      originalPushState.apply(history, args)
+      updateProductId()
+    }
+
+    history.replaceState = function (...args) {
+      originalReplaceState.apply(history, args)
+      updateProductId()
+    }
+
+    return () => {
+      window.removeEventListener("popstate", updateProductId)
+      history.pushState = originalPushState
+      history.replaceState = originalReplaceState
+    }
+  }, [getProductId])
+
+  useEffect(() => {
+    const checkForPendingReminder = async () => {
+      const productId = currentProductId
       console.log(
-        "[useProductPageState] Extracted productId:",
-        productId,
-        "from url:",
-        url
+        "[useProductPageState] Using productId from state:",
+        productId
       )
 
       if (productId) {
@@ -254,7 +297,7 @@ export function useProductPageState({
       StorageProxyService.addChangeListener(storageListener)
 
     return removeListener
-  }, [getProductId, marketplace, tabIdSession])
+  }, [getProductId, marketplace, tabIdSession, currentProductId])
 
   const setPluginClosed = (closed: boolean) => {
     console.log("[useProductPageState] Setting plugin closed:", closed)

@@ -114,7 +114,7 @@ const ProductView = ({
   const handleINeedIt = async () => {
     if (extractedProduct) {
       try {
-        await ProductActionManager.needIt(extractedProduct.id)
+        await ProductActionManager.needIt(extractedProduct)
       } catch (error) {
         console.error("[ProductView] Failed to execute needIt:", error)
       }

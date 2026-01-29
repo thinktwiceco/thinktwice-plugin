@@ -120,8 +120,10 @@ const App = () => {
 
   // Allow "ineedit" view to show even if hideOverlay is true
   // (this allows the celebration to display before auto-closing)
+  // But if pluginClosed is true, don't show even for I_NEED_IT view
   const shouldShowOverlay =
-    (!hideOverlay && !pluginClosed) || currentView === VIEW.I_NEED_IT
+    (!hideOverlay && !pluginClosed) ||
+    (currentView === VIEW.I_NEED_IT && !pluginClosed)
 
   console.log("[PLUGIN CLOSED] Should show overlay:", shouldShowOverlay, {
     hideOverlay,

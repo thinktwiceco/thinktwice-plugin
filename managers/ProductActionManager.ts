@@ -114,21 +114,35 @@ export class ProductActionManager {
    * Updates product state to "iNeedThis"
    * Deletes reminder if exists
    * Clears alarm if exists
-   * @param productId - ID of the product
+   * @param product - Product object
    * @param reminderId - Optional reminder ID to delete
    */
-  static async needIt(productId: string, reminderId?: string): Promise<void> {
+  static async needIt(product: Product, reminderId?: string): Promise<void> {
     try {
       console.log(
         "[ProductActionManager] needIt - productId:",
-        productId,
+        product.id,
         "reminderId:",
         reminderId
       )
 
-      // Update product state
-      await storage.updateProductState(productId, ProductState.I_NEED_THIS)
-      console.log("[ProductActionManager] Product state updated to iNeedThis")
+      // Check if product exists
+      const existingProduct = await storage.getProduct(product.id)
+
+      if (!existingProduct) {
+        // Product doesn't exist, create it with iNeedThis state
+        await storage.saveProduct({
+          ...product,
+          state: ProductState.I_NEED_THIS
+        })
+        console.log(
+          "[ProductActionManager] Product created with iNeedThis state"
+        )
+      } else {
+        // Product exists, just update the state
+        await storage.updateProductState(product.id, ProductState.I_NEED_THIS)
+        console.log("[ProductActionManager] Product state updated to iNeedThis")
+      }
 
       // Delete reminder if exists
       if (reminderId) {

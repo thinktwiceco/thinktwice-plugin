@@ -82,7 +82,7 @@ const EarlyReturnFromSleep = ({
     try {
       // Update product state to iNeedThis and delete reminder
       if (product) {
-        await ProductActionManager.needIt(product.id, reminderId)
+        await ProductActionManager.needIt(product, reminderId)
         console.log(
           "[EarlyReturnFromSleep] Product marked as iNeedThis, reminder deleted"
         )

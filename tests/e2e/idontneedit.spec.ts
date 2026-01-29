@@ -15,10 +15,13 @@ test.describe('ThinkTwice "I don\'t really need it" Flow', () => {
       "../../tmp/test-user-data-" + Math.random().toString(36).substring(7)
     )
     context = await chromium.launchPersistentContext(userDataDir, {
-      headless: process.env.CI ? false : process.env.HEADLESS === "true",
+      headless: !!process.env.CI || process.env.HEADLESS === "true",
       args: [
         `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`
+        `--load-extension=${EXTENSION_PATH}`,
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage"
       ]
     })
   })
@@ -72,7 +75,29 @@ test.describe('ThinkTwice "I don\'t really need it" Flow', () => {
       .first()
     await expect(celebrationText).toBeVisible({ timeout: 10000 })
 
-    // 7. Verify it auto-closes after roughly 4 seconds
+    // 7. Verify product state is saved to storage
+    const expectedProductId = `amazon-${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`
+    const storagePage = await context.newPage()
+    await storagePage.goto(`chrome-extension://${extensionId}/popup.html`)
+    const storageData = (await storagePage.evaluate(() => {
+      return new Promise<Record<string, { state?: string }>>((resolve) => {
+        chrome.storage.local.get("thinktwice_products", (result) => {
+          resolve(
+            (result.thinktwice_products as Record<
+              string,
+              { state?: string }
+            >) || {}
+          )
+        })
+      })
+    })) as Record<string, { state?: string }>
+    await storagePage.close()
+
+    expect(storageData).toBeDefined()
+    expect(storageData[expectedProductId]).toBeDefined()
+    expect(storageData[expectedProductId].state).toBe("dontNeedIt")
+
+    // 8. Verify it auto-closes after roughly 4 seconds
     // Returning null in the component should make the content invisible/gone
     await expect(celebrationText).not.toBeVisible({ timeout: 10000 })
   })

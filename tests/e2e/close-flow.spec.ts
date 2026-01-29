@@ -15,10 +15,13 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
       "../../tmp/test-user-data-" + Math.random().toString(36).substring(7)
     )
     context = await chromium.launchPersistentContext(userDataDir, {
-      headless: process.env.CI ? false : process.env.HEADLESS === "true",
+      headless: !!process.env.CI || process.env.HEADLESS === "true",
       args: [
         `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`
+        `--load-extension=${EXTENSION_PATH}`,
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage"
       ]
     })
   })

@@ -1,5 +1,6 @@
 import path from "path"
 import { chromium, expect, test as setup } from "@playwright/test"
+
 import { TEST_CONFIG } from "./test-config"
 
 const EXTENSION_PATH = path.resolve(__dirname, "../../build/chrome-mv3-dev")
@@ -10,6 +11,9 @@ setup("Verify extension is loadable", async () => {
   const userDataDir = path.join(__dirname, "../../tmp/test-user-data-setup")
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: process.env.CI ? true : false, // Headless in CI, headed locally for debugging
+    userAgent:
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    viewport: { width: 1280, height: 720 },
     args: [
       `--disable-extensions-except=${EXTENSION_PATH}`,
       `--load-extension=${EXTENSION_PATH}`,
@@ -37,8 +41,11 @@ setup("Verify extension is loadable", async () => {
   try {
     console.log(`Setup: Waiting for selector "${selector}"...`)
     await page.waitForSelector(selector, { timeout: 20000, state: "attached" })
-  } catch (e) {
-    console.log("Setup: Timed out waiting for overlay. Page title:", await page.title())
+  } catch {
+    console.log(
+      "Setup: Timed out waiting for overlay. Page title:",
+      await page.title()
+    )
   }
 
   // Check if the extension's overlay element exists
@@ -48,7 +55,10 @@ setup("Verify extension is loadable", async () => {
 
   console.log("Setup: Extension overlay detected:", overlayExists)
   if (!overlayExists) {
-    console.log("Debug: Page content snippet:", (await page.content()).slice(0, 500))
+    console.log(
+      "Debug: Page content snippet:",
+      (await page.content()).slice(0, 500)
+    )
   }
   expect(overlayExists).toBe(true)
 

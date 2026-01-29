@@ -70,7 +70,7 @@ const BackToAnOldFlame = ({
     // Delete reminder and update product state to iNeedThis
     if (product) {
       try {
-        await ProductActionManager.needIt(product.id, reminderId)
+        await ProductActionManager.needIt(product, reminderId)
         console.log(
           "[BackToAnOldFlame] Product marked as iNeedThis, reminder deleted"
         )
