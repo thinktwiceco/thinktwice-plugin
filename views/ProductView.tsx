@@ -19,12 +19,10 @@ import {
 } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import type { Product } from "../storage"
-import { storage } from "../storage"
-import { extractProduct } from "../utils/productExtractor"
+import { ProductState, storage } from "../storage"
 
 type ProductViewProps = {
-  productId?: string | null
-  marketplace: "amazon"
+  product: Product | null
   onShowIDontNeedIt: (product: Product | null) => void
   onShowSleepOnIt: (product: Product | null) => void
   onShowINeedIt: () => void
@@ -71,48 +69,34 @@ const actionsGroupStyle: React.CSSProperties = {
 }
 
 const ProductView = ({
-  productId,
-  marketplace,
+  product,
   onShowIDontNeedIt,
   onShowSleepOnIt,
   onShowINeedIt,
   onClose
 }: ProductViewProps) => {
-  const [extractedProduct, setExtractedProduct] = useState<Product | null>(null)
   const [showPauseMenu, setShowPauseMenu] = useState(false)
   const [showPrivacyInfo, setShowPrivacyInfo] = useState(false)
 
-  useEffect(() => {
-    if (productId) {
-      try {
-        const product = extractProduct(marketplace, productId)
-        setExtractedProduct(product)
-      } catch (error) {
-        console.error("[ProductView] Failed to extract product:", error)
-        setExtractedProduct(null)
-      }
-    }
-  }, [productId, marketplace])
-
   const handleSleepOnIt = () => {
-    onShowSleepOnIt(extractedProduct)
+    onShowSleepOnIt(product)
   }
 
   const handleIDontNeedIt = async () => {
-    if (extractedProduct) {
+    if (product) {
       try {
-        await ProductActionManager.dontNeedIt(extractedProduct)
+        await ProductActionManager.dontNeedIt(product)
       } catch (error) {
         console.error("[ProductView] Failed to execute dontNeedIt:", error)
       }
     }
-    onShowIDontNeedIt(extractedProduct)
+    onShowIDontNeedIt(product)
   }
 
   const handleINeedIt = async () => {
-    if (extractedProduct) {
+    if (product) {
       try {
-        await ProductActionManager.needIt(extractedProduct)
+        await ProductActionManager.needIt(product)
       } catch (error) {
         console.error("[ProductView] Failed to execute needIt:", error)
       }
@@ -174,6 +158,19 @@ const ProductView = ({
 
   const handleInfoClick = () => {
     setShowPrivacyInfo(!showPrivacyInfo)
+  }
+
+  const handleIntroSentect = (product: Product | null): string => {
+    console.log("[DEBUG] PRODUCT ---->", product)
+    if (!product) {
+      return ""
+    }
+
+    if (product.state && product.state === ProductState.DONT_NEED_IT) {
+      return "You are back! Are you thinking about buying this product?"
+    }
+
+    return "Quick thought before you buy"
   }
 
   return (
@@ -238,7 +235,7 @@ const ProductView = ({
             alt="lightbulb"
             style={{ width: iconSize.small, height: iconSize.small }}
           />
-          Quick thought before you buy
+          {handleIntroSentect(product)}
         </p>
       </div>
       <div style={bodyStyle}>

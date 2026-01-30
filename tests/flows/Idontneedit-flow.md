@@ -39,11 +39,10 @@ The "I don't really need it" action marks the product as unwanted, records this 
 
 ### 5. Auto-Close
 
-- **Timer**: After 4 seconds, the `Celebration` component triggers its `onClose` callback.
-- **Cleanup**:
-  - `setPluginClosed(true)` is called.
-  - The tab session state is updated in storage to mark `pluginClosed: true`.
-- **Result**: The extension overlay is removed from the DOM (`shouldShowOverlay` becomes `false`), effectively ending the interaction for that product/session.
+- **Timer**: After 4 seconds, the celebration triggers tab closure.
+- **Action**: Calls `ChromeMessaging.closeCurrentTab()`.
+- **Fallback**: If tab close fails, calls `onClose()` to hide the overlay.
+- **Result**: The browser tab closes, removing the temptation to purchase. If the user navigates to the same product again in the future, the overlay will appear again (unlike "I need it" which is a terminal state).
 
 ## Related Files
 

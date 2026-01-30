@@ -1,7 +1,8 @@
 import { expect, test } from "./fixtures"
 import { OverlayPage } from "./page-objects/OverlayPage"
-import { TEST_CONFIG } from "./test-config"
+import { PRIMARY_PRODUCT_ID, TEST_CONFIG } from "./test-config"
 import { navigateToProduct } from "./utils/extension-helpers"
+import { SECONDARY_PRODUCT_ID } from "./test-config"
 
 test.describe('ThinkTwice "Close and Pause" Flow', () => {
   test('should handle "Close for now" (Global Close)', async ({
@@ -10,12 +11,13 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
     extensionHelper
   }) => {
     const page = await extensionContext.newPage()
+      const productId = PRIMARY_PRODUCT_ID
 
     // Clear storage
     await extensionHelper.clearStorage()
 
     // Navigate to Amazon product page
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, productId)
 
     // Create overlay page object
     const overlayPage = new OverlayPage(page, extensionId)
@@ -46,7 +48,7 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
 
     // Open a NEW tab to the same product
     const newPage = await extensionContext.newPage()
-    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(newPage, productId)
 
     // Verify overlay is NOT visible in the new tab (global close affects all tabs)
     const newOverlayPage = new OverlayPage(newPage, extensionId)
@@ -59,12 +61,14 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
     extensionHelper
   }) => {
     const page = await extensionContext.newPage()
+    const productId1 = SECONDARY_PRODUCT_ID
+    const productId2 = PRIMARY_PRODUCT_ID
 
     // Clear storage
     await extensionHelper.clearStorage()
 
     // Navigate to Amazon product page
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, productId1)
 
     // Create overlay page object
     const overlayPage = new OverlayPage(page, extensionId)
@@ -86,7 +90,7 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
 
     // Navigate to a DIFFERENT product page in a NEW tab
     const newPage = await extensionContext.newPage()
-    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.SECONDARY)
+    await navigateToProduct(newPage, productId2)
 
     // Verify overlay is NOT shown (global snooze active)
     const newOverlayPage = new OverlayPage(newPage, extensionId)
@@ -99,12 +103,13 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
     extensionHelper
   }) => {
     const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
 
     // Clear storage
     await extensionHelper.clearStorage()
 
     // Navigate to Amazon product page
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, productId)
 
     // Create overlay page object
     const overlayPage = new OverlayPage(page, extensionId)
@@ -138,12 +143,14 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
     test.setTimeout(70000)
 
     const page = await extensionContext.newPage()
+    const productId1 =  SECONDARY_PRODUCT_ID
+    const productId2 =  PRIMARY_PRODUCT_ID
 
     // Clear storage
     await extensionHelper.clearStorage()
 
     // Navigate to Amazon product page
-    await navigateToProduct(page, "B005EJH6Z4")
+    await navigateToProduct(page, productId1)
 
     // Create overlay page object
     const overlayPage = new OverlayPage(page, extensionId)
@@ -167,7 +174,7 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
     // Open a NEW tab immediately
     console.log("Opening new tab to verify global snooze...")
     const newPage = await extensionContext.newPage()
-    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.SECONDARY)
+    await navigateToProduct(newPage, productId2)
 
     // Verify overlay is NOT visible in the new tab (global snooze active)
     const newOverlayPage = new OverlayPage(newPage, extensionId)

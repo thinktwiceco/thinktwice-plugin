@@ -1,6 +1,6 @@
 import { expect, test } from "./fixtures"
 import { OverlayPage } from "./page-objects/OverlayPage"
-import { TEST_CONFIG } from "./test-config"
+import { PRIMARY_PRODUCT_ID } from "./test-config"
 import { navigateToProduct } from "./utils/extension-helpers"
 
 test.describe("ThinkTwice Plugin E2E", () => {
@@ -20,7 +20,7 @@ test.describe("ThinkTwice Plugin E2E", () => {
 
     // Navigate to a known valid Amazon product page
     console.log("Navigating to Amazon product page...")
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, PRIMARY_PRODUCT_ID)
 
     // Create overlay page object
     const overlayPage = new OverlayPage(page, extensionId)

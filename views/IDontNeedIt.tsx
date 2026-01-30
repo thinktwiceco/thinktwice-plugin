@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import lightbulbIcon from "url:../assets/icons/Icons/Lightbulb.svg"
 import starIcon from "url:../assets/icons/Icons/Star.svg"
 import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"
@@ -7,6 +8,7 @@ import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
 import { commonSpacing, iconSize, layout, typography } from "../design-system"
+import { ChromeMessaging } from "../services/ChromeMessaging"
 import Celebration from "./Celebration"
 
 // Feature flag: Set to true to show investment options view
@@ -34,6 +36,20 @@ const optionsContainerStyle: React.CSSProperties = {
 }
 
 const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
+  // Handle tab close after celebration
+  const handleCelebrationClose = async () => {
+    console.log("[IDontNeedIt] Requesting tab close...")
+    try {
+      await ChromeMessaging.closeCurrentTab()
+      console.log("[IDontNeedIt] Tab close successful")
+    } catch (error) {
+      console.error("[IDontNeedIt] Tab close failed:", error)
+      if (onClose) {
+        onClose()
+      }
+    }
+  }
+
   // When feature flag is disabled, show celebration instead of investment options
   if (!SHOW_INVESTMENT_OPTIONS) {
     return (
@@ -44,7 +60,7 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
         subtitle="Your future self will thank you for being so thoughtful."
         autoCloseDelay={4000}
         onBack={onBack}
-        onClose={onClose}
+        onClose={handleCelebrationClose}
       />
     )
   }

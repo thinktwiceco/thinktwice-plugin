@@ -74,7 +74,7 @@ const App = () => {
   useGoogleFonts()
   const {
     currentView: reminderView,
-    currentProduct,
+    product,
     reminderId,
     reminderStartTime,
     pluginClosed,
@@ -91,16 +91,7 @@ const App = () => {
     setLocalView(VIEW.PRODUCT)
   }
 
-  const handleShowIDontNeedIt = async (product: Product | null) => {
-    // Update product state to dontNeedIt
-    if (product) {
-      try {
-        await ProductActionManager.dontNeedIt(product)
-        console.log("[Amazon] Product marked as dontNeedIt")
-      } catch (error) {
-        console.error("[Amazon] Failed to execute dontNeedIt:", error)
-      }
-    }
+  const handleShowIDontNeedIt = (product: Product | null) => {
     setLocalView(VIEW.I_DONT_NEED_IT)
   }
 
@@ -124,36 +115,8 @@ const App = () => {
     pluginClosed,
     currentView
   })
-  // #region agent log
-  fetch("http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      location: "amazon.tsx:121",
-      message: "Component render check",
-      data: { shouldShowOverlay, pluginClosed, currentView, reminderView },
-      timestamp: Date.now(),
-      sessionId: "debug-session",
-      hypothesisId: "H4"
-    })
-  }).catch(() => {})
-  // #endregion
 
   if (!shouldShowOverlay) {
-    // #region agent log
-    fetch("http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "amazon.tsx:129",
-        message: "OVERLAY HIDDEN - returning null",
-        data: { pluginClosed, currentView },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "H4"
-      })
-    }).catch(() => {})
-    // #endregion
     return null
   }
 
@@ -166,7 +129,7 @@ const App = () => {
       if (currentView === VIEW.EARLY_RETURN) {
         return (
           <EarlyReturnFromSleep
-            product={currentProduct}
+            product={product}
             reminderId={reminderId || ""}
             reminderStartTime={reminderStartTime || 0}
             onShowINeedIt={handleShowINeedIt}
@@ -178,7 +141,7 @@ const App = () => {
       if (currentView === VIEW.OLD_FLAME) {
         return (
           <BackToAnOldFlame
-            product={currentProduct}
+            product={product}
             reminderId={reminderId || ""}
             reminderStartTime={reminderStartTime || 0}
             onShowThoughtfulPurchase={handleShowThoughtfulPurchase}
@@ -219,8 +182,7 @@ const App = () => {
 
       return (
         <ProductView
-          productId={productId}
-          marketplace={MARKETPLACE}
+          product={product}
           onShowIDontNeedIt={handleShowIDontNeedIt}
           onShowSleepOnIt={handleShowSleepOnIt}
           onShowINeedIt={handleShowINeedIt}

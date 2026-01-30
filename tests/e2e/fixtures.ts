@@ -37,8 +37,9 @@ export const test = base.extend<TestFixtures>({
       "../../tmp/test-user-data-" + Math.random().toString(36).substring(7)
     )
 
+    const isHeaded = process.env.HEADED === 'true'
     const context = await chromium.launchPersistentContext(userDataDir, {
-      headless: !!process.env.CI || process.env.HEADLESS === "true",
+      headless: !isHeaded, // Default headless, set HEADED=true for headed mode
       userAgent:
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
       locale: "en-US",
@@ -51,7 +52,10 @@ export const test = base.extend<TestFixtures>({
         "--disable-dev-shm-usage",
         "--disable-blink-features=AutomationControlled",
         "--disable-features=IsolateOrigins,site-per-process",
-        "--disable-site-isolation-trials"
+        "--disable-site-isolation-trials",
+        "--window-size=1280,720",
+        "--disable-web-security",
+        "--disable-features=VizDisplayCompositor"
       ]
     })
 

@@ -1,6 +1,6 @@
 import { expect, test } from "./fixtures"
 import { OverlayPage } from "./page-objects/OverlayPage"
-import { TEST_CONFIG } from "./test-config"
+import { PRIMARY_PRODUCT_ID, SECONDARY_PRODUCT_ID, TEST_CONFIG } from "./test-config"
 import { navigateToProduct } from "./utils/extension-helpers"
 import { buildProductId } from "./utils/product-helpers"
 
@@ -11,12 +11,13 @@ test.describe('ThinkTwice "I need it" Flow', () => {
     extensionHelper
   }) => {
     const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
 
     // Clear storage to ensure clean state
     await extensionHelper.clearStorage()
 
     // Navigate to product page
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, productId)
 
     // Create overlay page object
     const overlayPage = new OverlayPage(page, extensionId)
@@ -45,10 +46,7 @@ test.describe('ThinkTwice "I need it" Flow', () => {
     await overlayPage.expectHidden(2000)
 
     // Verify product state is saved to storage
-    const expectedProductId = buildProductId(
-      "amazon",
-      TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY
-    )
+    const expectedProductId = buildProductId("amazon", productId)
     await extensionHelper.assertProductState(
       expectedProductId,
       TEST_CONFIG.STATES.I_NEED_THIS
@@ -59,7 +57,7 @@ test.describe('ThinkTwice "I need it" Flow', () => {
 
     // Navigate to the same product URL again
     const newPage = await extensionContext.newPage()
-    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(newPage, productId)
 
     // Wait a bit for the extension to check the product state
     await newPage.waitForTimeout(2000)
@@ -75,12 +73,14 @@ test.describe('ThinkTwice "I need it" Flow', () => {
     extensionHelper
   }) => {
     const page = await extensionContext.newPage()
+    const productId1 = SECONDARY_PRODUCT_ID
+    const productId2 = PRIMARY_PRODUCT_ID
 
     // Clear storage to ensure clean state
     await extensionHelper.clearStorage()
 
-    // Navigate to first product (PRIMARY)
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    // Navigate to first product
+    await navigateToProduct(page, productId1)
 
     // Create overlay page object
     const overlayPage = new OverlayPage(page, extensionId)
@@ -105,8 +105,8 @@ test.describe('ThinkTwice "I need it" Flow', () => {
     // Verify overlay is hidden for Product A after auto-close
     await overlayPage.expectHidden(2000)
 
-    // Navigate to a different product (SECONDARY)
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.SECONDARY)
+    // Navigate to a different product
+    await navigateToProduct(page, productId2)
 
     // Wait for extension to initialize after navigation
     await page.waitForTimeout(1000)

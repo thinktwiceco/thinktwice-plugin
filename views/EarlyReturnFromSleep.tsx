@@ -1,3 +1,17 @@
+/**
+ * EarlyReturnFromSleep View
+ *
+ * Shown when a user returns to a product page BEFORE the "Sleep on it" reminder timer has expired.
+ * This indicates they couldn't resist and came back early, breaking their commitment to wait.
+ *
+ * Scenario: User clicked "Sleep on it" (e.g., 24 hours), but came back after only 2 hours.
+ *
+ * Key differences from BackToAnOldFlame:
+ * - Uses "Clock" icon (vs Thoughtful icon)
+ * - Messaging emphasizes timing and encourages continuing to wait
+ * - Button options: "I need this now" / "I'll wait" / "I don't need it"
+ */
+
 import { useState } from "react"
 import clockIcon from "url:../assets/icons/Icons/Clock.svg"
 

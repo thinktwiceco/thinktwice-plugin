@@ -14,7 +14,7 @@ interface UseProductPageStateParams {
 
 interface UseProductPageStateReturn {
   currentView: "product" | "earlyreturn" | "oldflame" | null
-  currentProduct: Product | null
+  product: Product | null
   reminderId: string | null
   reminderDuration: number | null
   reminderStartTime: number | null
@@ -33,7 +33,7 @@ export function useProductPageState({
   const [currentView, setCurrentView] = useState<
     "product" | "earlyreturn" | "oldflame" | null
   >(null)
-  const [currentProduct, setCurrentProduct] = useState<Product | null>(null)
+  const [product, setProduct] = useState<Product | null>(null)
   const [reminderId, setReminderId] = useState<string | null>(null)
   const [reminderDuration, setReminderDuration] = useState<number | null>(null)
   const [reminderStartTime, setReminderStartTime] = useState<number | null>(
@@ -41,7 +41,7 @@ export function useProductPageState({
   )
   const [pluginClosed, setPluginClosedState] = useState(true)
   const [tabIdSession, setTabIdSession] = useState<number | null>(null)
-  const [currentProductId, setCurrentProductId] = useState<string | null>(null)
+  const [urlChangeCounter, setUrlChangeCounter] = useState(0)
 
   useEffect(() => {
     ChromeMessaging.getTabId().then((tabId) => {
@@ -50,160 +50,50 @@ export function useProductPageState({
   }, [])
 
   useEffect(() => {
-    const updateProductId = () => {
-      const url = window.location.href
-      const productId = getProductId(url)
-      setCurrentProductId((prev) => {
-        if (prev !== productId) {
-          console.log(
-            "[useProductPageState] ProductId changed:",
-            prev,
-            "->",
-            productId
-          )
-          return productId
-        }
-        return prev
-      })
+    const handleUrlChange = () => {
+      console.log("[useProductPageState] URL changed, triggering refresh")
+      setUrlChangeCounter((prev) => prev + 1)
     }
 
-    // Set initial productId
-    updateProductId()
+    // Set initial
+    handleUrlChange()
 
-    // Listen for popstate (browser back/forward)
-    window.addEventListener("popstate", updateProductId)
-
-    // Listen for full page navigations (when page is fully loaded)
-    window.addEventListener("load", updateProductId)
+    // Listen for URL changes
+    window.addEventListener("popstate", handleUrlChange)
+    window.addEventListener("load", handleUrlChange)
 
     return () => {
-      window.removeEventListener("popstate", updateProductId)
-      window.removeEventListener("load", updateProductId)
+      window.removeEventListener("popstate", handleUrlChange)
+      window.removeEventListener("load", handleUrlChange)
     }
-  }, [getProductId])
+  }, [])
 
   useEffect(() => {
     const checkForPendingReminder = async () => {
-      const productId = currentProductId || getProductId(window.location.href)
-      console.log(
-        "[useProductPageState] Using productId:",
-        productId,
-        "(from state:",
-        currentProductId,
-        ")"
-      )
+      const productId = getProductId(window.location.href)
+      console.log("[useProductPageState] Using productId:", productId)
 
       if (productId) {
         try {
-          // #region agent log
-          fetch(
-            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                location: "useProductPageState.ts:97",
-                message: "Effect started",
-                data: { productId, currentProductId },
-                timestamp: Date.now(),
-                sessionId: "debug-session",
-                hypothesisId: "H3"
-              })
-            }
-          ).catch(() => {})
-          // #endregion
           // Check 1: Global snooze
           console.log("[useProductPageState] Checking for global snooze...")
           const snoozedUntil = await storage.getGlobalSnooze()
-          // #region agent log
-          const nowTime = Date.now()
-          fetch(
-            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                location: "useProductPageState.ts:101",
-                message: "Snooze check",
-                data: {
-                  snoozedUntil,
-                  nowTime,
-                  isActive: snoozedUntil && snoozedUntil > nowTime,
-                  diff: snoozedUntil ? snoozedUntil - nowTime : null
-                },
-                timestamp: Date.now(),
-                sessionId: "debug-session",
-                hypothesisId: "H1,H5"
-              })
-            }
-          ).catch(() => {})
-          // #endregion
           if (snoozedUntil && snoozedUntil > Date.now()) {
             console.log(
               "[useProductPageState] Global snooze active until:",
               new Date(snoozedUntil)
             )
-            // #region agent log
-            fetch(
-              "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  location: "useProductPageState.ts:106",
-                  message: "Snooze ACTIVE - hiding overlay",
-                  data: { snoozedUntil, now: Date.now() },
-                  timestamp: Date.now(),
-                  sessionId: "debug-session",
-                  hypothesisId: "H1,H5"
-                })
-              }
-            ).catch(() => {})
-            // #endregion
             setPluginClosedState(true)
             setCurrentView(null)
+            setProduct(null)
             return
           } else if (snoozedUntil) {
             // Snooze has expired - clear it
             console.log("[useProductPageState] Snooze expired, clearing...")
-            // #region agent log
-            fetch(
-              "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  location: "useProductPageState.ts:112",
-                  message: "Snooze EXPIRED - clearing",
-                  data: { snoozedUntil, now: Date.now() },
-                  timestamp: Date.now(),
-                  sessionId: "debug-session",
-                  hypothesisId: "H1"
-                })
-              }
-            ).catch(() => {})
-            // #endregion
             await storage.clearGlobalSnooze()
-            // #region agent log
-            fetch(
-              "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  location: "useProductPageState.ts:112-after",
-                  message: "After clearGlobalSnooze",
-                  data: {},
-                  timestamp: Date.now(),
-                  sessionId: "debug-session",
-                  hypothesisId: "H1"
-                })
-              }
-            ).catch(() => {})
-            // #endregion
           }
 
-          // Check 2: Product has terminal state (I_NEED_THIS)
+          // Check 2: Product has terminal state (I_NEED_THIS only)
           const compositeKey = `${marketplace}-${productId}`
           console.log(
             "[useProductPageState] Checking product storage for key:",
@@ -220,51 +110,19 @@ export function useProductPageState({
             )
             setPluginClosedState(true)
             setCurrentView(null)
+            setProduct(null)
             return
           }
 
           // Check 3: User global close
           const globalClosed = await storage.getGlobalPluginClosed()
-          // #region agent log
-          fetch(
-            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                location: "useProductPageState.ts:136",
-                message: "Global plugin closed check",
-                data: { globalClosed },
-                timestamp: Date.now(),
-                sessionId: "debug-session",
-                hypothesisId: "H2"
-              })
-            }
-          ).catch(() => {})
-          // #endregion
           if (globalClosed) {
             console.log(
               "[useProductPageState] Global plugin closed - hiding overlay"
             )
-            // #region agent log
-            fetch(
-              "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  location: "useProductPageState.ts:141",
-                  message: "Global CLOSED - hiding overlay",
-                  data: { globalClosed },
-                  timestamp: Date.now(),
-                  sessionId: "debug-session",
-                  hypothesisId: "H2"
-                })
-              }
-            ).catch(() => {})
-            // #endregion
             setPluginClosedState(true)
             setCurrentView(null)
+            setProduct(null)
             return
           }
 
@@ -272,41 +130,26 @@ export function useProductPageState({
           console.log(
             "[useProductPageState] All checks passed - showing overlay"
           )
-          // #region agent log
-          fetch(
-            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                location: "useProductPageState.ts:150",
-                message: "ALL CHECKS PASSED - showing overlay",
-                data: { willSetPluginClosedTo: false },
-                timestamp: Date.now(),
-                sessionId: "debug-session",
-                hypothesisId: "H4"
-              })
-            }
-          ).catch(() => {})
-          // #endregion
           setPluginClosedState(false)
-          // #region agent log
-          fetch(
-            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                location: "useProductPageState.ts:150-after",
-                message: "After setPluginClosedState(false)",
-                data: {},
-                timestamp: Date.now(),
-                sessionId: "debug-session",
-                hypothesisId: "H4"
-              })
-            }
-          ).catch(() => {})
-          // #endregion
+
+          // Extract and merge product (fresh DOM data + stored state)
+          try {
+            const freshProduct = extractProduct(marketplace, productId)
+            const mergedProduct = existingProduct
+              ? { ...freshProduct, state: existingProduct.state }
+              : freshProduct
+            setProduct(mergedProduct)
+            console.log(
+              "[useProductPageState] Product extracted and merged:",
+              mergedProduct.id
+            )
+          } catch (error) {
+            console.error(
+              "[useProductPageState] Failed to extract product:",
+              error
+            )
+            setProduct(null)
+          }
 
           // Check for pending reminders (early return / old flame views)
           const reminders = await storage.getReminders()
@@ -338,15 +181,15 @@ export function useProductPageState({
               setReminderDuration(null)
               setReminderStartTime(null)
               setCurrentView(null)
+              // Keep product - it was already extracted above
               return
             }
 
+            setReminderId(pendingReminder.id)
             setReminderDuration(pendingReminder.duration)
             setReminderStartTime(
               pendingReminder.reminderTime - pendingReminder.duration
             )
-            const product = extractProduct(marketplace, productId)
-            setCurrentProduct(product)
 
             const now = Date.now()
             if (pendingReminder.reminderTime > now) {
@@ -392,26 +235,6 @@ export function useProductPageState({
         console.log(
           "[useProductPageState] Snooze storage changed, re-checking..."
         )
-        // #region agent log
-        fetch(
-          "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              location: "useProductPageState.ts:232",
-              message: "Snooze storage CHANGED - listener triggered",
-              data: {
-                oldValue: changes["thinktwice_snooze"]?.oldValue,
-                newValue: changes["thinktwice_snooze"]?.newValue
-              },
-              timestamp: Date.now(),
-              sessionId: "debug-session",
-              hypothesisId: "H1"
-            })
-          }
-        ).catch(() => {})
-        // #endregion
         checkForPendingReminder()
       }
 
@@ -432,7 +255,7 @@ export function useProductPageState({
       StorageProxyService.addChangeListener(storageListener)
 
     return removeListener
-  }, [getProductId, marketplace, tabIdSession, currentProductId])
+  }, [getProductId, marketplace, tabIdSession, urlChangeCounter])
 
   const setPluginClosed = async (closed: boolean) => {
     console.log("[useProductPageState] Setting global plugin closed:", closed)
@@ -442,7 +265,7 @@ export function useProductPageState({
 
   return {
     currentView,
-    currentProduct,
+    product,
     reminderId,
     reminderDuration,
     reminderStartTime,

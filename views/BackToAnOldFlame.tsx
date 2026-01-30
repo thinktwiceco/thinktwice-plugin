@@ -1,3 +1,17 @@
+/**
+ * BackToAnOldFlame View
+ *
+ * Shown when a user returns to a product page AFTER the "Sleep on it" reminder timer has expired.
+ * This indicates they successfully waited the full duration and are now thoughtfully reconsidering.
+ *
+ * Scenario: User clicked "Sleep on it", reminder expired (e.g., after 24 hours), and user came back.
+ *
+ * Key differences from EarlyReturnFromSleep:
+ * - Uses "Thoughtful" icon (vs Clock icon)
+ * - Messaging emphasizes successful waiting and thoughtful decision-making
+ * - Button options: "Yes, I want it" / "I don't need it" / "I'm still not sure"
+ */
+
 import { useState } from "react"
 import thoughtfulIcon from "url:../assets/icons/Icons/Thoughtful.svg"
 

@@ -1,7 +1,7 @@
 import { expect, test } from "./fixtures"
 import { OverlayPage } from "./page-objects/OverlayPage"
 import { PopupPage } from "./page-objects/PopupPage"
-import { TEST_CONFIG } from "./test-config"
+import { PRIMARY_PRODUCT_ID, TEST_CONFIG } from "./test-config"
 import { navigateToProduct } from "./utils/extension-helpers"
 import { extractProductInfo } from "./utils/product-helpers"
 
@@ -12,12 +12,13 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
     extensionHelper
   }) => {
     const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
 
     // Clear storage to ensure clean state
     await extensionHelper.clearStorage()
 
     // Navigate to the test product page
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, productId)
 
     // Create overlay page object
     const overlayPage = new OverlayPage(page, extensionId)
@@ -73,12 +74,13 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
     test.setTimeout(120000) // 2 minutes
 
     const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
 
     // Clear storage to ensure clean state
     await extensionHelper.clearStorage()
 
     // Navigate to the test product page
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, productId)
 
     // Extract product information
     const productInfo = await extractProductInfo(page)
@@ -156,12 +158,13 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
     extensionHelper
   }) => {
     const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
 
     // Clear storage to ensure clean state
     await extensionHelper.clearStorage()
 
     // Navigate to the test product page
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, productId)
 
     // Extract product information
     const productInfo = await extractProductInfo(page)
@@ -208,20 +211,20 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
     await productPage.waitForLoadState("load")
 
     // Verify we're on the correct product page
-    expect(productPage.url()).toContain(TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
-    console.log("[Test] Product page opened successfully")
+    expect(productPage.url()).toContain(productId)
+      console.log("[Test] Product page opened successfully")
 
-    // Reload the popup to see updated state
-    await popupPageObj.reload()
+      // Reload the popup to see updated state
+      await popupPageObj.reload()
 
-    // Verify the product is NO LONGER in "Sleeping on it" section
-    if (productInfo.name) {
-      await popupPageObj.expectProductNotInSleeping(productInfo.name)
-    }
+      // Verify the product is NO LONGER in "Sleeping on it" section
+      if (productInfo.name) {
+        await popupPageObj.expectProductNotInSleeping(productInfo.name)
+      }
 
-    console.log(
-      '[Test] Successfully verified "I changed my mind" flow - product removed from sleeping section'
-    )
+      console.log(
+        '[Test] Successfully verified "I changed my mind" flow - product removed from sleeping section'
+      )
 
     // Clean up
     await productPage.close()
@@ -238,7 +241,7 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
     await extensionHelper.clearStorage()
 
     // Navigate to the test product page
-    await navigateToProduct(page, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(page, PRIMARY_PRODUCT_ID)
 
     // Create overlay page object and complete sleep on it flow
     const overlayPage = new OverlayPage(page, extensionId)
@@ -260,7 +263,7 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
 
     // Go back to the same product url
     const newPage = await extensionContext.newPage()
-    await navigateToProduct(newPage, TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY)
+    await navigateToProduct(newPage, PRIMARY_PRODUCT_ID)
 
     // Create overlay page object for the new page
     const newOverlayPage = new OverlayPage(newPage, extensionId)
@@ -276,6 +279,363 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
     await expect(newOverlayPage.getButton(/I need this now/i)).toBeVisible()
     await expect(newOverlayPage.getButton(/I'll wait/i)).toBeVisible()
     await expect(newOverlayPage.getButton(/I don't need/i)).toBeVisible()
+
+    await newPage.close()
+  })
+
+  test("should show BackToAnOldFlame view when returning after timer expires", async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    test.setTimeout(120000) // 2 minutes
+
+    const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
+
+    // Clear storage to ensure clean state
+    await extensionHelper.clearStorage()
+
+    // Navigate to the test product page
+    await navigateToProduct(page, productId)
+
+    // Create overlay page object and complete sleep on it flow with 1 minute timer
+    const overlayPage = new OverlayPage(page, extensionId)
+    await overlayPage.expectAttached()
+    await overlayPage.clickSleepOnIt()
+    await overlayPage.selectDuration(/1 minute/i)
+    await overlayPage.clickSetReminder()
+    await overlayPage.expectSuccessMessage()
+
+    // Wait for tab to close
+    try {
+      await page.waitForTimeout(6000)
+      if (!page.isClosed()) {
+        await page.close()
+      }
+    } catch {
+      // Expected: page closed
+    }
+
+    // Wait for timer to expire
+    console.log("[Test] Waiting for 1 minute timer to expire...")
+    await page.waitForTimeout(TEST_CONFIG.TIMEOUTS.REMINDER_1MIN)
+
+    // Go back to the same product url AFTER timer expired
+    const newPage = await extensionContext.newPage()
+    await navigateToProduct(newPage, productId)
+
+    // Create overlay page object for the new page
+    const newOverlayPage = new OverlayPage(newPage, extensionId)
+    await newOverlayPage.expectAttached()
+
+    // Verify BackToAnOldFlame view is shown
+    await newOverlayPage.expectTextVisible("You're back!", 5000)
+    await newOverlayPage.expectTextVisible("thoughtful", 5000)
+
+    // Verify buttons are present
+    await expect(newOverlayPage.getButton(/Yes, I want it/i)).toBeVisible()
+    await expect(newOverlayPage.getButton(/I don't need it/i)).toBeVisible()
+    await expect(newOverlayPage.getButton(/I'm still not sure/i)).toBeVisible()
+
+    await newPage.close()
+  })
+
+  test('should delete reminder when clicking "I need this now" during early return', async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
+
+    // Clear storage to ensure clean state
+    await extensionHelper.clearStorage()
+
+    // Navigate to the test product page
+    await navigateToProduct(page, productId)
+
+    // Extract product information
+    const productInfo = await extractProductInfo(page)
+
+    // Create overlay page object and complete sleep on it flow
+    const overlayPage = new OverlayPage(page, extensionId)
+    await overlayPage.expectAttached()
+    await overlayPage.clickSleepOnIt()
+    await overlayPage.selectDuration(/24 hours/i)
+    await overlayPage.clickSetReminder()
+    await overlayPage.expectSuccessMessage()
+
+    // Wait for tab to close
+    try {
+      await page.waitForTimeout(6000)
+      if (!page.isClosed()) {
+        await page.close()
+      }
+    } catch {
+      // Expected: page closed
+    }
+
+    // Open popup and verify product is in "Sleeping on it" section
+    const popupPageObj = new PopupPage(
+      await extensionContext.newPage(),
+      extensionId
+    )
+    await popupPageObj.goto()
+    if (productInfo.name) {
+      await popupPageObj.expectProductInSleeping(productInfo.name)
+    }
+    await popupPageObj.page.close()
+
+    // Go back to the same product url BEFORE timer expires
+    const newPage = await extensionContext.newPage()
+    await navigateToProduct(newPage, productId)
+
+    // Create overlay page object for the new page
+    const newOverlayPage = new OverlayPage(newPage, extensionId)
+    await newOverlayPage.expectAttached()
+
+    // Verify EarlyReturnFromSleep view is shown
+    await newOverlayPage.expectTextVisible("You're back!", 5000)
+
+    // Click "I need this now" button
+    await newOverlayPage.clickButton(/I need this now/i)
+
+    // Verify celebration is shown
+    await newOverlayPage.expectCelebrationVisible(
+      TEST_CONFIG.TEXT.CELEBRATION_NEED_IT
+    )
+
+    // Wait for overlay to hide
+    await newOverlayPage.expectHidden(TEST_CONFIG.TIMEOUTS.CELEBRATION_FADE)
+
+    // Open popup again and verify product is NOT in "Sleeping on it" section
+    const popupPageObj2 = new PopupPage(
+      await extensionContext.newPage(),
+      extensionId
+    )
+    await popupPageObj2.goto()
+    if (productInfo.name) {
+      await popupPageObj2.expectProductNotInSleeping(productInfo.name)
+    }
+
+    console.log(
+      '[Test] Successfully verified reminder deletion after "I need this now"'
+    )
+  })
+
+  test('should delete reminder when clicking "Yes, I want it" after timer expires', async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    test.setTimeout(120000) // 2 minutes
+
+    const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
+
+    // Clear storage to ensure clean state
+    await extensionHelper.clearStorage()
+
+    // Navigate to the test product page
+    await navigateToProduct(page, productId)
+
+    // Extract product information
+    const productInfo = await extractProductInfo(page)
+
+    // Create overlay page object and complete sleep on it flow with 1 minute timer
+    const overlayPage = new OverlayPage(page, extensionId)
+    await overlayPage.expectAttached()
+    await overlayPage.clickSleepOnIt()
+    await overlayPage.selectDuration(/1 minute/i)
+    await overlayPage.clickSetReminder()
+    await overlayPage.expectSuccessMessage()
+
+    // Wait for tab to close
+    try {
+      await page.waitForTimeout(6000)
+      if (!page.isClosed()) {
+        await page.close()
+      }
+    } catch {
+      // Expected: page closed
+    }
+
+    // Wait for timer to expire
+    console.log("[Test] Waiting for 1 minute timer to expire...")
+    await page.waitForTimeout(TEST_CONFIG.TIMEOUTS.REMINDER_1MIN)
+
+    // Open popup and verify product is still in "Sleeping on it" section
+    const popupPageObj = new PopupPage(
+      await extensionContext.newPage(),
+      extensionId
+    )
+    await popupPageObj.goto()
+    if (productInfo.name) {
+      await popupPageObj.expectProductInSleeping(productInfo.name)
+    }
+    await popupPageObj.page.close()
+
+    // Go back to the same product url AFTER timer expired
+    const newPage = await extensionContext.newPage()
+    await navigateToProduct(newPage, productId)
+
+    // Create overlay page object for the new page
+    const newOverlayPage = new OverlayPage(newPage, extensionId)
+    await newOverlayPage.expectAttached()
+
+    // Verify BackToAnOldFlame view is shown
+    await newOverlayPage.expectTextVisible("You're back!", 5000)
+
+    // Click "Yes, I want it" button
+    await newOverlayPage.clickButton(/Yes, I want it/i)
+
+    // Verify celebration is shown
+    await newOverlayPage.expectCelebrationVisible(
+      TEST_CONFIG.TEXT.CELEBRATION_NEED_IT
+    )
+
+    // Wait for overlay to hide
+    await newOverlayPage.expectHidden(TEST_CONFIG.TIMEOUTS.CELEBRATION_FADE)
+
+    // Open popup again and verify product is NOT in "Sleeping on it" section
+    const popupPageObj2 = new PopupPage(
+      await extensionContext.newPage(),
+      extensionId
+    )
+    await popupPageObj2.goto()
+    if (productInfo.name) {
+      await popupPageObj2.expectProductNotInSleeping(productInfo.name)
+    }
+
+    console.log(
+      '[Test] Successfully verified reminder deletion after "Yes, I want it"'
+    )
+  })
+
+  test("should show EarlyReturnFromSleep on multiple early returns", async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
+
+    // Clear storage to ensure clean state
+    await extensionHelper.clearStorage()
+
+    // Navigate to the test product page
+    await navigateToProduct(page, productId)
+
+    // Create overlay page object and complete sleep on it flow
+    const overlayPage = new OverlayPage(page, extensionId)
+    await overlayPage.expectAttached()
+    await overlayPage.clickSleepOnIt()
+    await overlayPage.selectDuration(/24 hours/i)
+    await overlayPage.clickSetReminder()
+    await overlayPage.expectSuccessMessage()
+
+    // Wait for tab to close
+    try {
+      await page.waitForTimeout(6000)
+      if (!page.isClosed()) {
+        await page.close()
+      }
+    } catch {
+      // Expected: page closed
+    }
+
+    // First early return
+    const newPage1 = await extensionContext.newPage()
+    await navigateToProduct(newPage1, productId)
+    const newOverlayPage1 = new OverlayPage(newPage1, extensionId)
+    await newOverlayPage1.expectAttached()
+    await newOverlayPage1.expectTextVisible("You're back!", 5000)
+    await expect(newOverlayPage1.getButton(/I need this now/i)).toBeVisible()
+
+    // Click "I'll wait"
+    await newOverlayPage1.clickButton(/I'll wait/i)
+    await newOverlayPage1.expectHidden(5000)
+    await newPage1.close()
+
+    // Second early return - should still show EarlyReturnFromSleep
+    const newPage2 = await extensionContext.newPage()
+    await navigateToProduct(newPage2, productId)
+    const newOverlayPage2 = new OverlayPage(newPage2, extensionId)
+    await newOverlayPage2.expectAttached()
+    await newOverlayPage2.expectTextVisible("You're back!", 5000)
+    await expect(newOverlayPage2.getButton(/I need this now/i)).toBeVisible()
+
+    console.log(
+      "[Test] Successfully verified multiple early returns show EarlyReturnFromSleep"
+    )
+
+    await newPage2.close()
+  })
+
+  test("should show BackToAnOldFlame at exact expiration time", async ({
+    extensionContext,
+    extensionId,
+    extensionHelper
+  }) => {
+    test.setTimeout(120000) // 2 minutes
+
+    const page = await extensionContext.newPage()
+    const productId = PRIMARY_PRODUCT_ID
+
+    // Clear storage to ensure clean state
+    await extensionHelper.clearStorage()
+
+    // Navigate to the test product page
+    await navigateToProduct(page, productId)
+
+    // Record start time
+    const startTime = Date.now()
+
+    // Create overlay page object and complete sleep on it flow with 1 minute timer
+    const overlayPage = new OverlayPage(page, extensionId)
+    await overlayPage.expectAttached()
+    await overlayPage.clickSleepOnIt()
+    await overlayPage.selectDuration(/1 minute/i)
+    await overlayPage.clickSetReminder()
+    await overlayPage.expectSuccessMessage()
+
+    // Wait for tab to close
+    try {
+      await page.waitForTimeout(6000)
+      if (!page.isClosed()) {
+        await page.close()
+      }
+    } catch {
+      // Expected: page closed
+    }
+
+    // Wait until exactly 1 minute has passed
+    const elapsedTime = Date.now() - startTime
+    const remainingTime = TEST_CONFIG.TIMEOUTS.REMINDER_1MIN - elapsedTime
+    if (remainingTime > 0) {
+      await page.waitForTimeout(remainingTime)
+    }
+
+    // Go back to the same product url at expiration time
+    const newPage = await extensionContext.newPage()
+    await navigateToProduct(newPage, productId)
+
+    // Create overlay page object for the new page
+    const newOverlayPage = new OverlayPage(newPage, extensionId)
+    await newOverlayPage.expectAttached()
+
+    // Verify BackToAnOldFlame view is shown (not EarlyReturnFromSleep)
+    await newOverlayPage.expectTextVisible("You're back!", 5000)
+    await newOverlayPage.expectTextVisible("thoughtful", 5000)
+
+    // Verify buttons are for BackToAnOldFlame
+    await expect(newOverlayPage.getButton(/Yes, I want it/i)).toBeVisible()
+    await expect(newOverlayPage.getButton(/I'm still not sure/i)).toBeVisible()
+
+    console.log(
+      "[Test] Successfully verified BackToAnOldFlame at exact expiration time"
+    )
 
     await newPage.close()
   })

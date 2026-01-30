@@ -1,7 +1,7 @@
 import path from "path"
 import { chromium, expect, test as setup } from "@playwright/test"
 
-import { TEST_CONFIG } from "./test-config"
+import { PRIMARY_PRODUCT_ID } from "./test-config"
 
 const EXTENSION_PATH = path.resolve(__dirname, "../../build/chrome-mv3-dev")
 
@@ -9,8 +9,9 @@ setup("Verify extension is loadable", async () => {
   console.log("Setup: Verifying extension load from", EXTENSION_PATH)
 
   const userDataDir = path.join(__dirname, "../../tmp/test-user-data-setup")
+  const isHeaded = process.env.HEADED === 'true'
   const context = await chromium.launchPersistentContext(userDataDir, {
-    headless: process.env.CI ? true : false, // Headless in CI, headed locally for debugging
+    headless: !isHeaded, // Default headless, set HEADED=true for headed mode
     userAgent:
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     viewport: { width: 1280, height: 720 },
@@ -24,7 +25,10 @@ setup("Verify extension is loadable", async () => {
       "--disable-dev-shm-usage",
       "--disable-blink-features=AutomationControlled",
       "--disable-features=IsolateOrigins,site-per-process",
-      "--disable-site-isolation-trials"
+      "--disable-site-isolation-trials",
+      "--window-size=1280,720",
+      "--disable-web-security",
+      "--disable-features=VizDisplayCompositor"
     ]
   })
 
@@ -71,7 +75,7 @@ setup("Verify extension is loadable", async () => {
   })
 
   await page.goto(
-    `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
+    `https://www.amazon.com/dp/${PRIMARY_PRODUCT_ID}`,
     { waitUntil: "load" }
   )
 
