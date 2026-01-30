@@ -124,8 +124,36 @@ const App = () => {
     pluginClosed,
     currentView
   })
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      location: "amazon.tsx:121",
+      message: "Component render check",
+      data: { shouldShowOverlay, pluginClosed, currentView, reminderView },
+      timestamp: Date.now(),
+      sessionId: "debug-session",
+      hypothesisId: "H4"
+    })
+  }).catch(() => {})
+  // #endregion
 
   if (!shouldShowOverlay) {
+    // #region agent log
+    fetch("http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        location: "amazon.tsx:129",
+        message: "OVERLAY HIDDEN - returning null",
+        data: { pluginClosed, currentView },
+        timestamp: Date.now(),
+        sessionId: "debug-session",
+        hypothesisId: "H4"
+      })
+    }).catch(() => {})
+    // #endregion
     return null
   }
 

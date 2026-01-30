@@ -95,21 +95,112 @@ export function useProductPageState({
 
       if (productId) {
         try {
+          // #region agent log
+          fetch(
+            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                location: "useProductPageState.ts:97",
+                message: "Effect started",
+                data: { productId, currentProductId },
+                timestamp: Date.now(),
+                sessionId: "debug-session",
+                hypothesisId: "H3"
+              })
+            }
+          ).catch(() => {})
+          // #endregion
           // Check 1: Global snooze
           console.log("[useProductPageState] Checking for global snooze...")
           const snoozedUntil = await storage.getGlobalSnooze()
+          // #region agent log
+          const nowTime = Date.now()
+          fetch(
+            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                location: "useProductPageState.ts:101",
+                message: "Snooze check",
+                data: {
+                  snoozedUntil,
+                  nowTime,
+                  isActive: snoozedUntil && snoozedUntil > nowTime,
+                  diff: snoozedUntil ? snoozedUntil - nowTime : null
+                },
+                timestamp: Date.now(),
+                sessionId: "debug-session",
+                hypothesisId: "H1,H5"
+              })
+            }
+          ).catch(() => {})
+          // #endregion
           if (snoozedUntil && snoozedUntil > Date.now()) {
             console.log(
               "[useProductPageState] Global snooze active until:",
               new Date(snoozedUntil)
             )
+            // #region agent log
+            fetch(
+              "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  location: "useProductPageState.ts:106",
+                  message: "Snooze ACTIVE - hiding overlay",
+                  data: { snoozedUntil, now: Date.now() },
+                  timestamp: Date.now(),
+                  sessionId: "debug-session",
+                  hypothesisId: "H1,H5"
+                })
+              }
+            ).catch(() => {})
+            // #endregion
             setPluginClosedState(true)
             setCurrentView(null)
             return
           } else if (snoozedUntil) {
             // Snooze has expired - clear it
             console.log("[useProductPageState] Snooze expired, clearing...")
+            // #region agent log
+            fetch(
+              "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  location: "useProductPageState.ts:112",
+                  message: "Snooze EXPIRED - clearing",
+                  data: { snoozedUntil, now: Date.now() },
+                  timestamp: Date.now(),
+                  sessionId: "debug-session",
+                  hypothesisId: "H1"
+                })
+              }
+            ).catch(() => {})
+            // #endregion
             await storage.clearGlobalSnooze()
+            // #region agent log
+            fetch(
+              "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  location: "useProductPageState.ts:112-after",
+                  message: "After clearGlobalSnooze",
+                  data: {},
+                  timestamp: Date.now(),
+                  sessionId: "debug-session",
+                  hypothesisId: "H1"
+                })
+              }
+            ).catch(() => {})
+            // #endregion
           }
 
           // Check 2: Product has terminal state (I_NEED_THIS)
@@ -134,10 +225,44 @@ export function useProductPageState({
 
           // Check 3: User global close
           const globalClosed = await storage.getGlobalPluginClosed()
+          // #region agent log
+          fetch(
+            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                location: "useProductPageState.ts:136",
+                message: "Global plugin closed check",
+                data: { globalClosed },
+                timestamp: Date.now(),
+                sessionId: "debug-session",
+                hypothesisId: "H2"
+              })
+            }
+          ).catch(() => {})
+          // #endregion
           if (globalClosed) {
             console.log(
               "[useProductPageState] Global plugin closed - hiding overlay"
             )
+            // #region agent log
+            fetch(
+              "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  location: "useProductPageState.ts:141",
+                  message: "Global CLOSED - hiding overlay",
+                  data: { globalClosed },
+                  timestamp: Date.now(),
+                  sessionId: "debug-session",
+                  hypothesisId: "H2"
+                })
+              }
+            ).catch(() => {})
+            // #endregion
             setPluginClosedState(true)
             setCurrentView(null)
             return
@@ -147,7 +272,41 @@ export function useProductPageState({
           console.log(
             "[useProductPageState] All checks passed - showing overlay"
           )
+          // #region agent log
+          fetch(
+            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                location: "useProductPageState.ts:150",
+                message: "ALL CHECKS PASSED - showing overlay",
+                data: { willSetPluginClosedTo: false },
+                timestamp: Date.now(),
+                sessionId: "debug-session",
+                hypothesisId: "H4"
+              })
+            }
+          ).catch(() => {})
+          // #endregion
           setPluginClosedState(false)
+          // #region agent log
+          fetch(
+            "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                location: "useProductPageState.ts:150-after",
+                message: "After setPluginClosedState(false)",
+                data: {},
+                timestamp: Date.now(),
+                sessionId: "debug-session",
+                hypothesisId: "H4"
+              })
+            }
+          ).catch(() => {})
+          // #endregion
 
           // Check for pending reminders (early return / old flame views)
           const reminders = await storage.getReminders()
@@ -233,6 +392,26 @@ export function useProductPageState({
         console.log(
           "[useProductPageState] Snooze storage changed, re-checking..."
         )
+        // #region agent log
+        fetch(
+          "http://127.0.0.1:7242/ingest/1d41934a-9eab-419c-a72a-f8274ce160e8",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              location: "useProductPageState.ts:232",
+              message: "Snooze storage CHANGED - listener triggered",
+              data: {
+                oldValue: changes["thinktwice_snooze"]?.oldValue,
+                newValue: changes["thinktwice_snooze"]?.newValue
+              },
+              timestamp: Date.now(),
+              sessionId: "debug-session",
+              hypothesisId: "H1"
+            })
+          }
+        ).catch(() => {})
+        // #endregion
         checkForPendingReminder()
       }
 
