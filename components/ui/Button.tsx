@@ -1,4 +1,4 @@
-import { commonSpacing, spacing, textSize, iconSize } from "../../design-system"
+import { commonSpacing, iconSize, spacing, textSize } from "../../design-system"
 
 type ButtonProps = {
   children: React.ReactNode
@@ -72,7 +72,11 @@ const Button = ({
       onClick={handleClick}
       disabled={disabled}>
       {icon && (
-        <img src={icon} alt="icon" style={{ width: iconSize.medium, height: iconSize.medium }} />
+        <img
+          src={icon}
+          alt="icon"
+          style={{ width: iconSize.medium, height: iconSize.medium }}
+        />
       )}
       {children}
     </button>

@@ -1,6 +1,6 @@
 import React from "react"
 
-import { spacing, textSize, typography, layout } from "../../design-system"
+import { layout, spacing, textSize, typography } from "../../design-system"
 
 export type PauseDuration = "close" | "30s" | "1hour" | "1day"
 

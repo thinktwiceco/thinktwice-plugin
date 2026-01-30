@@ -1,4 +1,4 @@
-import { spacing, textSize, iconSize } from "../../design-system"
+import { iconSize, spacing, textSize } from "../../design-system"
 
 const PrivacyBadge = () => {
   const containerStyle: React.CSSProperties = {

@@ -1,6 +1,6 @@
 import React from "react"
 
-import { commonSpacing, spacing, layout, iconSize } from "../../design-system"
+import { commonSpacing, iconSize, layout, spacing } from "../../design-system"
 
 type HeaderProps = {
   onBack?: () => void

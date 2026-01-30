@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
-import { typography, iconSize } from "../design-system"
+import { iconSize, typography } from "../design-system"
 
 type CelebrationProps = {
   icon: string

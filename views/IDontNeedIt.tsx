@@ -6,7 +6,7 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
-import { commonSpacing, spacing, typography, layout, iconSize } from "../design-system"
+import { commonSpacing, iconSize, layout, typography } from "../design-system"
 import Celebration from "./Celebration"
 
 // Feature flag: Set to true to show investment options view
@@ -110,7 +110,11 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
         <img
           src={lightbulbIcon}
           alt="lightbulb"
-          style={{ width: iconSize.medium, height: iconSize.medium, flexShrink: 0 }}
+          style={{
+            width: iconSize.medium,
+            height: iconSize.medium,
+            flexShrink: 0
+          }}
         />
         <p className="info-container-text">
           <strong>Did you know?</strong> Not saving enough is the #1 regret of

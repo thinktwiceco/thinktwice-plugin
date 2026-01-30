@@ -10,9 +10,14 @@ import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PauseMenu, { type PauseDuration } from "../components/ui/PauseMenu"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
-import { spacing, textSize, typography, layout, iconSize } from "../design-system"
+import {
+  iconSize,
+  layout,
+  spacing,
+  textSize,
+  typography
+} from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
-import { ChromeMessaging } from "../services/ChromeMessaging"
 import type { Product } from "../storage"
 import { storage } from "../storage"
 import { extractProduct } from "../utils/productExtractor"
@@ -114,7 +119,6 @@ const ProductView = ({
     }
     onShowINeedIt()
   }
-
 
   const handleCloseClick = () => {
     setShowPauseMenu(true)

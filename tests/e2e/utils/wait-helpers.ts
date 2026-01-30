@@ -56,5 +56,3 @@ export async function waitForCelebrationHidden(
     timeout: timeout || TEST_CONFIG.TIMEOUTS.CELEBRATION_FADE
   })
 }
-
-
