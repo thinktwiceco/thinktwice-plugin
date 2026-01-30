@@ -1,7 +1,7 @@
 {
   "name": "maurice-plugin",
   "displayName": "Maurice plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reminds you to think twice before buying!",
   "author": "Thinktwiceco",
   "scripts": {
