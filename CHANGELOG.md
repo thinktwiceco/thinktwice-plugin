@@ -4,17 +4,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [0.3.2](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.3.1...v0.3.2) (2026-01-30)
 
-### [0.3.1](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.3.0...v0.3.1) (2026-01-30)
-
-## [0.3.0](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.2.0...v0.3.0) (2026-01-30)
-
-## [0.2.0](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.1.2...v0.2.0) (2026-01-30)
-
-### [0.1.2](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.1.1...v0.1.2) (2026-01-30)
-
-### [0.1.1](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.1.0...v0.1.1) (2026-01-30)
-
-
 ### Features
 
 * **popup:** add re-enable button when plugin is globally closed ([49567be](https://github.com/thinktwiceco/thinktwice-plugin/commit/49567be192d42955a36434e23d8daa38a098ebc0))
