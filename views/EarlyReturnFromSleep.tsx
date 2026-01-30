@@ -4,7 +4,7 @@ import clockIcon from "url:../assets/icons/Icons/Clock.svg"
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
-import { spacing, textSize } from "../design-system"
+import { typography, layout, iconSize } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
 import type { Product } from "../storage"
@@ -20,27 +20,15 @@ type EarlyReturnFromSleepProps = {
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
-  fontWeight: "bold",
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.md} 0`,
-  lineHeight: "1.3"
+  ...typography.title
 }
 
 const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.md,
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.xxl} 0`,
-  opacity: "0.9",
-  lineHeight: "1.4"
+  ...typography.subtitle
 }
 
 const actionsStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: spacing.md
+  ...layout.actionsContainer
 }
 
 const EarlyReturnFromSleep = ({
@@ -143,7 +131,7 @@ const EarlyReturnFromSleep = ({
           <img
             src={clockIcon}
             alt="clock"
-            style={{ width: "35px", height: "35px" }}
+            style={{ width: iconSize.large, height: iconSize.large }}
           />
         }
       />

@@ -54,3 +54,4 @@ export function extractProductIdFromUrl(url: string): string | null {
   return null
 }
 
+

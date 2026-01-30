@@ -1,4 +1,4 @@
-import { spacing, textSize } from "../../design-system"
+import { spacing, textSize, iconSize } from "../../design-system"
 
 const PrivacyBadge = () => {
   const containerStyle: React.CSSProperties = {
@@ -21,8 +21,8 @@ const PrivacyBadge = () => {
   return (
     <div style={containerStyle}>
       <svg
-        width="12"
-        height="12"
+        width={iconSize.small}
+        height={iconSize.small}
         viewBox="0 0 24 24"
         fill="none"
         stroke="var(--text-color-light)"

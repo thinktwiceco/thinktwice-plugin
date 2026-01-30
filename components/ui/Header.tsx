@@ -1,6 +1,6 @@
 import React from "react"
 
-import { commonSpacing, spacing } from "../../design-system"
+import { commonSpacing, spacing, layout, iconSize } from "../../design-system"
 
 type HeaderProps = {
   onBack?: () => void
@@ -11,9 +11,7 @@ type HeaderProps = {
 }
 
 const headerStyle: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr",
-  alignItems: "center",
+  ...layout.gridThreeColumn,
   marginBottom: commonSpacing.itemMargin
 }
 
@@ -123,7 +121,7 @@ const Header = ({
               <img
                 src={centerIcon}
                 alt={centerIconAlt || "icon"}
-                style={{ width: "20px", height: "20px" }}
+                style={{ width: iconSize.medium, height: iconSize.medium }}
               />
             ) : (
               centerIcon

@@ -72,9 +72,12 @@ export const test = base.extend<TestFixtures>({
         get: () => ["en-US", "en"]
       })
 
-      // Add chrome object
+      // Add chrome object ONLY on non-extension pages
+      // Don't override the real chrome API on extension pages
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(window as any).chrome = { runtime: {} }
+      if (!location.href.startsWith("chrome-extension://")) {
+        ;(window as any).chrome = { runtime: {} }
+      }
     })
 
     await use(context)

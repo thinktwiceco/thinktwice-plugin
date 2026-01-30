@@ -1,6 +1,6 @@
 import React from "react"
 
-import { spacing, textSize } from "../../design-system"
+import { spacing, textSize, typography, layout } from "../../design-system"
 
 export type PauseDuration = "close" | "30s" | "1hour" | "1day"
 
@@ -28,17 +28,14 @@ const menuStyle: React.CSSProperties = {
   padding: spacing.lg,
   minWidth: "280px",
   boxShadow: "0 4px 24px rgba(0, 0, 0, 0.15)",
-  display: "flex",
-  flexDirection: "column",
-  gap: spacing.md
+  ...layout.actionsContainer
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
+  ...typography.title,
   fontWeight: "600",
   margin: 0,
-  color: "#1a1a1a",
-  textAlign: "center"
+  color: "#1a1a1a"
 }
 
 const optionsStyle: React.CSSProperties = {
@@ -47,24 +44,17 @@ const optionsStyle: React.CSSProperties = {
   gap: spacing.sm
 }
 
-const optionButtonStyle: React.CSSProperties = {
+const cancelButtonStyle: React.CSSProperties = {
   padding: `${spacing.md} ${spacing.lg}`,
-  backgroundColor: "#f5f5f5",
-  color: "#1a1a1a",
+  backgroundColor: "transparent",
+  color: "#666666",
   border: "1px solid #e0e0e0",
   borderRadius: "8px",
   fontSize: textSize.md,
   cursor: "pointer",
-  textAlign: "left",
-  transition: "all 0.2s ease",
-  fontFamily: "inherit"
-}
-
-const cancelButtonStyle: React.CSSProperties = {
-  ...optionButtonStyle,
-  backgroundColor: "transparent",
-  color: "#666666",
   textAlign: "center",
+  transition: "all 0.2s ease",
+  fontFamily: "inherit",
   marginTop: spacing.sm
 }
 
@@ -82,56 +72,72 @@ const PauseMenu = ({ onSelect, onCancel }: PauseMenuProps) => {
         <h3 style={titleStyle}>Pause notifications?</h3>
         <div style={optionsStyle}>
           <button
-            style={optionButtonStyle}
+            className="option-button"
+            style={{
+              backgroundColor: "#f5f5f5",
+              color: "#1a1a1a",
+              border: "1px solid #e0e0e0",
+              textAlign: "left"
+            }}
             onClick={() => handleSelect("close")}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "#e8e8e8"
-              e.currentTarget.style.transform = "translateY(-1px)"
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "#f5f5f5"
-              e.currentTarget.style.transform = "translateY(0)"
             }}>
             Close for now
           </button>
           {isDebugMode && (
             <button
-              style={optionButtonStyle}
+              className="option-button"
+              style={{
+                backgroundColor: "#f5f5f5",
+                color: "#1a1a1a",
+                border: "1px solid #e0e0e0",
+                textAlign: "left"
+              }}
               onClick={() => handleSelect("30s")}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "#e8e8e8"
-                e.currentTarget.style.transform = "translateY(-1px)"
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = "#f5f5f5"
-                e.currentTarget.style.transform = "translateY(0)"
               }}>
               🐛 Pause for 30 seconds (debug)
             </button>
           )}
           <button
-            style={optionButtonStyle}
+            className="option-button"
+            style={{
+              backgroundColor: "#f5f5f5",
+              color: "#1a1a1a",
+              border: "1px solid #e0e0e0",
+              textAlign: "left"
+            }}
             onClick={() => handleSelect("1hour")}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "#e8e8e8"
-              e.currentTarget.style.transform = "translateY(-1px)"
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "#f5f5f5"
-              e.currentTarget.style.transform = "translateY(0)"
             }}>
             Pause for 1 hour
           </button>
           <button
-            style={optionButtonStyle}
+            className="option-button"
+            style={{
+              backgroundColor: "#f5f5f5",
+              color: "#1a1a1a",
+              border: "1px solid #e0e0e0",
+              textAlign: "left"
+            }}
             onClick={() => handleSelect("1day")}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "#e8e8e8"
-              e.currentTarget.style.transform = "translateY(-1px)"
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "#f5f5f5"
-              e.currentTarget.style.transform = "translateY(0)"
             }}>
             Pause for 1 day
           </button>

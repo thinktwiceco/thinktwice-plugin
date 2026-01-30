@@ -10,8 +10,9 @@ import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PauseMenu, { type PauseDuration } from "../components/ui/PauseMenu"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
-import { spacing, textSize } from "../design-system"
+import { spacing, textSize, typography, layout, iconSize } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
+import { ChromeMessaging } from "../services/ChromeMessaging"
 import type { Product } from "../storage"
 import { storage } from "../storage"
 import { extractProduct } from "../utils/productExtractor"
@@ -35,8 +36,7 @@ const headerStyle: React.CSSProperties = {
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xxl,
-  fontWeight: "bold",
+  ...typography.titleLarge,
   margin: "0",
   display: "flex",
   alignItems: "center",
@@ -45,9 +45,7 @@ const titleStyle: React.CSSProperties = {
 }
 
 const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.lg,
-  color: "var(--text-color-light)",
-  opacity: "0.8",
+  ...typography.subtitleLarge,
   margin: "0",
   display: "flex",
   alignItems: "center",
@@ -56,20 +54,15 @@ const subtitleStyle: React.CSSProperties = {
 }
 
 const bodyStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: spacing.md
+  ...layout.actionsContainer
 }
 
 const actionsStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: spacing.md
+  ...layout.actionsContainer
 }
 
 const actionsGroupStyle: React.CSSProperties = {
-  display: "flex",
-  gap: spacing.md
+  ...layout.actionsGroup
 }
 
 const ProductView = ({
@@ -121,6 +114,7 @@ const ProductView = ({
     }
     onShowINeedIt()
   }
+
 
   const handleCloseClick = () => {
     setShowPauseMenu(true)
@@ -238,7 +232,7 @@ const ProductView = ({
           <img
             src={lightbulbIcon}
             alt="lightbulb"
-            style={{ width: "16px", height: "16px" }}
+            style={{ width: iconSize.small, height: iconSize.small }}
           />
           Quick thought before you buy
         </p>
@@ -252,6 +246,7 @@ const ProductView = ({
             onClick={handleIDontNeedIt}>
             I don&apos;t really need it
           </Button>
+
           <div style={actionsGroupStyle}>
             <Button
               variant="secondary"
