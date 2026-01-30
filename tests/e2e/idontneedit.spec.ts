@@ -1,6 +1,6 @@
 import { expect, test } from "./fixtures"
 import { OverlayPage } from "./page-objects/OverlayPage"
-import { TEST_CONFIG, PRIMARY_PRODUCT_ID } from "./test-config"
+import { PRIMARY_PRODUCT_ID, TEST_CONFIG } from "./test-config"
 import { navigateToProduct } from "./utils/extension-helpers"
 import { buildProductId } from "./utils/product-helpers"
 

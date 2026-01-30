@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React from "react"
 import lightbulbIcon from "url:../assets/icons/Icons/Lightbulb.svg"
 import starIcon from "url:../assets/icons/Icons/Star.svg"
 import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"

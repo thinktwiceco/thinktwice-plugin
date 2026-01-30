@@ -15,7 +15,12 @@ export const TEST_CONFIG = {
    * Amazon product IDs used across E2E tests.
    * These should be stable, long-lived products.
    */
-  AMAZON_PRODUCT_IDS: ["B005EJH6Z4", "B07BMKXBVW", "B09B8V1LZ3", "B0F33VR8LB"] as const,
+  AMAZON_PRODUCT_IDS: [
+    "B005EJH6Z4",
+    "B07BMKXBVW",
+    "B09B8V1LZ3",
+    "B0F33VR8LB"
+  ] as const,
 
   /**
    * Timeout values in milliseconds
@@ -71,7 +76,7 @@ export const TEST_CONFIG = {
     I_NEED_THIS: "iNeedThis",
     DONT_NEED_IT: "dontNeedIt",
     SLEEPING: "sleeping"
-  },
+  }
 } as const
 
 /**
@@ -82,7 +87,6 @@ function getRandomProductId(): string {
   const idx = Math.floor(Math.random() * ids.length)
   return ids[idx]
 }
-
 
 export const PRIMARY_PRODUCT_ID = getRandomProductId()
 export const SECONDARY_PRODUCT_ID = getRandomProductId()

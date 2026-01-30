@@ -8,7 +8,6 @@ import { useState } from "react"
 
 import { useGoogleFonts } from "~/hooks/useGoogleFonts"
 import { useProductPageState } from "~/hooks/useProductPageState"
-import { ProductActionManager } from "~/managers/ProductActionManager"
 import type { Product } from "~/storage"
 import BackToAnOldFlame from "~/views/BackToAnOldFlame"
 import CelebrateThoughtfulPurchase from "~/views/CelebrateThoughtfulPurchase"
@@ -91,7 +90,7 @@ const App = () => {
     setLocalView(VIEW.PRODUCT)
   }
 
-  const handleShowIDontNeedIt = (product: Product | null) => {
+  const handleShowIDontNeedIt = (_product: Product | null) => {
     setLocalView(VIEW.I_DONT_NEED_IT)
   }
 
@@ -124,7 +123,7 @@ const App = () => {
     if (regex.test(window.location.href)) {
       // Extract product ID from URL
       const url = window.location.href
-      const productId = getAmazonProductId(url)
+      const _productId = getAmazonProductId(url)
 
       if (currentView === VIEW.EARLY_RETURN) {
         return (

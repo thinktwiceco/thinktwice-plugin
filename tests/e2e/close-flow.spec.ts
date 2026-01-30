@@ -1,8 +1,11 @@
 import { expect, test } from "./fixtures"
 import { OverlayPage } from "./page-objects/OverlayPage"
-import { PRIMARY_PRODUCT_ID, TEST_CONFIG } from "./test-config"
+import {
+  PRIMARY_PRODUCT_ID,
+  SECONDARY_PRODUCT_ID,
+  TEST_CONFIG
+} from "./test-config"
 import { navigateToProduct } from "./utils/extension-helpers"
-import { SECONDARY_PRODUCT_ID } from "./test-config"
 
 test.describe('ThinkTwice "Close and Pause" Flow', () => {
   test('should handle "Close for now" (Global Close)', async ({
@@ -11,7 +14,7 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
     extensionHelper
   }) => {
     const page = await extensionContext.newPage()
-      const productId = PRIMARY_PRODUCT_ID
+    const productId = PRIMARY_PRODUCT_ID
 
     // Clear storage
     await extensionHelper.clearStorage()
@@ -143,8 +146,8 @@ test.describe('ThinkTwice "Close and Pause" Flow', () => {
     test.setTimeout(70000)
 
     const page = await extensionContext.newPage()
-    const productId1 =  SECONDARY_PRODUCT_ID
-    const productId2 =  PRIMARY_PRODUCT_ID
+    const productId1 = SECONDARY_PRODUCT_ID
+    const productId2 = PRIMARY_PRODUCT_ID
 
     // Clear storage
     await extensionHelper.clearStorage()

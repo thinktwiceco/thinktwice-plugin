@@ -37,7 +37,7 @@ export const test = base.extend<TestFixtures>({
       "../../tmp/test-user-data-" + Math.random().toString(36).substring(7)
     )
 
-    const isHeaded = process.env.HEADED === 'true'
+    const isHeaded = process.env.HEADED === "true"
     const context = await chromium.launchPersistentContext(userDataDir, {
       headless: !isHeaded, // Default headless, set HEADED=true for headed mode
       userAgent:

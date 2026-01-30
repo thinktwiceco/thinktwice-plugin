@@ -212,19 +212,19 @@ test.describe('ThinkTwice "Sleep on it" Flow', () => {
 
     // Verify we're on the correct product page
     expect(productPage.url()).toContain(productId)
-      console.log("[Test] Product page opened successfully")
+    console.log("[Test] Product page opened successfully")
 
-      // Reload the popup to see updated state
-      await popupPageObj.reload()
+    // Reload the popup to see updated state
+    await popupPageObj.reload()
 
-      // Verify the product is NO LONGER in "Sleeping on it" section
-      if (productInfo.name) {
-        await popupPageObj.expectProductNotInSleeping(productInfo.name)
-      }
+    // Verify the product is NO LONGER in "Sleeping on it" section
+    if (productInfo.name) {
+      await popupPageObj.expectProductNotInSleeping(productInfo.name)
+    }
 
-      console.log(
-        '[Test] Successfully verified "I changed my mind" flow - product removed from sleeping section'
-      )
+    console.log(
+      '[Test] Successfully verified "I changed my mind" flow - product removed from sleeping section'
+    )
 
     // Clean up
     await productPage.close()

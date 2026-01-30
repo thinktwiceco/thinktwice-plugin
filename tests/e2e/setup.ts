@@ -9,7 +9,7 @@ setup("Verify extension is loadable", async () => {
   console.log("Setup: Verifying extension load from", EXTENSION_PATH)
 
   const userDataDir = path.join(__dirname, "../../tmp/test-user-data-setup")
-  const isHeaded = process.env.HEADED === 'true'
+  const isHeaded = process.env.HEADED === "true"
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: !isHeaded, // Default headless, set HEADED=true for headed mode
     userAgent:
@@ -74,10 +74,9 @@ setup("Verify extension is loadable", async () => {
     "sec-ch-ua-platform": '"Windows"'
   })
 
-  await page.goto(
-    `https://www.amazon.com/dp/${PRIMARY_PRODUCT_ID}`,
-    { waitUntil: "load" }
-  )
+  await page.goto(`https://www.amazon.com/dp/${PRIMARY_PRODUCT_ID}`, {
+    waitUntil: "load"
+  })
 
   // Plasmo injects a custom element with the tag 'plasmo-csui'
   // We'll wait for this standard selector
