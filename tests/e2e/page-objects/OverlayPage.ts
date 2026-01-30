@@ -113,6 +113,17 @@ export class OverlayPage {
   }
 
   /**
+   * Click any button by name
+   */
+  async clickButton(name: string | RegExp): Promise<void> {
+    const button = this.getButton(name)
+    await expect(button).toBeVisible({
+      timeout: TEST_CONFIG.TIMEOUTS.BUTTON_VISIBLE
+    })
+    await button.click()
+  }
+
+  /**
    * Wait for overlay to be attached to the DOM
    */
   async expectAttached(timeout?: number): Promise<void> {

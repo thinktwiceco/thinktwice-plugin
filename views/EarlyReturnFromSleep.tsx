@@ -1,10 +1,24 @@
+/**
+ * EarlyReturnFromSleep View
+ *
+ * Shown when a user returns to a product page BEFORE the "Sleep on it" reminder timer has expired.
+ * This indicates they couldn't resist and came back early, breaking their commitment to wait.
+ *
+ * Scenario: User clicked "Sleep on it" (e.g., 24 hours), but came back after only 2 hours.
+ *
+ * Key differences from BackToAnOldFlame:
+ * - Uses "Clock" icon (vs Thoughtful icon)
+ * - Messaging emphasizes timing and encourages continuing to wait
+ * - Button options: "I need this now" / "I'll wait" / "I don't need it"
+ */
+
 import { useState } from "react"
 import clockIcon from "url:../assets/icons/Icons/Clock.svg"
 
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
-import { spacing, textSize } from "../design-system"
+import { iconSize, layout, typography } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
 import type { Product } from "../storage"
@@ -20,27 +34,15 @@ type EarlyReturnFromSleepProps = {
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
-  fontWeight: "bold",
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.md} 0`,
-  lineHeight: "1.3"
+  ...typography.title
 }
 
 const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.md,
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.xxl} 0`,
-  opacity: "0.9",
-  lineHeight: "1.4"
+  ...typography.subtitle
 }
 
 const actionsStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: spacing.md
+  ...layout.actionsContainer
 }
 
 const EarlyReturnFromSleep = ({
@@ -143,7 +145,7 @@ const EarlyReturnFromSleep = ({
           <img
             src={clockIcon}
             alt="clock"
-            style={{ width: "35px", height: "35px" }}
+            style={{ width: iconSize.large, height: iconSize.large }}
           />
         }
       />

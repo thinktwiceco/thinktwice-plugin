@@ -5,7 +5,7 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
-import { spacing, textSize } from "../design-system"
+import { iconSize, spacing, typography } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
 import { storage } from "../storage"
@@ -19,21 +19,11 @@ type SleepOnItProps = {
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
-  fontWeight: "bold",
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.md} 0`,
-  lineHeight: "1.3"
+  ...typography.title
 }
 
 const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.md,
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.xxl} 0`,
-  opacity: "0.9",
-  lineHeight: "1.4"
+  ...typography.subtitle
 }
 
 const durationOptionsStyle: React.CSSProperties = {
@@ -43,26 +33,8 @@ const durationOptionsStyle: React.CSSProperties = {
   marginBottom: spacing.lg
 }
 
-const durationButtonStyle: React.CSSProperties = {
-  padding: spacing.md,
-  borderRadius: "8px",
-  border: "2px solid rgba(255, 255, 255, 0.2)",
-  backgroundColor: "transparent",
-  color: "var(--text-color-light)",
-  fontSize: textSize.sm,
-  fontWeight: "500",
-  cursor: "pointer",
-  transition: "all 0.2s ease"
-}
-
-const durationButtonSelectedStyle: React.CSSProperties = {
-  ...durationButtonStyle,
-  border: "2px solid var(--primary-button-color)",
-  backgroundColor: "rgba(104, 195, 212, 0.2)"
-}
-
 const successStyle: React.CSSProperties = {
-  ...subtitleStyle,
+  ...typography.subtitle,
   color: "var(--primary-button-color)",
   fontWeight: "600"
 }
@@ -167,7 +139,7 @@ const SleepOnIt = ({
           <img
             src={moonIcon}
             alt="moon"
-            style={{ width: "35px", height: "35px" }}
+            style={{ width: iconSize.large, height: iconSize.large }}
           />
         }
       />
@@ -185,10 +157,10 @@ const SleepOnIt = ({
             {durationOptions.map((option) => (
               <button
                 key={option.value}
-                style={
+                className={
                   selectedDuration === option.value
-                    ? durationButtonSelectedStyle
-                    : durationButtonStyle
+                    ? "option-button option-button-selected"
+                    : "option-button"
                 }
                 onClick={() => setSelectedDuration(option.value)}>
                 {option.label}

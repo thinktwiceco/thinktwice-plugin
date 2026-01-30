@@ -93,4 +93,3 @@ export async function waitForTabClosureOrTimeout(
     return page.isClosed()
   }
 }
-

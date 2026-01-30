@@ -15,19 +15,12 @@ export const TEST_CONFIG = {
    * Amazon product IDs used across E2E tests.
    * These should be stable, long-lived products.
    */
-  AMAZON_PRODUCT_IDS: {
-    /**
-     * Primary test product - used in most test cases
-     * Current: Anker PowerCore 10000 Portable Charger
-     */
-    PRIMARY: "B005EJH6Z4",
-
-    /**
-     * Secondary test product - used for multi-tab scenarios
-     * Should be different from PRIMARY to test different products
-     */
-    SECONDARY: "B07BMKXBVW"
-  },
+  AMAZON_PRODUCT_IDS: [
+    "B005EJH6Z4",
+    "B07BMKXBVW",
+    "B09B8V1LZ3",
+    "B0F33VR8LB"
+  ] as const,
 
   /**
    * Timeout values in milliseconds
@@ -85,3 +78,15 @@ export const TEST_CONFIG = {
     SLEEPING: "sleeping"
   }
 } as const
+
+/**
+ * Get a random product ID from the configured product IDs
+ */
+function getRandomProductId(): string {
+  const ids = TEST_CONFIG.AMAZON_PRODUCT_IDS
+  const idx = Math.floor(Math.random() * ids.length)
+  return ids[idx]
+}
+
+export const PRIMARY_PRODUCT_ID = getRandomProductId()
+export const SECONDARY_PRODUCT_ID = getRandomProductId()

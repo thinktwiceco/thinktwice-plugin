@@ -8,7 +8,6 @@ import { useState } from "react"
 
 import { useGoogleFonts } from "~/hooks/useGoogleFonts"
 import { useProductPageState } from "~/hooks/useProductPageState"
-import { ProductActionManager } from "~/managers/ProductActionManager"
 import type { Product } from "~/storage"
 import BackToAnOldFlame from "~/views/BackToAnOldFlame"
 import CelebrateThoughtfulPurchase from "~/views/CelebrateThoughtfulPurchase"
@@ -74,7 +73,7 @@ const App = () => {
   useGoogleFonts()
   const {
     currentView: reminderView,
-    currentProduct,
+    product,
     reminderId,
     reminderStartTime,
     pluginClosed,
@@ -91,16 +90,7 @@ const App = () => {
     setLocalView(VIEW.PRODUCT)
   }
 
-  const handleShowIDontNeedIt = async (product: Product | null) => {
-    // Update product state to dontNeedIt
-    if (product) {
-      try {
-        await ProductActionManager.dontNeedIt(product)
-        console.log("[Amazon] Product marked as dontNeedIt")
-      } catch (error) {
-        console.error("[Amazon] Failed to execute dontNeedIt:", error)
-      }
-    }
+  const handleShowIDontNeedIt = (_product: Product | null) => {
     setLocalView(VIEW.I_DONT_NEED_IT)
   }
 
@@ -133,12 +123,12 @@ const App = () => {
     if (regex.test(window.location.href)) {
       // Extract product ID from URL
       const url = window.location.href
-      const productId = getAmazonProductId(url)
+      const _productId = getAmazonProductId(url)
 
       if (currentView === VIEW.EARLY_RETURN) {
         return (
           <EarlyReturnFromSleep
-            product={currentProduct}
+            product={product}
             reminderId={reminderId || ""}
             reminderStartTime={reminderStartTime || 0}
             onShowINeedIt={handleShowINeedIt}
@@ -150,7 +140,7 @@ const App = () => {
       if (currentView === VIEW.OLD_FLAME) {
         return (
           <BackToAnOldFlame
-            product={currentProduct}
+            product={product}
             reminderId={reminderId || ""}
             reminderStartTime={reminderStartTime || 0}
             onShowThoughtfulPurchase={handleShowThoughtfulPurchase}
@@ -191,8 +181,7 @@ const App = () => {
 
       return (
         <ProductView
-          productId={productId}
-          marketplace={MARKETPLACE}
+          product={product}
           onShowIDontNeedIt={handleShowIDontNeedIt}
           onShowSleepOnIt={handleShowSleepOnIt}
           onShowINeedIt={handleShowINeedIt}

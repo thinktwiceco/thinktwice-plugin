@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
-import { spacing, textSize } from "../design-system"
+import { iconSize, typography } from "../design-system"
 
 type CelebrationProps = {
   icon: string
@@ -16,21 +16,12 @@ type CelebrationProps = {
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
-  fontWeight: "bold",
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.md} 0`,
-  lineHeight: "1.3"
+  ...typography.title
 }
 
 const subtitleStyle: React.CSSProperties = {
-  fontSize: textSize.md,
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: 0,
-  opacity: "0.9",
-  lineHeight: "1.4"
+  ...typography.subtitle,
+  margin: 0
 }
 
 const Celebration = ({
@@ -62,7 +53,7 @@ const Celebration = ({
           <img
             src={icon}
             alt={iconAlt}
-            style={{ width: "35px", height: "35px" }}
+            style={{ width: iconSize.large, height: iconSize.large }}
           />
         }
         centerIconAlt={iconAlt}

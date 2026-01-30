@@ -1,7 +1,7 @@
 import path from "path"
 import { chromium, expect, test as setup } from "@playwright/test"
 
-import { TEST_CONFIG } from "./test-config"
+import { PRIMARY_PRODUCT_ID } from "./test-config"
 
 const EXTENSION_PATH = path.resolve(__dirname, "../../build/chrome-mv3-dev")
 
@@ -9,8 +9,9 @@ setup("Verify extension is loadable", async () => {
   console.log("Setup: Verifying extension load from", EXTENSION_PATH)
 
   const userDataDir = path.join(__dirname, "../../tmp/test-user-data-setup")
+  const isHeaded = process.env.HEADED === "true"
   const context = await chromium.launchPersistentContext(userDataDir, {
-    headless: process.env.CI ? true : false, // Headless in CI, headed locally for debugging
+    headless: !isHeaded, // Default headless, set HEADED=true for headed mode
     userAgent:
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     viewport: { width: 1280, height: 720 },
@@ -24,7 +25,10 @@ setup("Verify extension is loadable", async () => {
       "--disable-dev-shm-usage",
       "--disable-blink-features=AutomationControlled",
       "--disable-features=IsolateOrigins,site-per-process",
-      "--disable-site-isolation-trials"
+      "--disable-site-isolation-trials",
+      "--window-size=1280,720",
+      "--disable-web-security",
+      "--disable-features=VizDisplayCompositor"
     ]
   })
 
@@ -47,9 +51,13 @@ setup("Verify extension is loadable", async () => {
       get: () => ["en-US", "en"]
     })
 
-    // Add chrome object
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any).chrome = { runtime: {} }
+    // Add chrome object ONLY on non-extension pages
+    // Don't override the real chrome API on extension pages
+
+    if (!location.href.startsWith("chrome-extension://")) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(window as any).chrome = { runtime: {} }
+    }
   })
 
   // In headless mode, we can't navigate to chrome:// URLs
@@ -66,10 +74,9 @@ setup("Verify extension is loadable", async () => {
     "sec-ch-ua-platform": '"Windows"'
   })
 
-  await page.goto(
-    `https://www.amazon.com/dp/${TEST_CONFIG.AMAZON_PRODUCT_IDS.PRIMARY}`,
-    { waitUntil: "load" }
-  )
+  await page.goto(`https://www.amazon.com/dp/${PRIMARY_PRODUCT_ID}`, {
+    waitUntil: "load"
+  })
 
   // Plasmo injects a custom element with the tag 'plasmo-csui'
   // We'll wait for this standard selector

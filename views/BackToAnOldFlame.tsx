@@ -1,10 +1,24 @@
+/**
+ * BackToAnOldFlame View
+ *
+ * Shown when a user returns to a product page AFTER the "Sleep on it" reminder timer has expired.
+ * This indicates they successfully waited the full duration and are now thoughtfully reconsidering.
+ *
+ * Scenario: User clicked "Sleep on it", reminder expired (e.g., after 24 hours), and user came back.
+ *
+ * Key differences from EarlyReturnFromSleep:
+ * - Uses "Thoughtful" icon (vs Clock icon)
+ * - Messaging emphasizes successful waiting and thoughtful decision-making
+ * - Button options: "Yes, I want it" / "I don't need it" / "I'm still not sure"
+ */
+
 import { useState } from "react"
 import thoughtfulIcon from "url:../assets/icons/Icons/Thoughtful.svg"
 
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
-import { spacing, textSize } from "../design-system"
+import { iconSize, layout, typography } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import { ChromeMessaging } from "../services/ChromeMessaging"
 import type { Product } from "../storage"
@@ -20,18 +34,11 @@ type BackToAnOldFlameProps = {
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
-  fontWeight: "bold",
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.md} 0`,
-  lineHeight: "1.3"
+  ...typography.title
 }
 
 const actionsStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: spacing.md
+  ...layout.actionsContainer
 }
 
 const BackToAnOldFlame = ({
@@ -132,7 +139,7 @@ const BackToAnOldFlame = ({
           <img
             src={thoughtfulIcon}
             alt="thoughtful"
-            style={{ width: "35px", height: "35px" }}
+            style={{ width: iconSize.large, height: iconSize.large }}
           />
         }
       />
@@ -142,10 +149,8 @@ const BackToAnOldFlame = ({
       </h1>
       <p
         style={{
-          ...titleStyle,
-          fontSize: textSize.lg,
-          fontWeight: "normal",
-          marginBottom: spacing.xxl
+          ...typography.subtitleLarge,
+          fontWeight: "normal"
         }}>
         Have you made up your mind?
       </p>

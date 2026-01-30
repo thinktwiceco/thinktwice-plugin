@@ -1,3 +1,4 @@
+import React from "react"
 import lightbulbIcon from "url:../assets/icons/Icons/Lightbulb.svg"
 import starIcon from "url:../assets/icons/Icons/Star.svg"
 import trophyIcon from "url:../assets/icons/Icons/Trophy.svg"
@@ -6,7 +7,8 @@ import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
-import { commonSpacing, spacing, textSize } from "../design-system"
+import { commonSpacing, iconSize, layout, typography } from "../design-system"
+import { ChromeMessaging } from "../services/ChromeMessaging"
 import Celebration from "./Celebration"
 
 // Feature flag: Set to true to show investment options view
@@ -18,31 +20,36 @@ type IDontNeedItProps = {
 }
 
 const titleStyle: React.CSSProperties = {
-  fontSize: textSize.xl,
-  fontWeight: "bold",
-  color: "var(--text-color-light)",
-  textAlign: "center",
-  margin: `0 0 ${spacing.md} 0`,
-  lineHeight: "1.3"
+  ...typography.title
 }
 
 const questionStyle: React.CSSProperties = {
-  fontSize: textSize.lg,
-  color: "var(--text-color-light)",
-  textAlign: "center",
+  ...typography.subtitleLarge,
   margin: `0 0 ${commonSpacing.sectionMargin} 0`,
   fontWeight: "500"
 }
 
 const optionsContainerStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: spacing.md,
+  ...layout.actionsContainer,
   width: "100%",
   marginBottom: commonSpacing.sectionMargin
 }
 
 const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
+  // Handle tab close after celebration
+  const handleCelebrationClose = async () => {
+    console.log("[IDontNeedIt] Requesting tab close...")
+    try {
+      await ChromeMessaging.closeCurrentTab()
+      console.log("[IDontNeedIt] Tab close successful")
+    } catch (error) {
+      console.error("[IDontNeedIt] Tab close failed:", error)
+      if (onClose) {
+        onClose()
+      }
+    }
+  }
+
   // When feature flag is disabled, show celebration instead of investment options
   if (!SHOW_INVESTMENT_OPTIONS) {
     return (
@@ -53,7 +60,7 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
         subtitle="Your future self will thank you for being so thoughtful."
         autoCloseDelay={4000}
         onBack={onBack}
-        onClose={onClose}
+        onClose={handleCelebrationClose}
       />
     )
   }
@@ -83,7 +90,7 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
           <img
             src={starIcon}
             alt="star"
-            style={{ width: "35px", height: "35px" }}
+            style={{ width: iconSize.large, height: iconSize.large }}
           />
         }
         centerIconAlt="star"
@@ -119,7 +126,11 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
         <img
           src={lightbulbIcon}
           alt="lightbulb"
-          style={{ width: "20px", height: "20px", flexShrink: 0 }}
+          style={{
+            width: iconSize.medium,
+            height: iconSize.medium,
+            flexShrink: 0
+          }}
         />
         <p className="info-container-text">
           <strong>Did you know?</strong> Not saving enough is the #1 regret of
