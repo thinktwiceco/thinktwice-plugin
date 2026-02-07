@@ -1,8 +1,8 @@
 import { useState } from "react"
-import clockIcon from "url:../assets/icons/Icons/Clock.svg"
-import lightbulbIcon from "url:../assets/icons/Icons/Lightbulb.svg"
-import thoughtfulIcon from "url:../assets/icons/Icons/Thoughtful.svg"
-import trophyIcon from "url:../assets/icons/Icons/Trophy.png"
+import alarmIcon from "url:../assets/icons/Icons/clock_blue_outline.png"
+import handsClappingIcon from "url:../assets/icons/Icons/hands-clapping-green.png"
+import lightbulbIcon from "url:../assets/icons/Icons/lightbulb_solid.png"
+import trophyIcon from "url:../assets/icons/Icons/shooting_star_red.png"
 
 import Nudge from "../components/Nudge"
 import Button from "../components/ui/Button"
@@ -10,13 +10,7 @@ import Card from "../components/ui/Card"
 import Header from "../components/ui/Header"
 import PauseMenu, { type PauseDuration } from "../components/ui/PauseMenu"
 import PrivacyBadge from "../components/ui/PrivacyBadge"
-import {
-  iconSize,
-  layout,
-  spacing,
-  textSize,
-  typography
-} from "../design-system"
+import { layout, spacing, textSize, typography } from "../design-system"
 import { ProductActionManager } from "../managers/ProductActionManager"
 import type { Product } from "../storage"
 import { ProductState, storage } from "../storage"
@@ -232,8 +226,8 @@ const ProductView = ({
         <p style={subtitleStyle}>
           <img
             src={lightbulbIcon}
-            alt="lightbulb"
-            style={{ width: iconSize.small, height: iconSize.small }}
+            alt=""
+            style={{ width: "20px", height: "20px" }}
           />
           {handleIntroSentect(product)}
         </p>
@@ -242,8 +236,8 @@ const ProductView = ({
         <Nudge />
         <div style={actionsStyle}>
           <Button
-            variant="primary"
-            icon={thoughtfulIcon}
+            variant="primaryEmphasized"
+            icon={handsClappingIcon}
             onClick={handleIDontNeedIt}>
             I don&apos;t really need it
           </Button>
@@ -251,13 +245,14 @@ const ProductView = ({
           <div style={actionsGroupStyle}>
             <Button
               variant="secondary"
-              icon={clockIcon}
+              icon={alarmIcon}
               onClick={handleSleepOnIt}>
               Sleep on it
             </Button>
             <Button
               variant="tertiary"
               icon={trophyIcon}
+              iconSize="26px"
               onClick={handleINeedIt}>
               I need it
             </Button>
