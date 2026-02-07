@@ -30,6 +30,7 @@ When users interact with ThinkTwice, they should feel:
 5. **Thoughtful** - "I'm being invited to reflect, not rushed to decide"
 
 The interface should never feel:
+
 - Aggressive or pushy
 - Judgmental or preachy
 - Cluttered or overwhelming
@@ -43,10 +44,12 @@ The interface should never feel:
 ### The Foundation: Deep Blue-Gray
 
 **Background Colors**
+
 - `#3d4f5e` - Main background
 - `#4a5d6e` - Secondary background
 
 **Feeling**: These deep, muted blue-grays evoke:
+
 - **Stability** - Like a calm ocean or evening sky
 - **Trust** - Professional but not corporate
 - **Contemplation** - A space for reflection, not action
@@ -59,6 +62,7 @@ These colors create a **calm container** that feels separate from the bright, ur
 **Primary Button Color**: `#b8d8d4`
 
 **Feeling**: This soft mint green communicates:
+
 - **Growth** - Like new leaves, suggesting positive change
 - **Freshness** - A clean slate, a new perspective
 - **Gentleness** - Soft and approachable, not aggressive
@@ -67,6 +71,7 @@ These colors create a **calm container** that feels separate from the bright, ur
 This is the color of "Sleep on it"—the main action. It's not red (urgent) or orange (aggressive). It's the color of **patience** and **growth**. When users see this color, they should feel: "This is a good choice. This feels right."
 
 **Text Color**: `#065F46` (Dark green)
+
 - Provides contrast while maintaining the green theme
 - Feels grounded and natural
 
@@ -75,6 +80,7 @@ This is the color of "Sleep on it"—the main action. It's not red (urgent) or o
 **Secondary Button Color**: `#bfdbfe`
 
 **Feeling**: This light, airy blue suggests:
+
 - **Clarity** - Like a clear sky, helping you see things clearly
 - **Calm Confidence** - "I know what I want"
 - **Openness** - Not defensive, but open to possibilities
@@ -83,6 +89,7 @@ This is the color of "Sleep on it"—the main action. It's not red (urgent) or o
 This color is for "I need it"—acknowledging that sometimes, you do know what you want. It's supportive, not confrontational.
 
 **Text Color**: `#223573` (Deep blue)
+
 - Maintains the calm, confident feeling
 - Professional but approachable
 
@@ -91,6 +98,7 @@ This color is for "I need it"—acknowledging that sometimes, you do know what y
 **Tertiary Button Color**: `#fca5a5`
 
 **Feeling**: This gentle coral-red conveys:
+
 - **Gentle Caution** - Not alarm, but awareness
 - **Self-Care** - "It's okay to say no"
 - **Warmth** - Caring, not cold rejection
@@ -99,17 +107,20 @@ This color is for "I need it"—acknowledging that sometimes, you do know what y
 This is for "I don't need it"—a decision that requires courage but shouldn't feel harsh. It's warm and supportive, like a friend saying "You've got this."
 
 **Text Color**: `#7F1D1D` (Deep red)
+
 - Grounds the warmth with stability
 - Feels decisive but not aggressive
 
 ### Text Colors: Clarity & Readability
 
 **Light Text**: `#d1dce5`
+
 - Soft, readable, and calming
 - Feels like moonlight—gentle illumination
 - High contrast against dark backgrounds without being harsh
 
 **Dark Text**: `#2d3e4e`
+
 - Grounded and trustworthy
 - Professional but not cold
 - Used in popup interfaces for clarity
@@ -119,6 +130,7 @@ This is for "I don't need it"—a decision that requires courage but shouldn't f
 **Popup Colors**: White (`#ffffff`), light grays (`#f9fafb`, `#e5e7eb`)
 
 **Feeling**: The popup interface uses a clean, neutral palette that feels:
+
 - **Professional** - Like a well-designed app
 - **Trustworthy** - Clean and organized
 - **Uncluttered** - Easy to scan and understand
@@ -131,6 +143,7 @@ This is the "settings" space—functional, clear, and straightforward.
 **Error Color**: `#e74c3c`
 
 **Feeling**: Errors should be:
+
 - **Clear** - You know something went wrong
 - **Not Panic-Inducing** - Mistakes happen, it's okay
 - **Actionable** - Here's what to do about it
@@ -144,16 +157,19 @@ This is the "settings" space—functional, clear, and straightforward.
 ThinkTwice feels like:
 
 **A quiet library corner** - Not a bustling store
+
 - Calm, contemplative space
 - Time to think
 - Respectful silence
 
 **A trusted advisor's office** - Not a sales floor
+
 - Professional but warm
 - Supportive, not pushy
 - Your interests first
 
 **A meditation app** - Not a shopping app
+
 - Peaceful and intentional
 - Focused on mindfulness
 - About the journey, not the destination
@@ -191,32 +207,32 @@ ThinkTwice feels like:
 
 ### Main Overlay (Dark Theme)
 
-| Color | Hex | Emotional Meaning | Usage |
-|-------|-----|-------------------|-------|
-| Background | `#3d4f5e` | Stability, contemplation | Main container |
-| Secondary BG | `#4a5d6e` | Depth, sophistication | Secondary containers |
-| Primary Action | `#b8d8d4` | Growth, patience | "Sleep on it" button |
-| Secondary Action | `#bfdbfe` | Clarity, confidence | "I need it" button |
-| Tertiary Action | `#fca5a5` | Gentle caution, self-care | "I don't need it" button |
-| Light Text | `#d1dce5` | Clarity, gentleness | Text on dark backgrounds |
+| Color            | Hex       | Emotional Meaning         | Usage                    |
+| ---------------- | --------- | ------------------------- | ------------------------ |
+| Background       | `#3d4f5e` | Stability, contemplation  | Main container           |
+| Secondary BG     | `#4a5d6e` | Depth, sophistication     | Secondary containers     |
+| Primary Action   | `#b8d8d4` | Growth, patience          | "Sleep on it" button     |
+| Secondary Action | `#bfdbfe` | Clarity, confidence       | "I need it" button       |
+| Tertiary Action  | `#fca5a5` | Gentle caution, self-care | "I don't need it" button |
+| Light Text       | `#d1dce5` | Clarity, gentleness       | Text on dark backgrounds |
 
 ### Popup Interface (Light Theme)
 
-| Color | Hex | Emotional Meaning | Usage |
-|-------|-----|-------------------|-------|
-| Background | `#ffffff` | Clean, neutral | Popup background |
-| Card Background | `#f9fafb` | Soft, organized | Card containers |
-| Border | `#e5e7eb` | Subtle separation | Dividers, borders |
-| Primary Text | `#1f2937` | Clear, readable | Main text |
-| Secondary Text | `#6b7280` | Supportive, muted | Secondary text |
-| Success | `#10b981` | Positive, growth | Success indicators |
+| Color           | Hex       | Emotional Meaning | Usage              |
+| --------------- | --------- | ----------------- | ------------------ |
+| Background      | `#ffffff` | Clean, neutral    | Popup background   |
+| Card Background | `#f9fafb` | Soft, organized   | Card containers    |
+| Border          | `#e5e7eb` | Subtle separation | Dividers, borders  |
+| Primary Text    | `#1f2937` | Clear, readable   | Main text          |
+| Secondary Text  | `#6b7280` | Supportive, muted | Secondary text     |
+| Success         | `#10b981` | Positive, growth  | Success indicators |
 
 ### Semantic Colors
 
-| Color | Hex | Emotional Meaning | Usage |
-|-------|-----|-------------------|-------|
-| Error | `#e74c3c` | Clear, not alarming | Error states |
-| Disabled | `#cccccc` | Neutral, inactive | Disabled elements |
+| Color    | Hex       | Emotional Meaning   | Usage             |
+| -------- | --------- | ------------------- | ----------------- |
+| Error    | `#e74c3c` | Clear, not alarming | Error states      |
+| Disabled | `#cccccc` | Neutral, inactive   | Disabled elements |
 
 ---
 
@@ -225,12 +241,14 @@ ThinkTwice feels like:
 **Font**: Inter
 
 **Why**: Inter feels:
+
 - **Modern but timeless** - Not trendy, will age well
 - **Highly readable** - Designed for screens
 - **Friendly but professional** - Approachable but trustworthy
 - **Neutral** - Doesn't add personality, lets content shine
 
 **Sizes**: Generous, readable
+
 - Never feels cramped or hard to read
 - Hierarchy is clear but not dramatic
 - Comfortable line spacing for easy reading
@@ -242,11 +260,13 @@ ThinkTwice feels like:
 ### Animations
 
 **Smooth & Gentle**
+
 - 0.2s transitions feel natural, not rushed
 - Subtle hover effects (slight lift, soft shadow)
 - No jarring movements or sudden changes
 
 **Purposeful**
+
 - Every animation has a reason
 - Helps users understand what's happening
 - Feels polished, not flashy
@@ -254,6 +274,7 @@ ThinkTwice feels like:
 ### Hover States
 
 **Inviting, Not Demanding**
+
 - Buttons lift slightly—"I'm ready when you are"
 - Borders glow softly—"I'm here if you need me"
 - Never aggressive or urgent
@@ -270,7 +291,7 @@ When a user encounters ThinkTwice, the visual language should tell this story:
 4. **"This is thoughtful"** - Every element invites reflection, not reaction
 5. **"This respects you"** - Privacy-focused, user-first, transparent
 
-The style should make users think: *"Finally, a tool that treats me like an adult and helps me make better decisions without being preachy or pushy."*
+The style should make users think: _"Finally, a tool that treats me like an adult and helps me make better decisions without being preachy or pushy."_
 
 ---
 
@@ -298,4 +319,4 @@ If the answer is no—if it feels urgent, pushy, judgmental, or manipulative—i
 
 ---
 
-*This style guide is about feeling, not just pixels. Use it to make decisions that align with ThinkTwice's core mission: helping people make thoughtful choices with dignity and respect.*
+_This style guide is about feeling, not just pixels. Use it to make decisions that align with ThinkTwice's core mission: helping people make thoughtful choices with dignity and respect._
