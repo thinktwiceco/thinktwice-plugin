@@ -86,7 +86,9 @@ body {
   font-size: 14px;
   color: var(--text-color-light);
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Circular icon button base */

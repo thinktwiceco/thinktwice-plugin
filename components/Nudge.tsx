@@ -1,26 +1,7 @@
 import { useEffect, useState } from "react"
 
+import nudgesData from "../assets/Nudge_Language_Categorized_Updated.json"
 import { spacing, textSize } from "../design-system"
-
-const MOCK_NUDGES = [
-  {
-    nudge:
-      "Every purchase is a vote for the kind of world you want to live in.",
-    theme: "environmental",
-    type: "reflection"
-  },
-  {
-    nudge:
-      "Waiting 24 hours before buying can save you from impulse purchases you'll regret.",
-    theme: "financial",
-    type: "advice"
-  },
-  {
-    nudge: "The best purchase is often the one you don't make.",
-    theme: "mindfulness",
-    type: "wisdom"
-  }
-]
 
 const CHARS_PER_SECOND = 17
 
@@ -29,8 +10,8 @@ const Nudge = () => {
   const [visibleCharCount, setVisibleCharCount] = useState(0)
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * MOCK_NUDGES.length)
-    setSelectedNudge(MOCK_NUDGES[randomIndex].nudge)
+    const randomIndex = Math.floor(Math.random() * nudgesData.length)
+    setSelectedNudge(nudgesData[randomIndex].nudge)
   }, [])
 
   useEffect(() => {
@@ -68,7 +49,8 @@ const Nudge = () => {
         style={{
           fontWeight: "600",
           fontSize: textSize.lg,
-          color: "var(--text-color-light)"
+          color: "var(--text-color-light)",
+          width: "100%"
         }}>
         <span style={{ color: "var(--text-color-light)" }}>
           {selectedNudge.slice(0, visibleCharCount)}
