@@ -1,13 +1,13 @@
 {
   "name": "maurice-plugin",
-  "displayName": "Maurice plugin",
+  "displayName": "Think Twice",
   "version": "0.3.2",
   "description": "Reminds you to think twice before buying!",
   "author": "Thinktwiceco",
   "scripts": {
     "dev": "export PARCEL_WORKERS=0 && plasmo dev",
     "build:test": "plasmo build --target=chrome-mv3 --dev",
-    "build": "plasmo build",
+    "build": "plasmo build && plasmo package",
     "package": "plasmo package",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

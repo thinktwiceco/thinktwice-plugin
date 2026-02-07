@@ -1,0 +1,55 @@
+Chrome Web Store Privacy Practices Justifications
+==================================================
+
+Copy these justifications into the corresponding fields on the Privacy practices tab
+of your Chrome Web Store Developer Dashboard.
+
+---
+
+1. SINGLE PURPOSE DESCRIPTION
+-----------------------------
+ThinkTwice helps users make more thoughtful purchasing decisions on Amazon by providing behavioral nudges and a "Sleep on it" reminder system. The extension intervenes at the moment of purchase to encourage users to pause and reconsider their buying decisions, promoting delayed gratification and conscious consumption.
+
+---
+
+2. ALARMS JUSTIFICATION
+------------------------
+The alarms permission is used to schedule reminder notifications at user-specified times (1 hour, 6 hours, 24 hours, 3 days, or 1 week after setting a reminder). When a user chooses to "Sleep on it" for a product, the extension creates a Chrome alarm that triggers a browser notification at the scheduled time, reminding them to reconsider their purchase decision. Alarms persist across browser restarts and service worker terminations to ensure reminders are not lost.
+
+---
+
+3. HOST PERMISSION (AMAZON) JUSTIFICATION
+------------------------------------------
+Host permission for Amazon.com is required to extract product information (name, price, image, product ID) from Amazon product pages. This data is used solely to create reminders and display product details in notifications and the extension popup. The extension only accesses product information when the user actively interacts with it on an Amazon product page. No data is sent to external servers - all information is stored locally in the browser.
+
+---
+
+4. NOTIFICATIONS JUSTIFICATION
+-------------------------------
+Notifications are used to alert users when their scheduled "Sleep on it" reminders are due. When a reminder time arrives, the extension displays a browser notification showing the product name, price, and image, with action buttons to "View Product" or "Not Interested". This helps users remember to reconsider purchases they previously wanted to delay, supporting the extension's core purpose of promoting thoughtful purchasing decisions.
+
+---
+
+5. REMOTE CODE JUSTIFICATION
+-----------------------------
+The extension does not use remote code execution (eval, Function constructor, or dynamically loaded external scripts). All code is bundled and included in the extension package. The extension uses standard JavaScript timing functions (setTimeout/setInterval) only for UI animations and delays, not for executing dynamic code.
+
+---
+
+6. STORAGE JUSTIFICATION
+-------------------------
+The storage permission is used to save user reminders, product information, and settings locally in the browser. This includes: (1) Reminder data (product ID, reminder time, duration, status) for the "Sleep on it" feature, (2) Product information (name, price, image, URL) extracted from Amazon pages, and (3) User preferences and settings. All data is stored locally using chrome.storage.local and never transmitted to external servers. Users can view and manage their reminders through the extension popup.
+
+---
+
+7. TABS JUSTIFICATION
+----------------------
+The tabs permission is used to: (1) Open product pages in new tabs when users click "View Product" from notifications or the popup, and (2) Close the current tab when users choose to dismiss the extension overlay. These actions are only performed in direct response to user interactions and are essential for the extension's core functionality of helping users navigate back to products they wanted to reconsider.
+
+---
+
+8. DATA USAGE CERTIFICATION
+----------------------------
+✓ Check the certification box confirming that your data usage complies with Chrome Web Store Developer Program Policies.
+
+Note: All data is stored locally and never sent to external servers, so you can certify compliance.

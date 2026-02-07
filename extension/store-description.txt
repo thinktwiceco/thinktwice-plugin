@@ -1,0 +1,2 @@
+ThinkTwice is a browser extension that helps users make more thoughtful purchasing decisions on online marketplaces. It intervenes at the moment of purchase with behavioral nudges and prompts users to reconsider their buying decisions. The extension offers a "Sleep on it" reminder system that allows users to set timed notifications to reconsider purchases after 24 hours or custom durations. By promoting delayed gratification and conscious consumption, it helps users avoid impulse purchases and make more intentional buying decisions.
+Currently supported: Amazon
