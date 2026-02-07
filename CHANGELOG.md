@@ -6,15 +6,14 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* **popup:** add re-enable button when plugin is globally closed ([49567be](https://github.com/thinktwiceco/thinktwice-plugin/commit/49567be192d42955a36434e23d8daa38a098ebc0))
-
+- **popup:** add re-enable button when plugin is globally closed ([49567be](https://github.com/thinktwiceco/thinktwice-plugin/commit/49567be192d42955a36434e23d8daa38a098ebc0))
 
 ### Miscellaneous Chores
 
-* **content:** add agent debug logging ([562cd41](https://github.com/thinktwiceco/thinktwice-plugin/commit/562cd4103764a8bb12aa2433b3ecd45e631a2d23))
-* **docs:** format changelog ([a01fa06](https://github.com/thinktwiceco/thinktwice-plugin/commit/a01fa06c0b78c60c9c43578a02f27b45d81d2a08))
-* **docs:** update documenation ([48fae23](https://github.com/thinktwiceco/thinktwice-plugin/commit/48fae233894225f262cc7c307a394f230328db1f))
-* **tests:** Fix unintended mocking ([ea6e9c6](https://github.com/thinktwiceco/thinktwice-plugin/commit/ea6e9c6059ef8e0bf70dd4a0326594536d68b75f))
+- **content:** add agent debug logging ([562cd41](https://github.com/thinktwiceco/thinktwice-plugin/commit/562cd4103764a8bb12aa2433b3ecd45e631a2d23))
+- **docs:** format changelog ([a01fa06](https://github.com/thinktwiceco/thinktwice-plugin/commit/a01fa06c0b78c60c9c43578a02f27b45d81d2a08))
+- **docs:** update documenation ([48fae23](https://github.com/thinktwiceco/thinktwice-plugin/commit/48fae233894225f262cc7c307a394f230328db1f))
+- **tests:** Fix unintended mocking ([ea6e9c6](https://github.com/thinktwiceco/thinktwice-plugin/commit/ea6e9c6059ef8e0bf70dd4a0326594536d68b75f))
 
 ## [0.1.0](https://github.com/thinktwiceco/thinktwice-plugin/compare/v0.0.4...v0.1.0) (2026-01-29)
 
