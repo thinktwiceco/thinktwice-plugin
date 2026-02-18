@@ -1,0 +1,177 @@
+[
+  {
+    "nudge": "68% of impulse buyers regret their purchase later. Pause to reflect!",
+    "theme": "Regret",
+    "type": "Call to action"
+  },
+  {
+    "nudge": "Over $900 is spent yearly on items people later regret buying.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "79% of shoppers buy items they never use. Will you?",
+    "theme": "Regret",
+    "type": "Call to action"
+  },
+  {
+    "nudge": "25% of impulse buys are never or rarely used after purchase.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "56% of online impulse purchases bring buyer's remorse.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "71% of people regret their spending habits at some point. Will you?",
+    "theme": "Regret",
+    "type": "Call to action"
+  },
+  {
+    "nudge": "78% have felt regret immediately after a purchase. Pause now!",
+    "theme": "Regret",
+    "type": "Call to action"
+  },
+  {
+    "nudge": "Nearly 3 in 4 Americans want to save more and never do. Is it time to start?",
+    "theme": "Financial",
+    "type": "Call to action"
+  },
+  {
+    "nudge": "Landfills overflow with perfectly usable goods. Pause before buying.",
+    "theme": "Environmental",
+    "type": "Call to action"
+  },
+  {
+    "nudge": "Recycling helps but reducing is even more powerful.",
+    "theme": "Environmental",
+    "type": "Statement"
+  },
+  {
+    "nudge": "Do I really need this or just want it for a moment?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "Will this item improve my life or clutter it?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "Is there a more sustainable way to get this?",
+    "theme": "Environmental",
+    "type": "Question"
+  },
+  {
+    "nudge": "Would saving this money instead feel better later?",
+    "theme": "Financial",
+    "type": "Question"
+  },
+  {
+    "nudge": "Will this purchase create waste later?",
+    "theme": "Environmental",
+    "type": "Question"
+  },
+  {
+    "nudge": "Do you own something similar already?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "How will this choice impact you savings goals?",
+    "theme": "Financial",
+    "type": "Question"
+  },
+  {
+    "nudge": "Every purchase adds up. Do you really need this?",
+    "theme": "Financial",
+    "type": "Question"
+  },
+  {
+    "nudge": "3 in 5 people hide items they regret buying at home.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "Will you still be happy you bought this in a month?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "Less stuff = More freedom. Buy thoughtfully.",
+    "theme": "Mindfulness",
+    "type": "Call to action"
+  },
+  {
+    "nudge": "Buying less is the ultimate power move.",
+    "theme": "Mindfulness",
+    "type": "Statement"
+  },
+  {
+    "nudge": "2 out of 3 buyers regret their online impulse purchases.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "About 80% of people buy items they never use.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "Shoppers spend around $1,000 a year on purchases they later regret.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "Over a lifetime, buyers waste $70k on disappointing online purchases.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "3 out of 4 shoppers have regrets about their spending habits.",
+    "theme": "Regret",
+    "type": "Statistic"
+  },
+  {
+    "nudge": "#1 regret of retirees is wishing they'd saved more. Is it time to start?",
+    "theme": "Financial",
+    "type": "Call to action"
+  },
+  {
+    "nudge": "Will this bring you joy after you buy it?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "Will this item improve your life?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "Is this a want or a need?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "Will you love or regret this purchase in a month?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "Do you already own something similar you can use?",
+    "theme": "Mindfulness",
+    "type": "Question"
+  },
+  {
+    "nudge": "Shopping less reduces stress and raises savings.",
+    "theme": "Mindfulness",
+    "type": "Statement"
+  },
+  {
+    "nudge": "A pause is the first step to intentional spending.",
+    "theme": "Mindfulness",
+    "type": "Statement"
+  }
+]

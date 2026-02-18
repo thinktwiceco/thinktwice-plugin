@@ -1,10 +1,16 @@
-import { commonSpacing, iconSize, spacing, textSize } from "../../design-system"
+import { commonSpacing, spacing, textSize } from "../../design-system"
 
 type ButtonProps = {
   children: React.ReactNode
   onClick?: () => void
-  variant: "primary" | "secondary" | "tertiary" | "disabled"
+  variant:
+    | "primary"
+    | "primaryEmphasized"
+    | "secondary"
+    | "tertiary"
+    | "disabled"
   icon?: string
+  iconSize?: string
   disabled?: boolean
 }
 
@@ -13,6 +19,7 @@ const Button = ({
   onClick,
   variant,
   icon,
+  iconSize: iconSizeProp,
   disabled
 }: ButtonProps) => {
   const getButtonStyle = (variant, isDisabled) => {
@@ -21,6 +28,7 @@ const Button = ({
       border: "none",
       padding: commonSpacing.buttonPadding,
       fontSize: textSize.md,
+      minHeight: "48px",
       cursor: isDisabled ? "not-allowed" : "pointer",
       display: "flex",
       alignItems: "center",
@@ -38,17 +46,27 @@ const Button = ({
           backgroundColor: "var(--primary-button-color)",
           color: "#065F46"
         }
+      case "primaryEmphasized":
+        return {
+          ...baseStyle,
+          backgroundColor: "var(--primary-button-color)",
+          color: "#044d3a",
+          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.22)",
+          padding: `${spacing.md} ${spacing.xxl}`,
+          fontSize: textSize.lg
+        }
       case "secondary":
         return {
           ...baseStyle,
           backgroundColor: "var(--secondary-button-color)",
-          color: "#223573"
+          color: "#36497f"
         }
       case "tertiary":
         return {
           ...baseStyle,
           backgroundColor: "var(--tertiary-button-color)",
-          color: "#7F1D1D"
+          color: "#7F1D1D",
+          whiteSpace: "nowrap"
         }
       case "disabled":
         return {
@@ -75,7 +93,10 @@ const Button = ({
         <img
           src={icon}
           alt="icon"
-          style={{ width: iconSize.medium, height: iconSize.medium }}
+          style={{
+            width: iconSizeProp ?? "24px",
+            height: iconSizeProp ?? "24px"
+          }}
         />
       )}
       {children}

@@ -55,7 +55,11 @@
     "web_accessible_resources": [
       {
         "resources": [
+          "assets/icons/Icons/clock_blue_outline.png",
+          "assets/icons/Icons/hands-clapping-green.png",
+          "assets/icons/Icons/shooting_star_red.png",
           "assets/icons/Icons/Thoughtful.svg",
+          "assets/icons/Icons/lightbulb_solid.png",
           "assets/icons/Icons/Lightbulb.svg",
           "assets/icons/Icons/Clock.svg",
           "assets/icons/Icons/Trophy.svg",
