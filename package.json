@@ -50,8 +50,7 @@
     "permissions": [
       "storage",
       "alarms",
-      "notifications",
-      "tabs"
+      "notifications"
     ],
     "web_accessible_resources": [
       {
