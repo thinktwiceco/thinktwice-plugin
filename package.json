@@ -1,7 +1,7 @@
 {
   "name": "maurice-plugin",
   "displayName": "Think Twice",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Reminds you to think twice before buying!",
   "author": "Thinktwiceco",
   "scripts": {
