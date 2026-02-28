@@ -77,6 +77,8 @@ const ProductView = ({
   }
 
   const handleIDontNeedIt = async () => {
+    onShowIDontNeedIt(product)
+
     if (product) {
       try {
         await ProductActionManager.dontNeedIt(product)
@@ -84,10 +86,11 @@ const ProductView = ({
         console.error("[ProductView] Failed to execute dontNeedIt:", error)
       }
     }
-    onShowIDontNeedIt(product)
   }
 
   const handleINeedIt = async () => {
+    onShowINeedIt()
+
     if (product) {
       try {
         await ProductActionManager.needIt(product)
@@ -95,7 +98,6 @@ const ProductView = ({
         console.error("[ProductView] Failed to execute needIt:", error)
       }
     }
-    onShowINeedIt()
   }
 
   const handleCloseClick = () => {
