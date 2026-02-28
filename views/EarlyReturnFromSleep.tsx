@@ -12,7 +12,7 @@
  * - Button options: "I need this now" / "I'll wait" / "I don't need it"
  */
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import clockIcon from "url:../assets/icons/Icons/Clock.svg"
 
 import Button from "../components/ui/Button"
@@ -54,29 +54,45 @@ const EarlyReturnFromSleep = ({
 }: EarlyReturnFromSleepProps) => {
   const [showCelebration, setShowCelebration] = useState(false)
   const [processing, setProcessing] = useState(false)
+  const [countdown, setCountdown] = useState<number | null>(null)
 
   // Calculate actual time waited
   const timeWaitedFormatted = formatDuration(Date.now() - reminderStartTime)
 
+  // Handle countdown and tab close
+  useEffect(() => {
+    if (countdown === null) return
+
+    if (countdown === 0) {
+      // Close the tab when countdown reaches 0
+      const closeTab = async () => {
+        console.log("[EarlyReturnFromSleep] Requesting tab close...")
+        try {
+          await ChromeMessaging.closeCurrentTab()
+          console.log("[EarlyReturnFromSleep] Tab close request successful")
+        } catch (error) {
+          console.error("[EarlyReturnFromSleep] Tab close failed:", error)
+          if (onClose) {
+            onClose()
+          }
+        }
+      }
+      closeTab()
+      return
+    }
+
+    // Decrement countdown every second
+    const timer = setTimeout(() => {
+      setCountdown(countdown - 1)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [countdown, onClose])
+
   const handleKeepWaiting = async () => {
     setProcessing(true)
     setShowCelebration(true)
-
-    // Wait 2 seconds to show celebration message, then close tab
-    setTimeout(async () => {
-      console.log("[EarlyReturnFromSleep] Requesting tab close...")
-
-      try {
-        await ChromeMessaging.closeCurrentTab()
-        console.log("[EarlyReturnFromSleep] Tab close request successful")
-      } catch (error) {
-        console.error("[EarlyReturnFromSleep] Tab close failed:", error)
-        // Fallback: hide the overlay
-        if (onClose) {
-          onClose()
-        }
-      }
-    }, 2000)
+    setCountdown(5) // Start 5-second countdown
   }
 
   const handleINeedIt = async () => {
@@ -113,16 +129,7 @@ const EarlyReturnFromSleep = ({
       }
     }
     setShowCelebration(true)
-
-    // Wait 2 seconds to show celebration message, then close tab
-    setTimeout(async () => {
-      try {
-        await ChromeMessaging.closeCurrentTab()
-      } catch (error) {
-        console.error("[EarlyReturnFromSleep] Tab close failed:", error)
-        if (onClose) onClose()
-      }
-    }, 2000)
+    setCountdown(5) // Start 5-second countdown
   }
 
   if (showCelebration) {
@@ -131,7 +138,11 @@ const EarlyReturnFromSleep = ({
         icon={clockIcon}
         iconAlt="clock"
         title="🎉 Great choice! Keep it up!"
-        subtitle="Closing tab..."
+        subtitle={
+          countdown !== null && countdown > 0
+            ? `Closing tab in ${countdown}`
+            : "Closing tab..."
+        }
         onClose={onClose}
       />
     )
