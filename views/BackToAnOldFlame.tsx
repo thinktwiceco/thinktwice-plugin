@@ -13,6 +13,9 @@
  */
 
 import { useEffect, useState } from "react"
+import clockIcon from "url:../assets/icons/Icons/clock_blue_outline.png"
+import handsClappingIcon from "url:../assets/icons/Icons/hands-clapping-green.png"
+import trophyIcon from "url:../assets/icons/Icons/shooting_star_red.png"
 import thoughtfulIcon from "url:../assets/icons/Icons/Thoughtful.svg"
 
 import Button from "../components/ui/Button"
@@ -176,16 +179,26 @@ const BackToAnOldFlame = ({
       </p>
 
       <div style={actionsStyle}>
-        <Button variant="primary" onClick={handleINeedIt} disabled={processing}>
+        <Button
+          variant="primary"
+          icon={trophyIcon}
+          iconSize="26px"
+          onClick={handleINeedIt}
+          disabled={processing}>
           Yes, I want it
         </Button>
         <Button
           variant="secondary"
+          icon={handsClappingIcon}
           onClick={handleDontNeedIt}
           disabled={processing}>
           I don&apos;t need it
         </Button>
-        <Button variant="tertiary" onClick={onClose} disabled={processing}>
+        <Button
+          variant="tertiary"
+          icon={clockIcon}
+          onClick={onClose}
+          disabled={processing}>
           I&apos;m still not sure
         </Button>
       </div>
