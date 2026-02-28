@@ -36,19 +36,44 @@ const optionsContainerStyle: React.CSSProperties = {
 }
 
 const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
-  // Handle tab close after celebration
-  const handleCelebrationClose = async () => {
-    console.log("[IDontNeedIt] Requesting tab close...")
-    try {
-      await ChromeMessaging.closeCurrentTab()
-      console.log("[IDontNeedIt] Tab close successful")
-    } catch (error) {
-      console.error("[IDontNeedIt] Tab close failed:", error)
-      if (onClose) {
-        onClose()
-      }
+  const [countdown, setCountdown] = React.useState<number | null>(null)
+
+  // Handle countdown and tab close
+  React.useEffect(() => {
+    if (countdown === null && !SHOW_INVESTMENT_OPTIONS) {
+      // Start countdown after component mounts
+      setCountdown(5)
     }
-  }
+  }, [])
+
+  React.useEffect(() => {
+    if (countdown === null) return
+
+    if (countdown === 0) {
+      // Close the tab when countdown reaches 0
+      const closeTab = async () => {
+        console.log("[IDontNeedIt] Requesting tab close...")
+        try {
+          await ChromeMessaging.closeCurrentTab()
+          console.log("[IDontNeedIt] Tab close successful")
+        } catch (error) {
+          console.error("[IDontNeedIt] Tab close failed:", error)
+          if (onClose) {
+            onClose()
+          }
+        }
+      }
+      closeTab()
+      return
+    }
+
+    // Decrement countdown every second
+    const timer = setTimeout(() => {
+      setCountdown(countdown - 1)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [countdown, onClose])
 
   // When feature flag is disabled, show celebration instead of investment options
   if (!SHOW_INVESTMENT_OPTIONS) {
@@ -57,10 +82,13 @@ const IDontNeedIt = ({ onBack, onClose }: IDontNeedItProps) => {
         icon={trophyIcon}
         iconAlt="trophy"
         title="Well done for choosing not to buy! 🎉"
-        subtitle="Your future self will thank you for being so thoughtful."
-        autoCloseDelay={4000}
+        subtitle={
+          countdown !== null
+            ? `Closing tab in ${countdown}`
+            : "Your future self will thank you for being so thoughtful."
+        }
         onBack={onBack}
-        onClose={handleCelebrationClose}
+        onClose={onClose}
       />
     )
   }

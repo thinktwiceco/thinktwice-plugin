@@ -12,7 +12,7 @@
  * - Button options: "Yes, I want it" / "I don't need it" / "I'm still not sure"
  */
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import thoughtfulIcon from "url:../assets/icons/Icons/Thoughtful.svg"
 
 import Button from "../components/ui/Button"
@@ -51,9 +51,40 @@ const BackToAnOldFlame = ({
     "dontNeed" | "needIt" | null
   >(null)
   const [processing, setProcessing] = useState(false)
+  const [countdown, setCountdown] = useState<number | null>(null)
 
   // Calculate actual time waited
   const timeWaitedFormatted = formatDuration(Date.now() - reminderStartTime)
+
+  // Handle countdown and tab close
+  useEffect(() => {
+    if (countdown === null) return
+
+    if (countdown === 0) {
+      // Close the tab when countdown reaches 0
+      const closeTab = async () => {
+        console.log("[BackToAnOldFlame] Requesting tab close...")
+        try {
+          await ChromeMessaging.closeCurrentTab()
+          console.log("[BackToAnOldFlame] Tab close request successful")
+        } catch (error) {
+          console.error("[BackToAnOldFlame] Tab close failed:", error)
+          if (onClose) {
+            onClose()
+          }
+        }
+      }
+      closeTab()
+      return
+    }
+
+    // Decrement countdown every second
+    const timer = setTimeout(() => {
+      setCountdown(countdown - 1)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [countdown, onClose])
 
   const handleDontNeedIt = async () => {
     setProcessing(true)
@@ -69,6 +100,7 @@ const BackToAnOldFlame = ({
     }
 
     setCelebrationType("dontNeed")
+    setCountdown(5) // Start 5-second countdown
   }
 
   const handleINeedIt = async () => {
@@ -91,30 +123,18 @@ const BackToAnOldFlame = ({
     setCelebrationType("needIt")
   }
 
-  const handleCelebrationClose = async () => {
-    console.log("[BackToAnOldFlame] Requesting tab close after celebration...")
-
-    try {
-      await ChromeMessaging.closeCurrentTab()
-      console.log("[BackToAnOldFlame] Tab close request successful")
-    } catch (error) {
-      console.error("[BackToAnOldFlame] Tab close failed:", error)
-      // Fallback: hide the overlay
-      if (onClose) {
-        onClose()
-      }
-    }
-  }
-
   if (celebrationType === "dontNeed") {
     return (
       <Celebration
         icon={thoughtfulIcon}
         iconAlt="thoughtful"
         title="🎉 Awesome!"
-        subtitle="Closing tab..."
-        autoCloseDelay={2000}
-        onClose={handleCelebrationClose}
+        subtitle={
+          countdown !== null && countdown > 0
+            ? `Closing tab in ${countdown}`
+            : "Closing tab..."
+        }
+        onClose={onClose}
       />
     )
   }

@@ -50,6 +50,7 @@ const SleepOnIt = ({
   ) // Default: 24 hours
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [countdown, setCountdown] = useState<number | null>(null)
 
   const durationOptions = [
     { label: "1 minute", value: 1 * 60 * 1000 },
@@ -97,6 +98,7 @@ const SleepOnIt = ({
       console.log("[SleepOnIt] Reminder saved successfully")
 
       setSaved(true)
+      setCountdown(5) // Start countdown when saved
     } catch (error) {
       console.error("[SleepOnIt] Failed to save reminder:", error)
       alert("Failed to save reminder. Please check the console for details.")
@@ -105,30 +107,35 @@ const SleepOnIt = ({
     }
   }
 
-  // Auto-close tab after 4 seconds when reminder is saved
+  // Handle countdown and tab close
   useEffect(() => {
-    if (saved) {
-      console.log(
-        "[SleepOnIt] Reminder saved, scheduling tab close in 4 seconds..."
-      )
-      const timer = setTimeout(async () => {
-        console.log("[SleepOnIt] Requesting tab close...")
+    if (countdown === null) return
 
+    if (countdown === 0) {
+      // Close the tab when countdown reaches 0
+      const closeTab = async () => {
+        console.log("[SleepOnIt] Requesting tab close...")
         try {
           await ChromeMessaging.closeCurrentTab()
           console.log("[SleepOnIt] Tab close request successful")
         } catch (error) {
           console.error("[SleepOnIt] Tab close failed:", error)
-          // Fallback: hide the overlay
           if (onClose) {
             onClose()
           }
         }
-      }, 4000) // 4 seconds
-
-      return () => clearTimeout(timer)
+      }
+      closeTab()
+      return
     }
-  }, [saved, onClose])
+
+    // Decrement countdown every second
+    const timer = setTimeout(() => {
+      setCountdown(countdown - 1)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [countdown, onClose])
 
   return (
     <Card footer={<PrivacyBadge />}>
@@ -176,7 +183,9 @@ const SleepOnIt = ({
         </>
       ) : (
         <p style={successStyle}>
-          ✓ Reminder saved! Hold tight and remember about the goal!
+          {countdown !== null && countdown > 0
+            ? `Closing tab in ${countdown}`
+            : "✓ Reminder saved!"}
         </p>
       )}
     </Card>
