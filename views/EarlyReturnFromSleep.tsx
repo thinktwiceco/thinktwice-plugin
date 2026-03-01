@@ -13,7 +13,10 @@
  */
 
 import { useEffect, useState } from "react"
+import alarmIcon from "url:../assets/icons/Icons/clock_blue_outline.png"
 import clockIcon from "url:../assets/icons/Icons/Clock.svg"
+import handsClappingIcon from "url:../assets/icons/Icons/hands-clapping-green.png"
+import trophyIcon from "url:../assets/icons/Icons/shooting_star_red.png"
 
 import Button from "../components/ui/Button"
 import Card from "../components/ui/Card"
@@ -167,20 +170,27 @@ const EarlyReturnFromSleep = ({
       <p style={subtitleStyle}>Have you made a decision?</p>
 
       <div style={actionsStyle}>
-        <Button variant="primary" onClick={handleINeedIt} disabled={processing}>
-          I need this now
-        </Button>
         <Button
-          variant="secondary"
-          onClick={handleKeepWaiting}
-          disabled={processing}>
-          I&apos;ll wait
-        </Button>
-        <Button
-          variant="tertiary"
+          variant="primaryEmphasized"
+          icon={handsClappingIcon}
           onClick={handleIDontNeedIt}
           disabled={processing}>
           I don&apos;t need it
+        </Button>
+        <Button
+          variant="secondary"
+          icon={alarmIcon}
+          onClick={handleKeepWaiting}
+          disabled={processing}>
+          Sleep on it
+        </Button>
+        <Button
+          variant="tertiary"
+          icon={trophyIcon}
+          iconSize="26px"
+          onClick={handleINeedIt}
+          disabled={processing}>
+          I need this now
         </Button>
       </div>
     </Card>

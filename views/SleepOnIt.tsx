@@ -151,14 +151,17 @@ const SleepOnIt = ({
         }
       />
       <h1 style={titleStyle}>Brilliant choice!</h1>
-      <p style={subtitleStyle}>
-        Taking time to think is a superpower. How long would you like to wait?
-      </p>
-
       {!saved ? (
         <>
-          <p style={{ ...subtitleStyle, marginBottom: spacing.md }}>
-            For how long you would like to think about this purchase?
+          <p
+            style={{
+              ...subtitleStyle,
+              marginBottom: spacing.md,
+              lineHeight: 1.2
+            }}>
+            Taking time to think is a superpower.
+            <br />
+            How long would you like to wait?
           </p>
           <div style={durationOptionsStyle}>
             {durationOptions.map((option) => (
@@ -182,11 +185,20 @@ const SleepOnIt = ({
           </Button>
         </>
       ) : (
-        <p style={successStyle}>
-          {countdown !== null && countdown > 0
-            ? `Closing tab in ${countdown}`
-            : "✓ Reminder saved!"}
-        </p>
+        <>
+          <p style={{ ...successStyle, marginBottom: spacing.md }}>
+            ✓ Reminder saved
+          </p>
+          <p style={{ ...subtitleStyle, marginBottom: spacing.md }}>
+            You have committed to waiting{" "}
+            {durationOptions.find((o) => o.value === selectedDuration)?.label ??
+              "this duration"}
+            . You can do it!
+          </p>
+          {countdown !== null && countdown > 0 && (
+            <p style={successStyle}>Closing tab in {countdown}</p>
+          )}
+        </>
       )}
     </Card>
   )
