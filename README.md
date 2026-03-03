@@ -1,4 +1,5 @@
 [![Lint and Format](https://github.com/thinktwiceco/thinktwice-plugin/actions/workflows/lint-and-format.yml/badge.svg)](https://github.com/thinktwiceco/thinktwice-plugin/actions/workflows/lint-and-format.yml)
+[![E2E Tests](https://github.com/thinktwiceco/thinktwice-plugin/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/thinktwiceco/thinktwice-plugin/actions/workflows/e2e-tests.yml)
 
 # ThinkTwice 🤔
 
